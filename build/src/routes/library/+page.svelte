@@ -1,6 +1,6 @@
 <style>
-    :global(body) {
-        margin: 0;
+    :root {
+        --lib-manga-height: 300px;
     }
     #lib-manga-section {
         display: flex;
@@ -13,20 +13,33 @@
     .manga {
         text-align: center;
         width: fit-content;
+        text-decoration: none;
+        color: white;
+        margin: 5px;
     }
     .manga-wrap {
         display: flex;
         justify-content: center;
         align-items: center;
-        width: 200px;
-        height: 300px;
-        margin: 5px;
+        width: calc(0.5*var(--lib-manga-height) + 50px);
+        height: var(--lib-manga-height);
         border-radius: 5px;
         overflow: hidden;
     }
     .manga-wrap img {
         width: auto;
         height: 105%;
+    }
+    .manga p {
+        margin: 0;
+        padding: 0;
+        width: calc(0.5*var(--lib-manga-height) + 50px);
+        height: 1.5em;
+        font-size: x-small;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        line-clamp: 2;
     }
 </style>
 
@@ -55,9 +68,9 @@
 {#each library as l, i}
     <a class="manga" href="/manga/{l.id}">
         <div class="manga-wrap">
-            <img class="temp" src={l.img} alt={l.title}/>
-            <!-- <p>{l.title}</p> -->
+            <img src={l.img} alt={l.title}/>
         </div>
+        <p>{l.title}</p>
     </a>
 {/each}
 </div>

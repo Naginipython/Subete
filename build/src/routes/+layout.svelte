@@ -1,12 +1,10 @@
 <style>
-    :global(body) {
-        margin: 0;
-    }
     :root {
         --snackbar-height: 25px;
         --nav-bar-height: 50px;
         --primary-color: #1a1a1a;
         --secondary-color: #330000;
+        --selection-color: maroon;
     }
     #snackbar {
         height: var(--snackbar-height);
@@ -24,7 +22,7 @@
         height: inherit;
     }
     .snackbar-item:hover {
-        background-color: maroon;
+        background-color: var(--selection-color);
     }
     #body {
         height: calc(100vh - var(--snackbar-height) - var(--nav-bar-height));
@@ -59,7 +57,7 @@
         border-right: 1px solid black;
     }
     .selected {
-        background-color: maroon;
+        background-color: var(--selection-color);
         border-radius: 15px;
     }
 </style>
@@ -67,9 +65,9 @@
 <script>
     import { navigating } from '$app/stores';
     import { invoke } from '@tauri-apps/api/tauri';
-    import Fa from 'svelte-fa'
     import { faFilter, faMagnifyingGlass, faEllipsisVertical } from '@fortawesome/free-solid-svg-icons'
     import { onMount } from "svelte";
+    import Fa from 'svelte-fa'
     import store from "$lib/store.js";
 
     onMount(async () => {
@@ -106,7 +104,7 @@
             document.getElementById("nav-centered").style.display = "block";
         }
     }
-//  PRIMARY APP COMMANDS & KEYS
+    // PRIMARY APP COMMANDS & KEYS
     window.addEventListener('keydown', handleKeydown);
     function handleKeydown(event) {
         if (event.ctrlKey && event.key === 'a') {

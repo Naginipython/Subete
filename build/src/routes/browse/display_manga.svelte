@@ -1,27 +1,39 @@
 <style>
-    /* manga (TO CHANGE) */
+    :root {
+        --manga-height: 200px; /* pref digit of 100 */
+    }
     .manga-section {
         overflow: hidden;
         white-space: nowrap;
         cursor: grab;
+        display: flex;
     }
     .manga {
-        padding: 0 5px;
+        display: inline-block;
+		scroll-snap-align: start;
+        text-align: center;
+        width: fit-content;
         text-decoration: none;
         color: white;
-        display: inline-block;
-		height: 100vh;
-		scroll-snap-align: start;
-		position: relative;
-        width: 200px;
+        margin: 5px;
     }
-    .manga img {
-        width: 200px;
+    .manga-wrap {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: calc(0.5*var(--manga-height) + 50px);
+        height: var(--manga-height);
+        border-radius: 5px;
+        overflow: hidden;
+    }
+    .manga-wrap img {
+        width: auto;
+        height: 105%;
     }
     .manga p {
         margin: 0;
         padding: 0;
-        width: 200px;
+        width: calc(0.5*var(--manga-height) + 50px);
         height: 2em;
         font-size: x-small;
         /* white-space: wrap; */
@@ -59,8 +71,6 @@
     };
 </script>
 
-<!-- display manga (only mangadex rn) -->
-<p>MangaDex <br><span style="font-size: small;">English</span></p>
 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 <div class="manga-section"
     bind:this={scrollContainer}
@@ -73,7 +83,9 @@
     {#each data as d, i} <!-- can change d to {varname varname}, example {img, title}. i exists to find index -->
 
         <a class="manga" href="/manga/{d.id}">
-            <img src={d.img} alt={d.title}/>
+            <div class="manga-wrap">
+                <img src={d.img} alt={d.title}/>
+            </div>
             <p>{d.title}</p>
         </a>
 

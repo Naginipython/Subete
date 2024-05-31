@@ -4,47 +4,72 @@
     import { searchManga } from "$lib/manga_sources/main.js";
 
     let name = '';
-    let data = [];
+    let results = [];
 
     store.subscribe(json => {
-        data = json["search_results"];
+        results = json["search_results"];
+        reformatResults();
         return json;
     });
 
     async function search() {
-        data = [];
-
-        let temp = await searchManga(name);
-        data = temp[0].data;
+        results = [];
+        results = await searchManga(name);
         
         store.update(json => {
-            json.search_results = data;
+            json.search_results = results;
             return json;
         });
-        data = data;
+        
+        reformatResults();
+    }
+
+    function reformatResults() {
+        // Exports the extention name to the outside.
+        // Turns a array of everything into:
+        // [{extention: string, data: []}]
+        if (!results.some(a => a.hasOwnProperty('data'))) {
+            results = Object.values(
+                results.reduce((result, item) => {
+                    let extention = item.extention;
+                    if (!result[extention]) {
+                        result[extention] = {extention: extention, data: []};
+                    }
+                    result[extention]['data'].push(item);
+                    return result;
+                }, {})
+            );
+        }
     }
 </script>
 
 <div>
     <!-- Search box -->
-    <form style="display:flex; justify-content:center">
+    <form id="form">
         <input id="input" placeholder="Enter a title..." bind:value="{name}" />
         <button id="search" on:click="{search}">&gt;</button><br>
     </form>
 
     <!-- displays manga -->
-    <DisplayManga {data}/>
+    {#each results as item, i}
+        <h3>{item.extention}</h3>
+        <DisplayManga data={item.data}/>
+    {/each}
 
 </div>
 <style>
-    :global(body) {
-        margin: 0;
-    }
     /* Searchbox (TO CHANGE) */
+    #form {
+        margin: 10px;
+        display: flex; 
+        justify-content: center
+    }
     #input {
         appearance: none;
         border: 1px solid black;
         width: 95vw;
+        background-color: var(--secondary-color);
+        color: white;
     }
     #search {
         appearance: none;
@@ -54,5 +79,7 @@
         padding: 1px 6px;
         border-radius: 0 5px 5px 0;
         margin-left: -5px;
+        background-color: var(--secondary-color);
+        color: white;
     }
 </style>

@@ -3,24 +3,21 @@
  * 
  * @param {string} query - String to be used to query the source
  * 
- * @returns {{
+ * @returns {Array<{
+ *      id: string,
+ *      title: string,
+ *      img: string,
  *      extention: string,
- *      data: Array<{
+ *      authors: string,
+ *      artists: string,
+ *      description: string,
+ *      chapters: Array<{
  *          id: string,
+ *          num: number,
  *          title: string,
- *          img: string,
- *          extention: string,
- *          authors: string,
- *          artists: string,
- *          description: string,
- *          chapters: Array<{
- *              id: string,
- *              num: number,
- *              title: string,
- *              page: number
- *          }>
+ *          page: number
  *      }>
- * }} 
+ * }>} 
  */
 export async function search(query) {
     let data = [];
@@ -39,15 +36,23 @@ export async function search(query) {
         let author_names = d['relationships'].filter(x => x.type == "author").map(y => y['attributes']['name']);
         let artist_names = d['relationships'].filter(x => x.type == "artist").map(y => y['attributes']['name']);
         temp['authors'] = author_names.join(', ');
-        console.log(temp['authors']);
         temp['artists'] = artist_names.join(', ');
-        console.log(temp['artists']);
         data.push(temp);
     }
-    return {
-        "extention": "mangadex",
-        "data": data,
-    };
+    return data;
+}
+
+export async function getChapters(id) {
+    let body = await fetch(`https://api.mangadex.org/manga/${id}/feed?limit=500&order[chapter]=asc&translatedLanguage[]=en`);
+    let res = await body.json();
+    return res['data'].map(e => {
+        return {
+            number: parseInt(e['attributes']['chapter']),
+            id: e['id'],
+            title: e['attributes']['title'] == "" || e['attributes']['title'] == null? `Chapter ${e['attributes']['chapter']}` : e['attributes']['title'],
+            page: 1,
+        }
+    });
 }
 
 /**
@@ -57,7 +62,7 @@ export async function search(query) {
  * 
  * @returns {Array<string>} 
  */
-export async function get_chapters(id) {
+export async function getChapterPages(id) {
     let body = await fetch(`https://api.mangadex.org/at-home/server/${id}`);
     let res = await body.json();
     let hash = res['chapter']['hash'];

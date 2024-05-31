@@ -1,13 +1,15 @@
 <script>
     import { invoke } from '@tauri-apps/api/tauri';
-    import store from "$lib/store.js"
     import { navigating } from '$app/stores';
+    import store from "$lib/store.js"
+    import { getChapters } from "$lib/manga_sources/main.js";
 
     export let data;
 
     let manga = {};
     let favorited = false;
 
+    // Adds to history when data is available
     $: if (Object.keys(manga).length != 0) {
         store.update(json => {
             json.history.push(manga);
@@ -33,22 +35,24 @@
 
     store.subscribe(async (json) => {
         // gets manga search details
-        let search_test = json.search_results.find(m => m.id == data.id);
-        if (search_test == undefined) {
-            let manga_test = json.library.find(m => m.id == data.id);
-            if (manga_test == undefined) {
+        // todo: this doesnt work because object is search_results[#]['data']
+        let manga_test = json.library.find(m => m.id == data.id);
+        if (manga_test == undefined) {
+            let search_test = json.search_results.find(m => m.id == data.id);
+            if (search_test == undefined) {
                 manga = json.history.find(m => m.id == data.id);
             } else {
-                manga = manga_test;
+                manga = search_test;
             }
         } else {
-            manga = search_test;
+            manga = manga_test;
         }
 
         // gets chapters, if needed
         if (manga['chapters'].length == 0) {
-            manga['chapters'] = await get_chapters();
+            manga['chapters'] = await getChapters(manga.extention, manga.id);
         }
+        console.log(manga['chapters'][0].page);
 
         // checks if in library
         let lib_item = json.library.find(l => l.id == manga.id);
@@ -60,18 +64,6 @@
         back = json.manga_return;
     });
 
-    async function get_chapters() {
-        let body = await fetch(`https://api.mangadex.org/manga/${manga.id}/feed?limit=500&order[chapter]=asc&translatedLanguage[]=en`);
-        let res = await body.json();
-        return res['data'].map(e => {
-            return {
-                number: parseInt(e['attributes']['chapter']),
-                id: e['id'],
-                title: e['attributes']['title'] == "" || e['attributes']['title'] == null? `Chapter ${e['attributes']['chapter']}` : e['attributes']['title'],
-                page: 1,
-            }
-        })
-    }
     async function toggle_fav() {
         favorited = !favorited;
         if (favorited) {
@@ -111,7 +103,12 @@
 
 
 {#each manga['chapters'] as c, i}
-    <a class="btn" href="/manga/{data.id}/reader/{i}">{c.number}: {c.title}</a><br>
+<div class="chapter">
+    <a class="btn" href="/manga/{data.id}/reader/{i}">{c.number}: {c.title}</a>
+    {#if manga['chapters'][i].page-1 != 0}
+        <p class="progress">&emsp;(page: {manga['chapters'][i].page})</p>
+    {/if}
+</div><br>
 {/each}
 
 <style>
@@ -187,7 +184,13 @@
         border-left-color: buttonface;
         box-sizing: border-box;
     }
+    .chapter {
+        display: inline-flex;
+        justify-content: left;
+        align-items: center;
+    }
     .btn {
+        
         background: none;
         color: inherit;
         border: none;
@@ -195,5 +198,11 @@
         font: inherit;
         cursor: pointer;
         outline: inherit;
+    }
+    .progress {
+        color: grey;
+        margin: 0;
+        padding: 0;
+        font-size: x-small;
     }
 </style>

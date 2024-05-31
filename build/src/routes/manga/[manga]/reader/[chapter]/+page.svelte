@@ -1,7 +1,8 @@
 <script>
     import store from "$lib/store.js"
     import { onMount } from "svelte";
-    import { getChapters } from "$lib/manga_sources/main.js"
+    import { invoke } from '@tauri-apps/api/tauri';
+    import { getChapterPages } from "$lib/manga_sources/main.js"
     export let data;
 
     let manga = {};
@@ -16,20 +17,21 @@
     });
 
     store.subscribe(async (json) => {
-        let search_test = json.search_results.find(m => m.id == data.id);
-        if (search_test == undefined) {
-            let manga_test = json.library.find(m => m.id == data.id);
-            if (manga_test == undefined) {
+        let manga_test = json.library.find(m => m.id == data.id);
+        if (manga_test == undefined) {
+            let search_test = json.search_results.find(m => m.id == data.id);
+            if (search_test == undefined) {
                 manga = json.history.find(m => m.id == data.id);
             } else {
-                manga = manga_test;
+                manga = search_test;
             }
         } else {
-            manga = search_test;
+            manga = manga_test;
         }
         
         index = manga['chapters'][data.manga_index].id;
-        chapters = await getChapters("mangadex", index);
+        page = manga['chapters'][data.manga_index].page-1;
+        chapters = await getChapterPages("mangadex", index);
         return json;
     });
 
@@ -39,6 +41,7 @@
             imgs[page++].classList.add('invisible');
             imgs[page].classList.add("visible");
             imgs[page].classList.remove("invisible");
+            manga['chapters'][data.manga_index].page = page+1;
             adjustImage();
         }
     }
@@ -48,7 +51,15 @@
             imgs[page--].classList.add('invisible');
             imgs[page].classList.add("visible");
             imgs[page].classList.remove("invisible");
+            manga['chapters'][data.manga_index].page = page+1;
         }
+    }
+    async function update_lib() {
+        await invoke('update_lib', { item: manga });
+        // store.update(json => {
+        //     json.library.push(manga);
+        //     return json;
+        // });
     }
     function toggle_arrows() {
         let to_toggle = ["next", "prev", "return", "page-num"]
@@ -77,24 +88,26 @@
 
     window.addEventListener('resize', adjustImage);
     function adjustImage() {
-        // Inital sizer
-        if (imgs[page].height > imgs[page].width) {
-            imgs[page].style.height = "100vh";
-            imgs[page].style.width = "auto";
-        } else {
-            imgs[page].style.height = "auto";
-            imgs[page].style.width = "100vw";
-        }
-        // double checking size compared to viewport
-        let width_dif = imgs[page].width - window.innerWidth
-        let height_diff = imgs[page].height - window.innerHeight;
-        if (width_dif > 0) {
-            imgs[page].style.height = "auto";
-            imgs[page].style.width = "100vw";
-        } 
-        if (height_diff > 0) {
-            imgs[page].style.height = "100vh";
-            imgs[page].style.width = "auto";
+        if (imgs[page] != undefined) {
+            // Inital sizer
+            if (imgs[page].height > imgs[page].width) {
+                imgs[page].style.height = "100vh";
+                imgs[page].style.width = "auto";
+            } else {
+                imgs[page].style.height = "auto";
+                imgs[page].style.width = "100vw";
+            }
+            // double checking size compared to viewport
+            let width_dif = imgs[page].width - window.innerWidth
+            let height_diff = imgs[page].height - window.innerHeight;
+            if (width_dif > 0) {
+                imgs[page].style.height = "auto";
+                imgs[page].style.width = "100vw";
+            } 
+            if (height_diff > 0) {
+                imgs[page].style.height = "100vh";
+                imgs[page].style.width = "auto";
+            }
         }
     }
 </script>
@@ -104,11 +117,11 @@
         <button id="prev" class="arrow" on:click={prev} style="opacity: 0%">&lt;</button>
         <button id="show-arrow" on:click={toggle_arrows}></button>
         <button id="next" class="arrow" on:click={next} style="opacity: 0%">&gt;</button>
-        <a id="return" href='/manga/{data.id}' style="opacity: 0%">Return</a>
+        <a id="return" href='/manga/{data.id}' style="opacity: 0%" on:click={update_lib}>Return</a>
     </div>
     <div class="center-img-div">
         {#each chapters as c, i}
-            {#if i == 0}
+            {#if i == manga['chapters'][data.manga_index].page-1}
                 <img on:load={adjustImage} class='visible' src={c} alt="{i} - {manga.title}" />
             {:else}
                 <img class='invisible' src={c} alt={c} />
@@ -140,6 +153,10 @@
         justify-content: center; 
         height: 100vh;
         overflow: hidden;
+    }
+    .center-img-div img {
+        /* Purely to look better when it pops in */
+        height: 0px;
     }
     /* arrows */
     #arrow_div {

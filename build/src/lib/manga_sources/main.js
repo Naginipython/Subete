@@ -31,7 +31,31 @@ export async function searchManga(query) {
     });
 
     results = await Promise.all(modulePromises);
-    return results;
+    return results.flat(1);
+}
+
+/**
+ * Takes in a query, and returns an array of objects with multiple extentions name and data.
+ * 
+ * @param {string} source - String representing a source. Will be combined with './' and '.js', so keep the extention name given in search
+ * @param {string} id - String of the id of a given manga. Used for finding the website details
+ * @returns {Array<{
+ *      id: string,
+ *      num: number,
+ *      title: string,
+ *      page: number
+ * }>} - Array chapter details
+ */
+export async function getChapters(source, id) {
+    const modules = import.meta.glob('./*.js');
+
+    for (const [key, value] of Object.entries(modules)) {
+        if (key == `./${source}.js`) {
+            const { getChapters } = await import(/* @vite-ignore */key);
+            return await getChapters(id);
+        }
+    }
+    return [];
 }
 
 /**
@@ -41,13 +65,13 @@ export async function searchManga(query) {
  * @param {string} id - String of the id of a given manga. Used for finding the website details
  * @returns {Array<string>} - Array of strings for each page link
 */
-export async function getChapters(source, id) {
+export async function getChapterPages(source, id) {
     const modules = import.meta.glob('./*.js');
 
     for (const [key, value] of Object.entries(modules)) {
         if (key == `./${source}.js`) {
-            const { get_chapters } = await import(/* @vite-ignore */key);
-            return await get_chapters(id);
+            const { getChapterPages } = await import(/* @vite-ignore */key);
+            return await getChapterPages(id);
         }
     }
     return [];

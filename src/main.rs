@@ -25,7 +25,7 @@ fn main() {
 
   tauri::Builder::default()
     .invoke_handler(tauri::generate_handler![
-      get_lib, add_to_lib, remove_from_lib
+      get_lib, add_to_lib, remove_from_lib, update_lib
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
@@ -50,6 +50,12 @@ struct ChapterItem {
   page: u32,
 }
 
+fn save(lib: &Vec<LibraryItem>) {
+  let mut file = File::create("library.json").unwrap();
+  let json = serde_json::to_string(&*lib).unwrap();
+  file.write_all(json.as_bytes()).unwrap();
+}
+
 #[tauri::command]
 fn get_lib() -> Value {
   // todo: fix unwraps
@@ -61,20 +67,30 @@ fn get_lib() -> Value {
 fn add_to_lib(new_item: LibraryItem) {
   // todo: fix unwraps
   println!("Adding to library...");
-  let mut file = File::create("library.json").unwrap();
   let mut lib = LIB.lock().unwrap();
   lib.push(new_item);
-  let json = serde_json::to_string(&*lib).unwrap();
-  file.write_all(json.as_bytes()).unwrap();
+  save(&*lib);
+}
+
+#[tauri::command]
+fn update_lib(item: LibraryItem) {
+  let mut lib = LIB.lock().unwrap();
+  for entry in lib.iter_mut() {
+    if entry.id == item.id {
+        *entry = item;
+        save(&*lib);
+        return;
+    }
+  }
+  // If it somehow isn't on the list, add it
+  lib.push(item);
 }
 
 #[tauri::command]
 fn remove_from_lib(id: String) {
   // todo: fix unwraps
   println!("Removing from library...");
-  let mut file = File::create("library.json").unwrap();
   let mut lib = LIB.lock().unwrap();
   lib.retain(|l| l.id != id);
-  let json = serde_json::to_string(&*lib).unwrap();
-  file.write_all(json.as_bytes()).unwrap();
+  save(&*lib);
 }
