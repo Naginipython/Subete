@@ -35,7 +35,7 @@ export async function searchManga(query) {
 }
 
 /**
- * Takes in a query, and returns an array of objects with multiple extentions name and data.
+ * Takes in a source string and an id that the source can use to retrieve the chapter details for a series.
  * 
  * @param {string} source - String representing a source. Will be combined with './' and '.js', so keep the extention name given in search
  * @param {string} id - String of the id of a given manga. Used for finding the website details
@@ -50,7 +50,7 @@ export async function getChapters(source, id) {
     const modules = import.meta.glob('./*.js');
 
     for (const [key, value] of Object.entries(modules)) {
-        if (key == `./${source}.js`) {
+        if (key == `./${source.toLowerCase()}.js`) {
             const { getChapters } = await import(/* @vite-ignore */key);
             return await getChapters(id);
         }
@@ -59,7 +59,7 @@ export async function getChapters(source, id) {
 }
 
 /**
- * Takes in a query, and returns an array of objects with multiple extentions name and data.
+ * Takes in a source string and an id that the source can use to retrieve the chapter pages for a series.
  * 
  * @param {string} source - String representing a source. Will be combined with './' and '.js', so keep the extention name given in search
  * @param {string} id - String of the id of a given manga. Used for finding the website details

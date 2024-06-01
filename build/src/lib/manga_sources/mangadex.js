@@ -30,7 +30,7 @@ export async function search(query) {
         temp['title'] = d['attributes']['title']['en'];
         let filetemp = d["relationships"].filter(o => o.type == "cover_art")[0];
         temp['img'] = `https://uploads.mangadex.org/covers/${temp['id']}/${filetemp['attributes']['fileName']}`;
-        temp['extention'] = "mangadex";
+        temp['extention'] = "MangaDex";
         temp['description'] = d['attributes']['description']['en'];
         temp['chapters'] = [];
         let author_names = d['relationships'].filter(x => x.type == "author").map(y => y['attributes']['name']);
@@ -42,6 +42,17 @@ export async function search(query) {
     return data;
 }
 
+/**
+ * Takes in an id that the source can use to retrieve the chapter details for a series.
+ * 
+ * @param {string} id - String of the id of a given manga. Used for finding the website details
+ * @returns {Array<{
+ *      id: string,
+ *      number: number,
+ *      title: string,
+ *      page: number
+ * }>} - Array chapter details
+ */
 export async function getChapters(id) {
     let body = await fetch(`https://api.mangadex.org/manga/${id}/feed?limit=500&order[chapter]=asc&translatedLanguage[]=en`);
     let res = await body.json();
@@ -56,7 +67,7 @@ export async function getChapters(id) {
 }
 
 /**
- * Gets an array of chapter links
+ * Takes in an id that the source can use to retrieve the chapter pages for a series.
  * 
  * @param {string} id - String to be used to query the source
  * 

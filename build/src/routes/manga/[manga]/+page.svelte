@@ -52,7 +52,6 @@
         if (manga['chapters'].length == 0) {
             manga['chapters'] = await getChapters(manga.extention, manga.id);
         }
-        console.log(manga['chapters'][0].page);
 
         // checks if in library
         let lib_item = json.library.find(l => l.id == manga.id);
@@ -104,7 +103,13 @@
 
 {#each manga['chapters'] as c, i}
 <div class="chapter">
-    <a class="btn" href="/manga/{data.id}/reader/{i}">{c.number}: {c.title}</a>
+    <a class="btn" href="/manga/{data.id}/reader/{i}">
+        {#if c.title == ""}
+            Chapter {c.number}
+        {:else}
+            {c.number}: {c.title}
+        {/if}
+    </a>
     {#if manga['chapters'][i].page-1 != 0}
         <p class="progress">&emsp;(page: {manga['chapters'][i].page})</p>
     {/if}

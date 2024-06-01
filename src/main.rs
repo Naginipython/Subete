@@ -45,7 +45,7 @@ struct LibraryItem {
 #[derive(Debug, Deserialize, Serialize)]
 struct ChapterItem {
   id: String,
-  number: u32,
+  number: f64,
   title: String,
   page: u32,
 }
