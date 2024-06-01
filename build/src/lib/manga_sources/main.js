@@ -69,7 +69,7 @@ export async function getChapterPages(source, id) {
     const modules = import.meta.glob('./*.js');
 
     for (const [key, value] of Object.entries(modules)) {
-        if (key == `./${source}.js`) {
+        if (key == `./${source.toLowerCase()}.js`) {
             const { getChapterPages } = await import(/* @vite-ignore */key);
             return await getChapterPages(id);
         }

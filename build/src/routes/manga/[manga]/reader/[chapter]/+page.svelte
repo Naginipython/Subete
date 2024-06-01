@@ -31,7 +31,7 @@
         
         index = manga['chapters'][data.manga_index].id;
         page = manga['chapters'][data.manga_index].page-1;
-        chapters = await getChapterPages("mangadex", index);
+        chapters = await getChapterPages(manga.extention, index);
         return json;
     });
 
