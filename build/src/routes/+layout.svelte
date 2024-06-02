@@ -80,21 +80,38 @@
 
     // Redirect Manager
     $: if($navigating) {
-        document.body.scrollTop;
+        console.log("navigated")
         page_check()
     };
     let selected_valid_links = ["/library", "/updates", "/browse", "/more"];
+    let scroll_memory = {};
     function page_check() {
-        if (selected_valid_links.includes($navigating.to.url.pathname)) {
+        let nav = $navigating.to.url.pathname;
+        let from = $navigating.from.url.pathname
+        // Highlights nav bar items
+        if (selected_valid_links.includes(nav)) {
             // removes selected first from all
             selected_valid_links.forEach(link => {
                 document.getElementById(link).classList.remove("selected");
             });
-            document.getElementById($navigating.to.url.pathname).classList.add("selected");
+            document.getElementById(nav).classList.add("selected");
         }
 
+        // Is topmost for every nav, except '/library'
+        // sets memory
+        scroll_memory[from] = document.getElementById('body').scrollTop;
+        // remembers
+        if (!scroll_memory.hasOwnProperty(nav)) {
+            document.getElementById('body').scrollTop = 0;
+        } else {
+            // required for '/library', seemingly
+            setTimeout(() => document.getElementById('body').scrollTop = scroll_memory[nav], 1);
+        }
 
-        if ($navigating.to.url.pathname.includes("reader")) {
+        console.log(scroll_memory)
+
+        // Removes snackbar and nav for reader
+        if (nav.includes("reader")) {
             document.getElementById("snackbar").style.display = "none";
             document.getElementById("body").style.height = "100vh";
             document.getElementById("nav-centered").style.display = "none";
@@ -109,8 +126,8 @@
     function handleKeydown(event) {
         if (event.ctrlKey && event.key === 'a') {
         // Prevent the default browser action (select all)
-        event.preventDefault();
-        console.log("interesting")
+            event.preventDefault();
+            console.log("interesting")
         }
     }
 </script>
