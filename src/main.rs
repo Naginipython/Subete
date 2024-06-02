@@ -48,6 +48,7 @@ struct ChapterItem {
   number: f64,
   title: String,
   page: u32,
+  completed: bool
 }
 
 fn save(lib: &Vec<LibraryItem>) {

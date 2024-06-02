@@ -1,21 +1,15 @@
 <script>
     import store from "$lib/store.js"
-    import { onMount } from "svelte";
     import { invoke } from '@tauri-apps/api/tauri';
     import { getChapterPages } from "$lib/manga_sources/main.js"
+    import { goto } from "$app/navigation";
     export let data;
 
     let manga = {};
-    let index = -1;
-    let page = 0;
+    let curr_page = 0;
     let imgs = -1;
-    let chapters = []
-
-    onMount(async () => {
-        index = data.manga_index;
-        imgs = document.getElementsByTagName("img");
-    });
-
+    let chapters = [];
+    
     store.subscribe(async (json) => {
         let manga_test = json.library.find(m => m.id == data.id);
         if (manga_test == undefined) {
@@ -28,39 +22,34 @@
         } else {
             manga = manga_test;
         }
+        start_reader(manga['chapters'][data.manga_index].page-1);
         
-        index = manga['chapters'][data.manga_index].id;
-        page = manga['chapters'][data.manga_index].page-1;
-        chapters = await getChapterPages(manga.extention, index);
         return json;
     });
+    async function start_reader(page) {
+        chapters = [];
+        imgs = document.getElementsByTagName("img");
+        chapters = await getChapterPages(manga.extention, manga['chapters'][data.manga_index].id);
+        if (manga['chapters'][data.manga_index].completed && page != Infinity) {
+            console.log("got here")
+            curr_page = 0;
+        } else if (page == Infinity) {
+            curr_page = chapters.length-1;
+        } else {
+            curr_page = page;
+        }
+    }
 
-    function next() {
-        if (page < imgs.length-1) {
-            imgs[page].classList.remove('visible');
-            imgs[page++].classList.add('invisible');
-            imgs[page].classList.add("visible");
-            imgs[page].classList.remove("invisible");
-            manga['chapters'][data.manga_index].page = page+1;
-            adjustImage();
-        }
+    $: if (imgs.length > 0) {
+        if (curr_page >= imgs.length-1) manga['chapters'][data.manga_index].completed = true;
+        else manga['chapters'][data.manga_index].completed = false;
     }
-    function prev() {
-        if (page > 0) {
-            imgs[page].classList.remove('visible');
-            imgs[page--].classList.add('invisible');
-            imgs[page].classList.add("visible");
-            imgs[page].classList.remove("invisible");
-            manga['chapters'][data.manga_index].page = page+1;
-        }
-    }
+    
     async function update_lib() {
         await invoke('update_lib', { item: manga });
-        // store.update(json => {
-        //     json.library.push(manga);
-        //     return json;
-        // });
     }
+
+    // ----- INPUT -----
     function toggle_arrows() {
         let to_toggle = ["next", "prev", "return", "page-num"]
         if (document.getElementById("next").style.opacity == "0.5") {
@@ -71,7 +60,6 @@
             document.getElementById("page-num").style.opacity = "1"
         }
     }
-    
     function keyInput(key) {
         switch (key.keyCode) {
             case 39: // left
@@ -85,29 +73,62 @@
                 break;
         }
     }
-
+    function next() {
+        if (curr_page < imgs.length-1) {
+            curr_page++;
+            manga['chapters'][data.manga_index].page = curr_page+1;
+            adjustImage();
+        } else if (curr_page == imgs.length-1) {
+            curr_page++;
+            adjustImage();
+        } else {
+            goto(`/manga/${data.id}/reader/${parseInt(data.manga_index)+1}`).then(() => {
+                update_lib();
+                start_reader(0);
+            });
+        }
+    }
+    function prev() {
+        if (curr_page > 0) {
+            curr_page--;
+            manga['chapters'][data.manga_index].page = curr_page+1;
+            adjustImage();
+        } else if (curr_page == 0) {
+            curr_page--;
+        } else {
+            goto(`/manga/${data.id}/reader/${parseInt(data.manga_index)-1}`).then(() => {
+                update_lib();
+                start_reader(Infinity);
+            });
+        }
+    }
     window.addEventListener('resize', adjustImage);
     function adjustImage() {
-        if (imgs[page] != undefined) {
+        // console.log("adjustImage start")
+        if (imgs[curr_page] != undefined) {
             // Inital sizer
-            if (imgs[page].height > imgs[page].width) {
-                imgs[page].style.height = "100vh";
-                imgs[page].style.width = "auto";
+            if (imgs[curr_page].height > imgs[curr_page].width) {
+            // console.log("height: 100vw");
+                imgs[curr_page].style.height = "100vh";
+                imgs[curr_page].style.width = "auto";
             } else {
-                imgs[page].style.height = "auto";
-                imgs[page].style.width = "100vw";
+            // console.log("width: 100vw");
+                imgs[curr_page].style.height = "auto";
+                imgs[curr_page].style.width = "100vw";
             }
             // double checking size compared to viewport
-            let width_dif = imgs[page].width - window.innerWidth
-            let height_diff = imgs[page].height - window.innerHeight;
-            if (width_dif > 0) {
-                imgs[page].style.height = "auto";
-                imgs[page].style.width = "100vw";
-            } 
-            if (height_diff > 0) {
-                imgs[page].style.height = "100vh";
-                imgs[page].style.width = "auto";
-            }
+            // let height_diff = imgs[curr_page].height - window.innerHeight;
+            // if (height_diff > 0) {
+            // console.log("got here3");
+            //     imgs[curr_page].style.height = "auto";
+            //     imgs[curr_page].style.width = "100vw";
+            // } 
+            // let width_dif = imgs[curr_page].width - window.innerWidth
+            // if (width_dif > 0) {
+            // console.log("got here4");
+            //     imgs[curr_page].style.height = "100vh";
+            //     imgs[curr_page].style.width = "auto";
+            // }
         }
     }
 </script>
@@ -117,20 +138,17 @@
         <button id="prev" class="arrow" on:click={prev} style="opacity: 0%">&lt;</button>
         <button id="show-arrow" on:click={toggle_arrows}></button>
         <button id="next" class="arrow" on:click={next} style="opacity: 0%">&gt;</button>
-        <a id="return" href='/manga/{data.id}' style="opacity: 0%" on:click={update_lib}>Return</a>
+        <a id="return" href="/manga/{data.id}" style="opacity: 0%" on:click={update_lib}>Return</a>
     </div>
     <div class="center-img-div">
+        <p id="prev-chapter" class={curr_page == -1? 'visible' : 'invisible'}>previous chapter?</p>
         {#each chapters as c, i}
-            {#if i == manga['chapters'][data.manga_index].page-1}
-                <img on:load={adjustImage} class='visible' src={c} alt="{i} - {manga.title}" />
-            {:else}
-                <img class='invisible' src={c} alt={c} />
-            {/if}
+            <img on:load={adjustImage} class={i == curr_page? 'visible' : 'invisible'} src={c} alt="{i} - {manga.title}" />
         {/each}
-        <p id="next-chapter" class='invisible'>next chapter?</p>
+            <p id="next-chapter" class={curr_page == manga['chapters'][data.manga_index].page? 'visible' : 'invisible'}>next chapter?</p>
     </div>
     <p id="page-num" style="opacity: 0%">
-        {page+1}/{imgs.length}
+        {curr_page+1}/{imgs.length}
     </p>
 </div>
 

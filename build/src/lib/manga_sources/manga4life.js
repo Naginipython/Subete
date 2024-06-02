@@ -133,7 +133,8 @@ export async function getChapters(id) {
          "id": `${id}-chapter-${num+decimal}`,
          "number": num+decimal,
          "title": e['ChapterName'] == null? "" : e['ChapterName'],
-         "page": 1
+         "page": 1,
+         "completed": false
       }
    });
    
@@ -149,6 +150,7 @@ export async function getChapters(id) {
 */
 export async function getChapterPages(id) {
    let retrieved;
+   let link;
    try {
       const response = await http.fetch(`https://manga4life.com/read-online/${id}-page-1.html`, {
         method: 'GET',
@@ -170,25 +172,41 @@ export async function getChapterPages(id) {
             console.error('Error parsing JSON:', error);
           }
       }
+
+      // Gets the link data
+      // CurPathName
+      const pattern2 = /vm\.CurPathName\s*=\s*(\".*?\");/s;
+      const match2 = rawHtml.match(pattern2);
+      if (match2 && match2[1]) {
+         const jsCode = match2[1];
+         try {
+            console.log(jsCode)
+            link = JSON.parse(jsCode);
+          } catch (error) {
+            console.error('Error parsing JSON:', error);
+          }
+      }
    } catch (error) {
       console.error('Error fetching data:', error);
    }
-   // todo: with 'curr_chap_obj', get 'total_chap_num'. Create an array of that 'num' links such as this: `https://scans-hot.leanbox.us/manga/Mashle/0162.5-001.png`
+
+   
+
+   // prep
    let split_id = id.split("-chapter-");
    let pages = parseInt(retrieved.Page);
-   console.log(pages);
    let data = [];
+
+   // creates the links
    for (let i=1; i < pages+1; i++) {
-      // Notes: will likely fail for chap
       if (split_id[1].includes(".")) {
          // 5 is the 4 number length the site uses a lot, plus the period. Just in case a chapter is multiple decimal long
          let pad_math = 5 + split_id[1].split(".")[1].length; 
-         data.push(`https://scans-hot.leanbox.us/manga/${split_id[0]}/${split_id[1].padStart(pad_math, '0')}-${i.toString().padStart(3, '0')}.png`)
+         data.push(`https://${link}/manga/${split_id[0]}/${split_id[1].padStart(pad_math, '0')}-${i.toString().padStart(3, '0')}.png`)
       } else {
-         data.push(`https://scans-hot.leanbox.us/manga/${split_id[0]}/${split_id[1].padStart(4, '0')}-${i.toString().padStart(3, '0')}.png`)
+         data.push(`https://${link}/manga/${split_id[0]}/${split_id[1].padStart(4, '0')}-${i.toString().padStart(3, '0')}.png`)
       }
    }
-   // console.log(data);
    
    return data;
 }

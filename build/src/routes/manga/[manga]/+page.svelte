@@ -51,6 +51,7 @@
         // gets chapters, if needed
         if (manga['chapters'].length == 0) {
             manga['chapters'] = await getChapters(manga.extention, manga.id);
+            manga['chapters'].sort((a,b) => b.number-a.number);
         }
 
         // checks if in library
@@ -110,7 +111,9 @@
             {c.number}: {c.title}
         {/if}
     </a>
-    {#if manga['chapters'][i].page-1 != 0}
+    {#if manga['chapters'][i].completed}
+        <p class="progress">&emsp;(done)</p>
+    {:else if manga['chapters'][i].page-1 != 0}
         <p class="progress">&emsp;(page: {manga['chapters'][i].page})</p>
     {/if}
 </div><br>

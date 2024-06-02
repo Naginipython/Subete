@@ -41,9 +41,10 @@ export async function searchManga(query) {
  * @param {string} id - String of the id of a given manga. Used for finding the website details
  * @returns {Array<{
  *      id: string,
- *      num: number,
+ *      number: number,
  *      title: string,
- *      page: number
+ *      page: number,
+ *      completed: boolean
  * }>} - Array chapter details
  */
 export async function getChapters(source, id) {

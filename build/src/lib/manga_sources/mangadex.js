@@ -62,6 +62,7 @@ export async function getChapters(id) {
             id: e['id'],
             title: e['attributes']['title'] == "" || e['attributes']['title'] == null? `Chapter ${e['attributes']['chapter']}` : e['attributes']['title'],
             page: 1,
+            completed: false
         }
     });
 }
