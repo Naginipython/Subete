@@ -16,7 +16,8 @@ const store = writable({
                     id: string,
                     num: int,
                     title: string,
-                    page: int
+                    page: int,
+                    completed: boolean
                 }
             ]
         }*/
@@ -35,11 +36,11 @@ const store = writable({
                     id: string,
                     num: int,
                     title: string,
-                    page: int
+                    page: int,
+                    completed: boolean
                 }
-            ],
+            ]
             // todo:
-            // source: string,
             // language?
         }*/
     ],
@@ -57,9 +58,10 @@ const store = writable({
                     id: string,
                     num: int,
                     title: string,
-                    page: int
+                    page: int,
+                    completed: boolean
                 }
-            ],
+            ]
         }*/
     ]
 });

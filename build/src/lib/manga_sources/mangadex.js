@@ -1,24 +1,19 @@
 /**
- * Takes in a query, and returns an object with the extention name and data.
- * 
- * @param {string} query - String to be used to query the source
- * 
- * @returns {Array<{
- *      id: string,
- *      title: string,
- *      img: string,
- *      extention: string,
- *      authors: string,
- *      artists: string,
- *      description: string,
- *      chapters: Array<{
- *          id: string,
- *          num: number,
- *          title: string,
- *          page: number
- *      }>
- * }>} 
- */
+* Takes in a query, and returns an object with the extention name and data.
+* 
+* @param {string} query - String to be used to query the source
+* 
+* @returns {Array<{
+*      id: string,
+*      title: string,
+*      img: string,
+*      extention: string,
+*      authors: string,
+*      artists: string,
+*      description: string,
+*      chapters: Array<{}>
+* }>} 
+*/
 export async function search(query) {
     let data = [];
     let body = await fetch(`https://api.mangadex.org/manga?limit=100&includes[]=cover_art&includes[]=author&includes[]=artist&title=${query}`);
@@ -43,16 +38,17 @@ export async function search(query) {
 }
 
 /**
- * Takes in an id that the source can use to retrieve the chapter details for a series.
- * 
- * @param {string} id - String of the id of a given manga. Used for finding the website details
- * @returns {Array<{
- *      id: string,
- *      number: number,
- *      title: string,
- *      page: number
- * }>} - Array chapter details
- */
+* Takes in an id that the source can use to retrieve the chapter details for a series.
+* 
+* @param {string} id - String of the id of a given manga. Used for finding the website details
+* @returns {Array<{
+*     id: string,
+*     number: number,
+*     title: string,
+*     page: number,
+*     completed: boolean
+* }>} - Array chapter details
+*/
 export async function getChapters(id) {
     let body = await fetch(`https://api.mangadex.org/manga/${id}/feed?limit=500&order[chapter]=asc&translatedLanguage[]=en`);
     let res = await body.json();

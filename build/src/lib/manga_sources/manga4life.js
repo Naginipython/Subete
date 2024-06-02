@@ -2,11 +2,11 @@ import { http } from '@tauri-apps/api';
 import { ResponseType } from '@tauri-apps/api/http';
 
 /**
- * Takes in a query, and returns an object with the extention name and data.
- * 
- * @param {string} query - String to be used to query the source
- * 
- * @returns {Array<{
+* Takes in a query, and returns an object with the extention name and data.
+* 
+* @param {string} query - String to be used to query the source
+* 
+* @returns {Array<{
 *      id: string,
 *      title: string,
 *      img: string,
@@ -14,12 +14,7 @@ import { ResponseType } from '@tauri-apps/api/http';
 *      authors: string,
 *      artists: string,
 *      description: string,
-*      chapters: Array<{
-*          id: string,
-*          num: number,
-*          title: string,
-*          page: number
-*      }>
+*      chapters: Array<{}>
 * }>} 
 */
 export async function search(query) {
@@ -93,10 +88,11 @@ export async function search(query) {
 * 
 * @param {string} id - String of the id of a given manga. Used for finding the website details
 * @returns {Array<{
-*      id: string,
-*      number: number,
-*      title: string,
-*      page: number
+*     id: string,
+*     number: number,
+*     title: string,
+*     page: number,
+*     completed: boolean
 * }>} - Array chapter details
 */
 export async function getChapters(id) {

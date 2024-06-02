@@ -1,26 +1,18 @@
 /**
- * Takes in a query, and returns an array of objects with multiple extentions name and data.
- * 
- * @param {string} query - String to be used to query the source
- * @returns {Array<{
- *      extention: string,
- *      data: Array<{
- *          id: string,
- *          title: string,
- *          img: string,
- *          extention: string,
- *          authors: string,
- *          artists: string,
- *          description: string,
- *          chapters: Array<{
- *              id: string,
- *              num: number,
- *              title: string,
- *              page: number
- *          }>
- *      }>
- * }>} - An array of objects, notably the top level contains the extention & data
- */
+* Takes in a query, and returns an array of objects with multiple extentions name and data.
+* 
+* @param {string} query - String to be used to query the source
+* @returns {Array<{
+*      id: string,
+*      title: string,
+*      img: string,
+*      extention: string,
+*      authors: string,
+*      artists: string,
+*      description: string,
+*      chapters: Array<{}>
+* }>} - An array of objects, notably the top level contains the extention & data
+*/
 export async function searchManga(query) {
     const modules = import.meta.glob('./*.js');
 
@@ -35,18 +27,18 @@ export async function searchManga(query) {
 }
 
 /**
- * Takes in a source string and an id that the source can use to retrieve the chapter details for a series.
- * 
- * @param {string} source - String representing a source. Will be combined with './' and '.js', so keep the extention name given in search
- * @param {string} id - String of the id of a given manga. Used for finding the website details
- * @returns {Array<{
- *      id: string,
- *      number: number,
- *      title: string,
- *      page: number,
- *      completed: boolean
- * }>} - Array chapter details
- */
+* Takes in a source string and an id that the source can use to retrieve the chapter details for a series.
+* 
+* @param {string} source - String representing a source. Will be combined with './' and '.js', so keep the extention name given in search
+* @param {string} id - String of the id of a given manga. Used for finding the website details
+* @returns {Array<{
+*     id: string,
+*     number: number,
+*     title: string,
+*     page: number,
+*     completed: boolean
+* }>} - Array chapter details
+*/
 export async function getChapters(source, id) {
     const modules = import.meta.glob('./*.js');
 
