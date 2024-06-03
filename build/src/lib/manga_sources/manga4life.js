@@ -36,7 +36,6 @@ export async function search(query) {
          const jsCode = match[1];
          try {
             retrieved = JSON.parse(jsCode);
-            console.log(retrieved.length)
           } catch (error) {
             console.error('Error parsing JSON:', error);
           }

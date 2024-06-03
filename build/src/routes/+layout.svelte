@@ -3,7 +3,7 @@
     import { goto } from "$app/navigation";
     import { onMount } from "svelte";
     import { invoke } from '@tauri-apps/api/tauri';
-    import { faFilter, faMagnifyingGlass, faEllipsisVertical, faArrowLeft, faHeart } from '@fortawesome/free-solid-svg-icons'
+    import { faFilter, faMagnifyingGlass, faEllipsisVertical, faArrowLeft, faHeart, faBook } from '@fortawesome/free-solid-svg-icons'
     import { faHeart as faOutlineHeart } from '@fortawesome/free-regular-svg-icons';
     import Fa from 'svelte-fa'
     import store from "$lib/store.js";
@@ -18,9 +18,11 @@
     });
 
     let type = "manga";
+    let nav = '';
     let selected_valid_links = ["/library", "/updates", "/browse", "/more"];
     let scroll_memory = {};
     let in_manga = false;
+    let in_browser = false;
     let manga_data = {
         favorited: false,
         data: {},
@@ -30,7 +32,7 @@
     // ----- REDIRECT MANAGER -----
     $: if($navigating) page_check();
     function page_check() {
-        let nav = $navigating.to.url.pathname;
+        nav = $navigating.to.url.pathname;
         let from = $navigating.from.url.pathname
         // Highlights nav bar items
         if (selected_valid_links.includes(nav)) {
@@ -118,31 +120,37 @@
 </script>
 
 <div id="snackbar">
-    {#if !in_manga}
+    <!-- left side -->
+    {#if in_manga}
+        <button class="snackbar-item" on:click={async () => goto(manga_data.back)}><Fa icon={faArrowLeft} /></button>
+    {:else}
         <button id="manga" class="snackbar-item {type=="manga"? 'selected':''}">Manga</button>
         <button id="anime" class="snackbar-item">Anime</button>
         <button id="ln" class="snackbar-item">LN</button>
         <p class="snackbar-item" style="margin:0;padding:0;display:linline-flex;">Nothing here done</p>
-        <div class="snackbar-right">
-            <!-- https://fontawesome.com/search -->
-            <button class="snackbar-item"><Fa icon={faMagnifyingGlass} /></button>
-            <button class="snackbar-item"><Fa icon={faFilter} /></button>
-            <button class="snackbar-item"><Fa icon={faEllipsisVertical} /></button>
-        </div>
-    {:else}
-        <button class="snackbar-item" on:click={async () => goto(manga_data.back)}><Fa icon={faArrowLeft} /></button>
-        <div class="snackbar-right">
+    {/if}
+    
+    <!-- right side -->
+    <div class="snackbar-right">
+        {#if in_manga}
             <button class="snackbar-item" on:click={async () => toggle_fav()}>
                 {#if manga_data.favorited}
-                    <Fa icon={faHeart} />
+                <Fa icon={faHeart} />
                 {:else}
-                    <Fa icon={faOutlineHeart} />
+                <Fa icon={faOutlineHeart} />
                 {/if}
             </button>
             <button class="snackbar-item"><Fa icon={faFilter} /></button>
             <button class="snackbar-item"><Fa icon={faEllipsisVertical} /></button>
-        </div>
-    {/if}
+        {:else if nav.includes('browse')}
+            <button class="snackbar-item"><Fa icon={faBook} /></button>
+        {:else}
+            <!-- https://fontawesome.com/search -->
+            <button class="snackbar-item"><Fa icon={faMagnifyingGlass} /></button>
+            <button class="snackbar-item"><Fa icon={faFilter} /></button>
+            <button class="snackbar-item"><Fa icon={faEllipsisVertical} /></button>
+        {/if}
+    </div>
 </div>
 
 <div id="body">

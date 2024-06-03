@@ -13,16 +13,22 @@
 *      chapters: Array<{}>
 * }>} - An array of objects, notably the top level contains the extention & data
 */
-export async function searchManga(query) {
-    const modules = import.meta.glob('./*.js');
+export async function searchManga(query, check_sources) {
+    const sources = import.meta.glob('./*.js');
 
     let results = [];
-    const modulePromises = Object.entries(modules).map(async ([path, moduleImporter]) => {
-        const { search } = await moduleImporter();
-        return search(query);
+    const modulePromises = Object.entries(sources).map(async ([path, moduleImporter]) => {
+        console.log(path.split('/')[1].split('.')[0])
+        console.log(check_sources)
+        if (check_sources.some(s => s == path.split('/')[1].split('.')[0])) {
+            console.log()
+            const { search } = await moduleImporter();
+            return search(query);
+        }
     });
 
     results = await Promise.all(modulePromises);
+    results = results.filter(x => x != undefined);
     return results.flat(1);
 }
 
@@ -40,9 +46,9 @@ export async function searchManga(query) {
 * }>} - Array chapter details
 */
 export async function getChapters(source, id) {
-    const modules = import.meta.glob('./*.js');
+    const sources = import.meta.glob('./*.js');
 
-    for (const [key, value] of Object.entries(modules)) {
+    for (const [key, value] of Object.entries(sources)) {
         if (key == `./${source.toLowerCase()}.js`) {
             const { getChapters } = await import(/* @vite-ignore */key);
             return await getChapters(id);
@@ -59,13 +65,22 @@ export async function getChapters(source, id) {
  * @returns {Array<string>} - Array of strings for each page link
 */
 export async function getChapterPages(source, id) {
-    const modules = import.meta.glob('./*.js');
+    const sources = import.meta.glob('./*.js');
 
-    for (const [key, value] of Object.entries(modules)) {
+    for (const [key, value] of Object.entries(sources)) {
         if (key == `./${source.toLowerCase()}.js`) {
             const { getChapterPages } = await import(/* @vite-ignore */key);
             return await getChapterPages(id);
         }
     }
     return [];
+}
+
+export function getSources() {
+    const sources = import.meta.glob('./*.js');
+
+    // Gets the string of the source files, and removes the './' and '.js'
+    const sourceStr = Object.entries(sources).map(e => e[0].split('/')[1].split('.')[0]);
+    
+    return sourceStr;
 }
