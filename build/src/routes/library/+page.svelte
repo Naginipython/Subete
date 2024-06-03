@@ -10,14 +10,14 @@
         margin: auto;
         width: var(--calculated-width);
     }
-    .manga {
+    .lib-manga {
         text-align: center;
         width: fit-content;
         text-decoration: none;
         color: white;
         margin: 5px;
     }
-    .manga-wrap {
+    .lib-manga-wrap {
         display: flex;
         justify-content: center;
         align-items: center;
@@ -26,11 +26,11 @@
         border-radius: 5px;
         overflow: hidden;
     }
-    .manga-wrap img {
+    .lib-manga-wrap img {
         width: auto;
         height: 105%;
     }
-    .manga p {
+    .lib-manga p {
         margin: 0;
         padding: 0;
         width: calc(0.5*var(--lib-manga-height) + 50px);
@@ -66,8 +66,8 @@
 
 <div id="lib-manga-section">
 {#each library as l, i}
-    <a class="manga" href="/manga/{l.id}">
-        <div class="manga-wrap">
+    <a class="lib-manga" href="/manga/{l.id}">
+        <div class="lib-manga-wrap">
             <img src={l.img} alt={l.title}/>
         </div>
         <p>{l.title}</p>

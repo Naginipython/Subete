@@ -1,37 +1,27 @@
 <script>
-    import store from "$lib/store.js"
     import { invoke } from '@tauri-apps/api/tauri';
+    import { faArrowLeft, faBookmark } from '@fortawesome/free-solid-svg-icons';
+    import { faBookmark as faOutlineBookmark } from '@fortawesome/free-regular-svg-icons';
     import { getChapterPages } from "$lib/manga_sources/main.js"
+    import { find_manga } from "$lib/common.js";
     import { goto } from "$app/navigation";
+    import Fa from 'svelte-fa'
     export let data;
 
-    let manga = {};
+    let manga = find_manga(data.id);
+    let chapter = manga['chapters'][data.manga_index];
     let curr_page = 0;
     let imgs = -1;
     let chapters = [];
+
+    start_reader(chapter.page-1);
     
-    store.subscribe(async (json) => {
-        let manga_test = json.library.find(m => m.id == data.id);
-        if (manga_test == undefined) {
-            let search_test = json.search_results.find(m => m.id == data.id);
-            if (search_test == undefined) {
-                manga = json.history.find(m => m.id == data.id);
-            } else {
-                manga = search_test;
-            }
-        } else {
-            manga = manga_test;
-        }
-        start_reader(manga['chapters'][data.manga_index].page-1);
-        
-        return json;
-    });
+    // Prepares Reader & pages
     async function start_reader(page) {
         chapters = [];
         imgs = document.getElementsByTagName("img");
-        chapters = await getChapterPages(manga.extention, manga['chapters'][data.manga_index].id);
-        if (manga['chapters'][data.manga_index].completed && page != Infinity) {
-            console.log("got here")
+        chapters = await getChapterPages(manga.extention, chapter.id);
+        if (chapter.completed && page != Infinity) {
             curr_page = 0;
         } else if (page == Infinity) {
             curr_page = chapters.length-1;
@@ -40,49 +30,58 @@
         }
     }
 
-    $: if (imgs.length > 0) {
-        if (curr_page >= imgs.length-1) manga['chapters'][data.manga_index].completed = true;
-        else manga['chapters'][data.manga_index].completed = false;
+    // Checks for completion
+    $: if (imgs.length > 0 && !chapter.completed) {
+        if (curr_page >= imgs.length-1) chapter.completed = true;
+        else chapter.completed = false;
     }
     
+    // Updates library backend
     async function update_lib() {
         await invoke('update_lib', { item: manga });
+        goto(`/manga/${data.id}`)
     }
 
     // ----- INPUT -----
-    function toggle_arrows() {
-        let to_toggle = ["next", "prev", "return", "page-num"]
+    window.addEventListener('keydown', keyInput);
+    function keyInput(key) {
+        switch (key.keyCode) {
+            case 39: // left
+            case 'd': // d
+            case 32: // space
+                next();
+                break;
+            case 37: //right
+            case 'a': // a
+                prev();
+                break;
+        }
+    }
+    function toggle_menu() {
+        /*let to_toggle = ["next", "prev", "return", "page-num"]
         if (document.getElementById("next").style.opacity == "0.5") {
             to_toggle.forEach(e => document.getElementById(e).style.opacity = "0");
         } else {
             to_toggle.forEach(e => document.getElementById(e).style.opacity = "0.5");
             // exception
             document.getElementById("page-num").style.opacity = "1"
-        }
-    }
-    function keyInput(key) {
-        switch (key.keyCode) {
-            case 39: // left
-            case 68: // d
-            case 32: // space
-                next();
-                break;
-            case 37: //right
-            case 65: // a
-                prev();
-                break;
+        }*/
+        if (document.getElementById("chap-menu").style.opacity == "1") {
+            document.getElementById("chap-menu").style.opacity = "0";
+        } else {
+            document.getElementById("chap-menu").style.opacity = "1";
         }
     }
     function next() {
         if (curr_page < imgs.length-1) {
             curr_page++;
-            manga['chapters'][data.manga_index].page = curr_page+1;
+            chapter.page = curr_page+1;
             adjustImage();
         } else if (curr_page == imgs.length-1) {
             curr_page++;
             adjustImage();
         } else {
-            goto(`/manga/${data.id}/reader/${parseInt(data.manga_index)+1}`).then(() => {
+            goto(`/manga/${data.id}/reader/${parseInt(data.manga_index)-1}`).then(() => {
                 update_lib();
                 start_reader(0);
             });
@@ -91,17 +90,19 @@
     function prev() {
         if (curr_page > 0) {
             curr_page--;
-            manga['chapters'][data.manga_index].page = curr_page+1;
+            chapter.page = curr_page+1;
             adjustImage();
         } else if (curr_page == 0) {
             curr_page--;
         } else {
-            goto(`/manga/${data.id}/reader/${parseInt(data.manga_index)-1}`).then(() => {
+            goto(`/manga/${data.id}/reader/${parseInt(data.manga_index)+1}`).then(() => {
                 update_lib();
                 start_reader(Infinity);
             });
         }
     }
+
+    // Image Fitting
     window.addEventListener('resize', adjustImage);
     function adjustImage() {
         // console.log("adjustImage start")
@@ -132,31 +133,52 @@
         }
     }
 </script>
-<svelte:window on:keydown|preventDefault={keyInput} />
+<!-- <svelte:window on:keydown|preventDefault={keyInput} /> -->
 <div>
-    <div id="arrow_div">
-        <button id="prev" class="arrow" on:click={prev} style="opacity: 0%">&lt;</button>
-        <button id="show-arrow" on:click={toggle_arrows}></button>
-        <button id="next" class="arrow" on:click={next} style="opacity: 0%">&gt;</button>
-        <a id="return" href="/manga/{data.id}" style="opacity: 0%" on:click={update_lib}>Return</a>
+    
+    <div id="chap-menu" style="opacity: 0">
+        <div class="menu-background"></div>
+        <div id="chap-snackbar">
+            <button class="chap-snack-item" on:click={update_lib}><Fa icon={faArrowLeft} /></button>
+            <div id="chap-snack-text">
+                <p>{manga.title}</p>
+                <p style="font-size: x-small">
+                    {#if chapter.title == ""}
+                        Chapter {chapter.number}
+                    {:else}
+                        Chapter {chapter.number}: {chapter.title}
+                    {/if}
+                </p>
+            </div>
+            <div class="chap-snack-right">
+                <button class="chap-snack-item"><Fa icon={faOutlineBookmark} /></button>
+            </div>
+        </div>
+        
+        <button id="prev" class="arrow" on:click={prev}>&lt;</button>
+        <button id="show-arrow" on:click={toggle_menu}></button>
+        <button id="next" class="arrow" on:click={next}>&gt;</button>
+        
+        <div id="page-num">
+            <p>
+                {curr_page+1}/{imgs.length}
+            </p>
+        </div>
     </div>
     <div class="center-img-div">
         <p id="prev-chapter" class={curr_page == -1? 'visible' : 'invisible'}>previous chapter?</p>
-        {#each chapters as c, i}
-            <img on:load={adjustImage} class={i == curr_page? 'visible' : 'invisible'} src={c} alt="{i} - {manga.title}" />
-        {/each}
-            <p id="next-chapter" class={curr_page == manga['chapters'][data.manga_index].page? 'visible' : 'invisible'}>next chapter?</p>
+        {#if chapter.length == 0}
+            <p style="color: white; font-size: xx-large">loading</p>
+        {:else}
+            {#each chapters as c, i}
+                <img on:load={adjustImage} class={i == curr_page? 'visible' : 'invisible'} src={c} alt="{i} - {manga.title}" />
+            {/each}
+        {/if}
+            <p id="next-chapter" class={curr_page == chapter.page? 'visible' : 'invisible'}>next chapter?</p>
     </div>
-    <p id="page-num" style="opacity: 0%">
-        {curr_page+1}/{imgs.length}
-    </p>
 </div>
 
 <style>
-    /* remove body shit */
-    :global(body) {
-        margin: 0;
-    }
     /* img */
     .visible {
         display: flex;
@@ -177,9 +199,54 @@
         height: 0px;
     }
     /* arrows */
-    #arrow_div {
+    #chap-menu {
         position: absolute;
         width: 100vw;
+    }
+    #chap-snackbar {
+        /* opacity: 0.5; */
+        height: calc(var(--snackbar-height)*2);
+        /* background-color: var(--secondary-color); */
+        position: absolute;
+        width: 100vw;
+    }
+    .menu-background {
+        width: 100vw;
+        position: absolute;
+        opacity: 0.5;
+        height: calc(var(--snackbar-height)*2);
+        background-color: var(--secondary-color);
+    }
+    .chap-snack-item {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background-color: transparent;
+        /* background-color: green; */
+        border: 0;
+        color: white;
+        font-size: medium;
+        height: inherit;
+        width: 50px;
+    }
+    button.chap-snack-item:hover {
+        background-color: var(--selection-color);
+        border-radius: 50%;
+    }
+    #chap-snack-text {
+        position: relative;
+        top: -9px;
+        display: inline-flex; 
+        height: inherit; 
+        flex-direction: column;
+    }
+    #chap-snack-text p {
+        padding: 0;
+        margin: 0;
+    }
+    .chap-snack-right {
+        float: right; 
+        height: inherit
     }
     #show-arrow {
         position: relative;
@@ -188,10 +255,14 @@
         opacity: 50%;
         margin: auto;
         opacity: 0%;
+        height: calc(100vh - calc(var(--snackbar-height)*2));
+        top: calc(var(--snackbar-height)*2);
     }
     .arrow {
+        opacity: 0;
         position: relative;
-        height: 100vh;
+        height: calc(100vh - calc(var(--snackbar-height)*2));
+        top: calc(var(--snackbar-height)*2);
         width: 35vw;
         font-size: xx-large;
     }
@@ -200,35 +271,6 @@
     }
     #next {
         float: right;
-    }
-    #return {
-        position: absolute;
-        top: 0;
-        left: 0;
-        font-size: large;
-        width: 35vw;
-        text-decoration: none;
-        align-items: flex-start;
-        text-align: center;
-        cursor: default;
-        color: buttontext;
-        padding-block-start: 2px;
-        padding-block-end: 3px;
-        /* padding-inline-start: 6px; */
-        border-top-width: 2px;
-        border-right-width: 2px;
-        border-bottom-width: 2px;
-        border-left-width: 2px;
-        border-top-style: outset;
-        border-right-style: outset;
-        border-bottom-style: outset;
-        border-left-style: outset;
-        border-top-color: buttonface;
-        border-right-color: buttonface;
-        border-bottom-color: buttonface;
-        border-left-color: buttonface;
-        /* background-color: buttonface; */
-        box-sizing: border-box;
     }
     #next-chapter {
         position: absolute;
@@ -240,10 +282,19 @@
     }
     #page-num {
         position: absolute;
-        bottom: -15px;
-        left: 50%;
-        right: 50%;
+        width: 100vw;
+        text-align: center;
+        /* bottom: -15px; */
         font-weight: 600;
         text-shadow: 1px 0 0 #000, 0 -1px 0 #000, 0 1px 0 #000, -1px 0 0 #000;
+    }
+    #page-num p {
+        padding: 10px;
+        margin: 0;
+        background-color: var(--secondary-color-transparent);
+        border-radius: 30%;
+        width: fit-content;
+        display: inline-flex;
+        justify-content: center;
     }
 </style>

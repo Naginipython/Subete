@@ -26,6 +26,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@fortawesome/free-regular-svg-icons": "^6.5.2",
 		"@fortawesome/free-solid-svg-icons": "^6.5.2",
 		"@tauri-apps/api": "^1.5.4",
 		"svelte-fa": "^4.0.2"

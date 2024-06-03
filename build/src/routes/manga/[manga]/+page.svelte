@@ -1,13 +1,16 @@
 <script>
     import { invoke } from '@tauri-apps/api/tauri';
-    import { navigating } from '$app/stores';
+    import { goto } from "$app/navigation";
+    import { faEllipsisVertical, faBookmark, faAnglesDown, faCircleCheck, faSquareCheck, faCheck, faArrowTurnDown, faXmark } from '@fortawesome/free-solid-svg-icons'
+    import { faCircleDown, faBookmark as faOutlineBookmark, faSquare } from '@fortawesome/free-regular-svg-icons';
+    import Fa from 'svelte-fa'
     import store from "$lib/store.js"
     import { getChapters } from "$lib/manga_sources/main.js";
+    import { find_manga } from "$lib/common.js";
 
     export let data;
 
     let manga = {};
-    let favorited = false;
 
     // Adds to history when data is available
     $: if (Object.keys(manga).length != 0) {
@@ -17,75 +20,50 @@
         });
     }
     
-    // sets back button
-    let back = "/";
-    $: if($navigating) set_back();
-    function set_back() {
-        switch ($navigating.from.url.pathname) {
-            case "/library":
-            case "/updates":
-            case "/browse":
-                store.update(json => {
-                    json.manga_return = $navigating.from.url.pathname;
-                    back = json.manga_return;
-                    return json;
-                });
-        }
-    }
-
     store.subscribe(async (json) => {
         // gets manga search details
-        // todo: this doesnt work because object is search_results[#]['data']
-        let manga_test = json.library.find(m => m.id == data.id);
-        if (manga_test == undefined) {
-            let search_test = json.search_results.find(m => m.id == data.id);
-            if (search_test == undefined) {
-                manga = json.history.find(m => m.id == data.id);
-            } else {
-                manga = search_test;
-            }
-        } else {
-            manga = manga_test;
-        }
+        manga = find_manga(data.id);
 
         // gets chapters, if needed
         if (manga['chapters'].length == 0) {
             manga['chapters'] = await getChapters(manga.extention, manga.id);
             manga['chapters'].sort((a,b) => b.number-a.number);
         }
-
-        // checks if in library
-        let lib_item = json.library.find(l => l.id == manga.id);
-        if (lib_item != -1 && lib_item != undefined) {
-            favorited = true;
-        }
-        
-        // sets back button
-        back = json.manga_return;
     });
 
-    async function toggle_fav() {
-        favorited = !favorited;
-        if (favorited) {
-            await invoke('add_to_lib', { newItem: manga });
-            store.update(json => {
-                json.library.push(manga);
-                return json;
-            });
+    // CHAPTER OPTION BUTTONS
+    function toggle_complete(index) {
+        if (manga['chapters'][index].completed) {
+            manga['chapters'][index].completed = false;
         } else {
-            await invoke('remove_from_lib', { id: manga.id });
-            store.update(json => {
-                json.library = json.library.filter(m => m.id != manga.id);
-                return json;
-            });
+            manga['chapters'][index].completed = true;
+        }
+        invoke('update_lib', { item: manga });
+    }
+    function check_below(index) {
+        for (let i = index+1; i < manga['chapters'].length; i++) {
+            manga['chapters'][i].completed = true;
+        }
+        invoke('update_lib', { item: manga });
+    }
+    function remove_page(index) {
+        manga['chapters'][index].page = 1;
+        invoke('update_lib', { item: manga });
+    }
+    let opened = [];
+    function show_options(index) {
+        if (opened.includes(index)) {
+            let i = opened.indexOf(index);
+            if (i != -1) opened.splice(i, 1);
+            document.getElementById(`i-${index}`).style.display = "none";
+            document.getElementById(`o-${index}`).style.display = "flex";
+        } else {
+            opened.push(index);
+            document.getElementById(`i-${index}`).style.display = "flex";
+            document.getElementById(`o-${index}`).style.display = "none";
         }
     }
 </script>
-
-<div id="top-bar">
-    <a class="return" href="{back}">&lt;</a>
-    <button class="fav-btn" on:click={async () =>  toggle_fav()}>{favorited? '♥' : '♡'}</button><br>
-</div>
 
 <div id="header" >
     <div id="img-wrapper">
@@ -103,34 +81,55 @@
 
 
 {#each manga['chapters'] as c, i}
-<div class="chapter">
-    <a class="btn" href="/manga/{data.id}/reader/{i}">
-        {#if c.title == ""}
-            Chapter {c.number}
-        {:else}
-            {c.number}: {c.title}
+<div class="chapter" style="{manga['chapters'][i].completed? 'color: grey' : ''}">
+    <!-- Main Chapter button -->
+    <button class="chapter-link" on:click={() => goto(`/manga/${data.id}/reader/${i}`)}>
+        {#if c.title == ""} Chapter {c.number}
+        {:else} Chapter {c.number} - {c.title}
         {/if}
-    </a>
-    {#if manga['chapters'][i].completed}
-        <p class="progress">&emsp;(done)</p>
-    {:else if manga['chapters'][i].page-1 != 0}
-        <p class="progress">&emsp;(page: {manga['chapters'][i].page})</p>
-    {/if}
-</div><br>
+        <div class="chapter-lower">
+            <p>date - group</p>
+            {#if manga['chapters'][i].page-1 != 0 && !manga['chapters'][i].completed}
+                <p class="progress">&emsp;(page: {manga['chapters'][i].page})</p>
+            {/if}
+        </div>
+    </button>
+    <!-- options menu -->
+    <div class="chap-btns">
+        <!-- simple check icon -->
+        <button id="check" class="chapter-btn" on:click={() => toggle_complete(i)}>
+            {#if manga['chapters'][i].completed} <Fa icon={faXmark} />
+            {:else} <Fa icon={faCheck} />
+            {/if}
+        </button>
+        <!-- expanded options menu -->
+        <div id="i-{i}" style="display:none">
+            <button id="bookmark" class="chapter-btn"><Fa icon={faOutlineBookmark} /></button>
+            <button id="check-below" class="chapter-btn" on:click={() => check_below(i)}><Fa icon={faAnglesDown} /></button>
+            <button id="download" class="chapter-btn"><Fa icon={faCircleDown} /><!--<Fa icon={faCircleCheck} />--></button>
+            <button id="select" class="chapter-btn"><Fa icon={faSquare} /><!--<Fa icon={faSquareCheck} />--></button>
+            {#if manga['chapters'][i].page-1 != 0}
+            <button id="uncheck" class="chapter-btn" on:click={() => remove_page(i)}>
+                <Fa icon={faXmark} />
+            </button>
+            {/if}
+            <button id="options-return" class="chapter-btn" on:click={() => show_options(i)}>
+                <Fa icon={faArrowTurnDown} />
+            </button>
+        </div>
+        <!-- options expantion button -->
+        <div id="o-{i}" style="display:flex">
+            <button id="options" class="chapter-btn" on:click={() => show_options(i)}>
+                <Fa icon={faEllipsisVertical} />
+            </button>
+        </div>
+    </div>
+</div>
 {/each}
 
 <style>
-    #top-bar {
-        overflow: hidden;
-    }
-    .fav-btn {
-        padding: 0 10px;
-        font-size: xx-large;
-        float: right;
-    }
     #header {
         padding: 10px;
-        padding-top: 0px;
         overflow: hidden;
         border: 1px solid black;
     }
@@ -167,50 +166,54 @@
     #desc {
         overflow: scroll;
     }
-    .return {
-        font-size: xx-large;
-        padding: 15px;
-        width: 20vw;
-        text-decoration: none;
-        align-items: flex-start;
-        text-align: center;
-        cursor: default;
-        color: white;
-        padding-block-start: 2px;
-        padding-block-end: 3px;
-        border-top-width: 2px;
-        border-right-width: 2px;
-        border-bottom-width: 2px;
-        border-left-width: 2px;
-        border-top-style: outset;
-        border-right-style: outset;
-        border-bottom-style: outset;
-        border-left-style: outset;
-        border-top-color: buttonface;
-        border-right-color: buttonface;
-        border-bottom-color: buttonface;
-        border-left-color: buttonface;
-        box-sizing: border-box;
-    }
     .chapter {
+        width: 100vw;
+        padding: 5px 0;
+        overflow: auto;
+        display: inline-flex;
+    }
+    .chapter:hover {
+        background-color: var(--selection-color)
+    }
+    .chapter-link {
+        cursor: pointer;
         display: inline-flex;
         justify-content: left;
-        align-items: center;
-    }
-    .btn {
-        
-        background: none;
+        flex-direction: column;
+        padding-left: 10px;
+        border: 0;
+        background-color: transparent;
         color: inherit;
-        border: none;
-        padding: 0;
-        font: inherit;
-        cursor: pointer;
-        outline: inherit;
+        width: 100%;
+        float: left;
+    }
+    .chapter-lower {
+        display: inline-flex;
+    }
+    .chapter-lower p {
+        margin: 0; 
+        padding: 0; 
+        font-size: x-small;
     }
     .progress {
         color: grey;
-        margin: 0;
-        padding: 0;
-        font-size: x-small;
+    }
+    .chap-btns {
+        float: right;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 10px;
+    }
+    .chapter-btn {
+        display: inline-flex;
+        align-items: center;
+        background-color: transparent;
+        /* background-color: green; */
+        border: 0;
+        color: white;
+        font-size: large;
+        height: inherit;
+        margin: 0 2px;
     }
 </style>
