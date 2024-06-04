@@ -1,2 +1,5 @@
 run:
     cargo tauri dev
+
+buid:
+    NO_STRIP=true cargo tauri build

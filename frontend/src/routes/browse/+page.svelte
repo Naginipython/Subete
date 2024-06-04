@@ -5,6 +5,7 @@
     import store from "$lib/store.js";
     import { searchManga, getSources } from "$lib/manga_sources/main.js";
     import DisplayManga from "./display_manga.svelte";
+    import { invoke } from '@tauri-apps/api/tauri';
 
     let name = '';
     let results = [];
@@ -26,7 +27,10 @@
                 s.push(key);
             }
         }
-        results = await searchManga(name, s);
+        // results = await searchManga(name, s);
+        let query = 'mashle';
+        let check = ['mangadex']
+        results = await invoke('search', { query: `${name}`, sources: s });
         console.log(results);
         
         store.update(json => {

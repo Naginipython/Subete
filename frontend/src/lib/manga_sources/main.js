@@ -1,3 +1,4 @@
+
 /**
 * Takes in a query, and returns an array of objects with multiple extentions name and data.
 * 
@@ -19,7 +20,6 @@ export async function searchManga(query, check_sources) {
     let results = [];
     const modulePromises = Object.entries(sources).map(async ([path, moduleImporter]) => {
         if (check_sources.some(s => s == path.split('/')[1].split('.')[0])) {
-            console.log()
             const { search } = await moduleImporter();
             return search(query);
         }

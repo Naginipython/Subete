@@ -9,8 +9,9 @@
     import store from "$lib/store.js";
     import { find_manga,in_lib,toggle_favorite } from "$lib/common.js";
 
+    let library = [];
     onMount(async () => {
-        let library = await invoke('get_lib');
+        library = await invoke('get_lib');
         store.update(json => {
             json.library = library;
             return json;
