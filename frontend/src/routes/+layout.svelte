@@ -201,7 +201,7 @@
     #body {
         height: calc(100vh - var(--snackbar-height) - var(--nav-bar-height));
         color: white;
-        overflow: scroll;
+        overflow: hidden;
         background-color: var(--primary-color);
     }
     #nav-centered {

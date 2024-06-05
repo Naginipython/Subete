@@ -3,3 +3,8 @@ run:
 
 buid:
     NO_STRIP=true cargo tauri build
+
+to start:
+    node
+    rust (rustup)
+    cargo install tauri-cli

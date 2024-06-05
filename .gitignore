@@ -1,6 +1,7 @@
 ## PERSONAL
 # TEMPORARY json library database
 library.json
+plugins.json
 # random temporary files for testing purposes
 temp/*
 
