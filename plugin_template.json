@@ -1,0 +1,9 @@
+{
+    "id": "[SOURCE NAME]",
+    "search_url": "[LINK] {title}",
+    "search": "function search(json) { let data = []; } return data; }",
+    "chapters_url": "[link]{id}[link-remainder]",
+    "get_chapters": "function getChapters(json) { return json; }",
+    "pages_url": "[link]{id}",
+    "get_pages": "function getChapterPages(json) { return json }"
+}
