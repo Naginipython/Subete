@@ -25,10 +25,10 @@
         manga = find_manga(data.id);
 
         // gets chapters, if needed
-        if (manga['chapters'].length == 0) {
-            manga['chapters'] = await getChapters(manga.extention, manga.id);
-            manga['chapters'].sort((a,b) => b.number-a.number);
-        }
+        // if (manga['chapters'].length == 0) {
+        //     manga['chapters'] = await getChapters(manga.extention, manga.id);
+        //     manga['chapters'].sort((a,b) => b.number-a.number);
+        // }
     });
 
     // CHAPTER OPTION BUTTONS

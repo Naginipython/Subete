@@ -12,11 +12,15 @@
     let library = [];
     onMount(async () => {
         library = await invoke('get_lib');
+        console.log(library);
         store.update(json => {
             json.library = library;
             return json;
         });
     });
+    store.subscribe(json => {
+        library = json.library;
+    })
 
     let type = "manga";
     let nav = '';
@@ -116,7 +120,22 @@
     // BACKEND CALLS
     async function toggle_fav() {
         manga_data.favorited = !manga_data.favorited;
-        await toggle_favorite(manga_data.data);
+        let manga = manga_data.data;
+        if (!library.some(m => m.id == manga.id)) {
+            await invoke('add_to_lib', { newItem: manga });
+            store.update(_json => {
+                _json.library.push(manga);
+                return _json;
+            });
+        } else {
+            await invoke('remove_from_lib', { id: manga.id });
+            store.update(_json => {
+                _json.library = _json.library.filter(m => m.id != manga.id);
+                return _json;
+            });
+        }
+        // await toggle_favorite(manga_data.data);
+        // library = await invoke('get_lib');
     }
 </script>
 

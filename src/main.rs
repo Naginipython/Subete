@@ -8,6 +8,8 @@ use plugins::*;
 // mod scrape;
 mod library;
 mod plugins;
+mod database;
+mod schema;
 
 fn main() {
   // geckodriver

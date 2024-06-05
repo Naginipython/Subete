@@ -26,7 +26,6 @@ export function in_lib(id) {
 }
 
 export async function toggle_favorite(manga) {
-    console.log(manga);
     if (!in_lib(manga.id)) {
         await invoke('add_to_lib', { newItem: manga });
         store.update(_json => {

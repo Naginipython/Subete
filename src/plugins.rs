@@ -41,7 +41,7 @@ fn init_plugins() -> Vec<Plugins> {
               temp['title'] = d['attributes']['title']['en'];
               let filetemp = d['relationships'].filter(o => o.type == 'cover_art')[0];
               temp['img'] = `https://uploads.mangadex.org/covers/${temp['id']}/${filetemp['attributes']['fileName']}`;
-              temp['extention'] = 'MangaDex';
+              temp['extension'] = 'MangaDex';
               temp['description'] = d['attributes']['description']['en'];
               temp['chapters'] = [];
               let author_names = d['relationships'].filter(x => x.type == 'author').map(y => y['attributes']['name']);
