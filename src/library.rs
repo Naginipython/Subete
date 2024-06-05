@@ -6,32 +6,32 @@ use lazy_static::lazy_static;
 lazy_static! {
     pub static ref LIB: Mutex<Vec<LibraryItem>> = match File::open("library.json") {
         Ok(file) => Mutex::new(serde_json::from_reader(file).unwrap_or_default()),
-        Err(e) => {
-          eprintln!("ERROR: {e}");
+        Err(_e) => {
+          File::create("library.json").unwrap();
           Mutex::new(Vec::new())
         }
     };
 }
 
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct LibraryItem {
-  id: String,
-  title: String,
-  img: String,
-  extention: String,
-  authors: String,
-  artists: String,
-  description: Option<String>,
-  chapters: Vec<ChapterItem>
+  pub id: String,
+  pub title: String,
+  pub img: String,
+  pub extension: String,
+  pub authors: String,
+  pub artists: String,
+  pub description: Option<String>,
+  pub chapters: Vec<ChapterItem>
 }
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct ChapterItem {
-  id: String,
-  number: f64,
-  title: String,
-  page: u32,
-  completed: bool
+  pub id: String,
+  pub number: f64,
+  pub title: String,
+  pub page: u32,
+  pub completed: bool
 }
 
 fn save(lib: &Vec<LibraryItem>) {
@@ -78,4 +78,13 @@ pub fn remove_from_lib(id: String) {
   let mut lib = LIB.lock().unwrap();
   lib.retain(|l| l.id != id);
   save(&*lib);
+}
+
+pub fn find_manga(id: String) -> Option<LibraryItem> {
+  let lib = LIB.lock().unwrap();
+  let found_item = lib.iter().find(|item| item.id == id);
+  match found_item {
+    Some(item) => Some(item.clone()),
+    None => None,
+  }
 }

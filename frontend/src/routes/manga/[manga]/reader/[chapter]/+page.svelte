@@ -2,7 +2,7 @@
     import { invoke } from '@tauri-apps/api/tauri';
     import { faArrowLeft, faBookmark } from '@fortawesome/free-solid-svg-icons';
     import { faBookmark as faOutlineBookmark } from '@fortawesome/free-regular-svg-icons';
-    import { getChapterPages } from "$lib/manga_sources/main.js"
+    // import { getChapterPages } from "$lib/manga_sources/main.js"
     import { find_manga } from "$lib/common.js";
     import { goto } from "$app/navigation";
     import Fa from 'svelte-fa'
@@ -20,7 +20,8 @@
     async function start_reader(page) {
         chapters = [];
         imgs = document.getElementsByTagName("img");
-        chapters = await getChapterPages(manga.extention, chapter.id);
+        chapters = await invoke('get_pages', { source: manga.extension, id: chapter.id });
+        // chapters = await getChapterPages(manga.extention, chapter.id);
         if (chapter.completed && page != Infinity) {
             curr_page = 0;
         } else if (page == Infinity) {

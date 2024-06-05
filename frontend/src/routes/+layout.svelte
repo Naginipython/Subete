@@ -1,5 +1,5 @@
 <script>
-    import { navigating } from '$app/stores';
+    import { navigating, page } from '$app/stores';
     import { goto } from "$app/navigation";
     import { onMount } from "svelte";
     import { invoke } from '@tauri-apps/api/tauri';
@@ -21,6 +21,7 @@
     let type = "manga";
     let nav = '';
     let selected_valid_links = ["/library", "/updates", "/browse", "/more"];
+    $: path = $page.url.pathname;
     let scroll_memory = {};
     let in_manga = false;
     let in_browser = false;
@@ -160,10 +161,10 @@
 
 <div id="nav-centered">
     <nav class="nav-bar">
-        <a id="/library" class="separator {window.location.pathname=='/library'? 'selected' : ''}" href="/library">Library</a>
-        <a id="/updates" class="separator {window.location.pathname=='/updates'? 'selected' : ''}" href="/updates">Updates</a>
-        <a id="/browse" class="separator {window.location.pathname=='/browse'? 'selected' : ''}" href="/browse">Browse</a>
-        <a id="/more" class="{window.location.pathname=='/more'? 'selected' : ''}" href="/more">More</a>
+        <a id="/library" class="separator {path=='/library'? 'selected' : ''}" href="/library">Library</a>
+        <a id="/updates" class="separator {path=='/updates'? 'selected' : ''}" href="/updates">Updates</a>
+        <a id="/browse" class="separator {path=='/browse'? 'selected' : ''}" href="/browse">Browse</a>
+        <a id="/more" class="{path=='/more'? 'selected' : ''}" href="/more">More</a>
     </nav>
 </div>
 
@@ -201,7 +202,7 @@
     #body {
         height: calc(100vh - var(--snackbar-height) - var(--nav-bar-height));
         color: white;
-        overflow: hidden;
+        overflow: scroll;
         background-color: var(--primary-color);
     }
     #nav-centered {
