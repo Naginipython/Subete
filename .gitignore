@@ -3,7 +3,11 @@
 library.json
 plugins.json
 # random temporary files for testing purposes
-temp/*
+temp/
+# Script for easily remembering 'NO_STRIP=true cargo tauri build'
+build.sh
+# Feels uneeded
+frontend/build/
 
 ## RUST
 debug/
