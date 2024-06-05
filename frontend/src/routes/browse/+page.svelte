@@ -3,20 +3,15 @@
     // import { faHeart as faOutlineHeart } from '@fortawesome/free-regular-svg-icons';
     import Fa from 'svelte-fa'
     import store from "$lib/store.js";
-    // import { searchManga, getSources } from "$lib/manga_sources/main.js";
+    import { searchManga, getSources } from "$lib/manga_sources/main.js";
     import DisplayManga from "./display_manga.svelte";
     import { invoke } from '@tauri-apps/api/tauri';
-    import { onMount } from "svelte";
 
     let name = '';
     let results = [];
-    let sources = [];
+    let sources = getSources();
     // todo: save checked_sources to disk
     let checked_source = {"mangadex": true};
-
-    onMount(async () => {
-        sources = await invoke('get_plugin_names');
-    });
 
     store.subscribe(json => {
         results = json["search_results"];
@@ -32,6 +27,9 @@
                 s.push(key);
             }
         }
+        // results = await searchManga(name, s);
+        let query = 'mashle';
+        let check = ['mangadex']
         results = await invoke('search', { query: `${name}`, sources: s });
         console.log(results);
         
@@ -44,17 +42,17 @@
     }
 
     function reformatResults() {
-        // Exports the extension name to the outside.
+        // Exports the extention name to the outside.
         // Turns a array of everything into:
-        // [{extension: string, data: []}]
+        // [{extention: string, data: []}]
         if (!results.some(a => a.hasOwnProperty('data'))) {
             results = Object.values(
                 results.reduce((result, item) => {
-                    let extension = item.extension;
-                    if (!result[extension]) {
-                        result[extension] = {extension: extension, data: []};
+                    let extention = item.extention;
+                    if (!result[extention]) {
+                        result[extention] = {extention: extention, data: []};
                     }
-                    result[extension]['data'].push(item);
+                    result[extention]['data'].push(item);
                     return result;
                 }, {})
             );
@@ -93,7 +91,7 @@
 
     <!-- displays manga -->
     {#each results as item, i}
-        <h3>{item.extension}</h3>
+        <h3>{item.extention}</h3>
         <DisplayManga data={item.data}/>
     {/each}
 

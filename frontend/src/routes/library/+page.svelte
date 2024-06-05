@@ -1,38 +1,3 @@
-<script>
-    import store from "$lib/store.js";
-    import { onMount } from "svelte";
-
-    let library = [];
-
-    store.subscribe(json => {
-        library = json["library"];
-        return library;
-    });
-
-    onMount(async () => {
-        setTimeout(() => setWidth(), 5);
-    });
-    
-    window.addEventListener('resize', setWidth);
-    function setWidth() {
-        var viewportWidth = window.innerWidth;
-        var newWidth = Math.floor(viewportWidth / 210) * 220;
-        
-        document.documentElement.style.setProperty('--calculated-width', `${newWidth}px`);
-    }
-</script>
-
-<div id="lib-manga-section">
-{#each library as l, i}
-    <a class="lib-manga" href="/manga/{l.id}">
-        <div class="lib-manga-wrap">
-            <img src={l.img} alt={l.title}/>
-        </div>
-        <p>{l.title}</p>
-    </a>
-{/each}
-</div>
-
 <style>
     :root {
         --lib-manga-height: 300px;
@@ -77,3 +42,35 @@
         line-clamp: 2;
     }
 </style>
+
+<script>
+    import store from "$lib/store.js";
+
+    let library = [];
+
+    store.subscribe(json => {
+        library = json["library"];
+        return library;
+    });
+
+    window.addEventListener('resize', setWidth);
+    setWidth();
+
+    function setWidth() {
+        var viewportWidth = window.innerWidth;
+        var newWidth = Math.floor(viewportWidth / 210) * 220;
+        
+        document.documentElement.style.setProperty('--calculated-width', `${newWidth}px`);
+    }
+</script>
+
+<div id="lib-manga-section">
+{#each library as l, i}
+    <a class="lib-manga" href="/manga/{l.id}">
+        <div class="lib-manga-wrap">
+            <img src={l.img} alt={l.title}/>
+        </div>
+        <p>{l.title}</p>
+    </a>
+{/each}
+</div>

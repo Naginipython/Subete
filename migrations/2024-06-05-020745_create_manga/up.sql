@@ -1,5 +1,5 @@
 -- Your SQL goes here
-CREATE TABLE library (
+CREATE TABLE manga (
     id TEXT PRIMARY KEY,
     title TEXT NOT NULL,
     img TEXT NOT NULL,
