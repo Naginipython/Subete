@@ -220,8 +220,11 @@
     #body {
         height: calc(100vh - var(--snackbar-height) - var(--nav-bar-height));
         color: white;
-        overflow: hidden;
+        overflow: scroll;
         background-color: var(--primary-color);
+    }
+    #body::-webkit-scrollbar {
+        display: none;
     }
     #nav-centered {
         height: var(--nav-bar-height);

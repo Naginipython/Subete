@@ -1,5 +1,18 @@
+// @generated automatically by Diesel CLI.
+
 diesel::table! {
-    manga (id) {
+    chapters (id) {
+        id -> Text,
+        manga_id -> Text,
+        number -> Float,
+        title -> Text,
+        page -> Integer,
+        completed -> Bool,
+    }
+}
+
+diesel::table! {
+    library (id) {
         id -> Text,
         title -> Text,
         img -> Text,
@@ -11,19 +24,21 @@ diesel::table! {
 }
 
 diesel::table! {
-    chapter (id) {
+    plugins (id) {
         id -> Text,
-        manga_id -> Text,
-        number -> Float,
-        title -> Text,
-        page -> Integer,
-        completed -> Bool,
+        search_url -> Text,
+        search -> Text,
+        chapters_url -> Text,
+        get_chapters -> Text,
+        pages_url -> Text,
+        get_pages -> Text,
     }
 }
 
-diesel::joinable!(chapter -> manga (manga_id));
+diesel::joinable!(chapters -> library (manga_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
-    manga,
-    chapter,
+    chapters,
+    library,
+    plugins,
 );
