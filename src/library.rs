@@ -3,8 +3,6 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use lazy_static::lazy_static;
 
-use crate::database::{create_manga, get_library};
-
 lazy_static! {
     pub static ref LIB: Mutex<Vec<LibraryItem>> = match File::open("library.json") {
         Ok(file) => Mutex::new(serde_json::from_reader(file).unwrap_or_default()),
@@ -18,22 +16,22 @@ lazy_static! {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct LibraryItem {
-  pub id: String,
-  pub title: String,
-  pub img: String,
-  pub extension: String,
-  pub authors: String,
-  pub artists: String,
-  pub description: Option<String>,
-  pub chapters: Vec<ChapterItem>
+  id: String,
+  title: String,
+  img: String,
+  extention: String,
+  authors: String,
+  artists: String,
+  description: Option<String>,
+  chapters: Vec<ChapterItem>
 }
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ChapterItem {
-  pub id: String,
-  pub number: f32,
-  pub title: String,
-  pub page: i32,
-  pub completed: bool
+  id: String,
+  number: f64,
+  title: String,
+  page: u32,
+  completed: bool
 }
 
 fn save(lib: &Vec<LibraryItem>) {
@@ -46,23 +44,17 @@ fn save(lib: &Vec<LibraryItem>) {
 pub fn get_lib() -> Value {
   // todo: fix unwraps
   println!("Getting library...");
-
-  // let lib = LIB.lock().unwrap();
-  // serde_json::to_value(&*lib).unwrap()
-  let lib = get_library().unwrap_or_default();
-  serde_json::to_value(lib).unwrap()
+  let lib = LIB.lock().unwrap();
+  serde_json::to_value(&*lib).unwrap()
 }
 
 #[tauri::command]
 pub fn add_to_lib(new_item: LibraryItem) {
   // todo: fix unwraps
   println!("Adding to library...");
-  // let mut lib = LIB.lock().unwrap();
-  // lib.push(new_item);
-  // save(&*lib);
-  if let Err(e) = create_manga(new_item) {
-    eprint!("Error adding to library: ")
-  }
+  let mut lib = LIB.lock().unwrap();
+  lib.push(new_item);
+  save(&*lib);
 }
 
 #[tauri::command]
