@@ -19,7 +19,7 @@ fn main() {
       // library.rs
       get_lib, add_to_lib, remove_from_lib, update_lib, 
       // plugins.rs
-      search, get_chapters, get_plugin_names, get_pages
+      search, get_chapters, get_plugin_names, get_pages, add_plugin
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");

@@ -4,6 +4,7 @@
     import Fa from 'svelte-fa'
     import store from "$lib/store.js";
     // import { searchManga, getSources } from "$lib/manga_sources/main.js";
+    import { search as mang } from "$lib/manga_sources/manga4life.js";
     import DisplayManga from "./display_manga.svelte";
     import { invoke } from '@tauri-apps/api/tauri';
     import { onMount } from "svelte";
@@ -32,6 +33,7 @@
                 s.push(key);
             }
         }
+        // results = await mang(name);
         results = await invoke('search', { query: `${name}`, sources: s });
         console.log(results);
         

@@ -18,6 +18,7 @@ export async function searchManga(query, check_sources) {
     const sources = import.meta.glob('./*.js');
 
     let results = [];
+    console.log("here");
     const modulePromises = Object.entries(sources).map(async ([path, moduleImporter]) => {
         if (check_sources.some(s => s == path.split('/')[1].split('.')[0])) {
             const { search } = await moduleImporter();

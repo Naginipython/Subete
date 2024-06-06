@@ -53,8 +53,10 @@ pub fn add_to_lib(new_item: LibraryItem) {
   // todo: fix unwraps
   println!("Adding to library...");
   let mut lib = LIB.lock().unwrap();
-  lib.push(new_item);
-  save(&*lib);
+  if !lib.iter().any(|l| l.id.eq(&new_item.id)) {
+    lib.push(new_item);
+    save(&*lib);
+  }
 }
 
 #[tauri::command]
@@ -80,6 +82,7 @@ pub fn remove_from_lib(id: String) {
   save(&*lib);
 }
 
+#[allow(dead_code)]
 pub fn find_manga(id: String) -> Option<LibraryItem> {
   let lib = LIB.lock().unwrap();
   let found_item = lib.iter().find(|item| item.id == id);

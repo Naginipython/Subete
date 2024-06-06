@@ -125,6 +125,8 @@
     <!-- left side -->
     {#if in_manga}
         <button class="snackbar-item" on:click={async () => goto(manga_data.back)}><Fa icon={faArrowLeft} /></button>
+    {:else if nav.includes('add_sources')}
+        <button class="snackbar-item" on:click={() => goto('/browse/')}><Fa icon={faArrowLeft} /></button>
     {:else}
         <button id="manga" class="snackbar-item {type=="manga"? 'selected':''}">Manga</button>
         <button id="anime" class="snackbar-item">Anime</button>
@@ -161,9 +163,9 @@
 
 <div id="nav-centered">
     <nav class="nav-bar">
-        <a id="/library" class="separator {path=='/library'? 'selected' : ''}" href="/library">Library</a>
-        <a id="/updates" class="separator {path=='/updates'? 'selected' : ''}" href="/updates">Updates</a>
-        <a id="/browse" class="separator {path=='/browse'? 'selected' : ''}" href="/browse">Browse</a>
+        <a id="/library" class="{path=='/library'? 'selected' : ''}" href="/library">Library</a>
+        <a id="/updates" class="{path=='/updates'? 'selected' : ''}" href="/updates">Updates</a>
+        <a id="/browse" class="{path.includes('/browse')? 'selected' : ''}" href="/browse">Browse</a>
         <a id="/more" class="{path=='/more'? 'selected' : ''}" href="/more">More</a>
     </nav>
 </div>
@@ -223,18 +225,17 @@
         text-decoration: none;
         display: flex;
         height: inherit;
-        padding: 0vw 5vw;
+        padding: 0vw 3vw;
         cursor: pointer;
         align-items: center;
         justify-content: center;
+        border-radius: 15px;
+        margin: 0 5px;
     }
-    .separator {
-        border-right: 1px solid black;
+    .nav-bar a:hover {
+        background-color: var(--selection-color);
     }
     .selected {
         background-color: var(--selection-color);
-    }
-    a.selected {
-        border-radius: 15px;
     }
 </style>
