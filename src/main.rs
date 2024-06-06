@@ -4,10 +4,12 @@
 // use scrape::*;
 use library::*;
 use plugins::*;
+use settings::*;
 
 // mod scrape;
 mod library;
 mod plugins;
+mod settings;
 
 fn main() {
   // geckodriver
@@ -19,7 +21,9 @@ fn main() {
       // library.rs
       get_lib, add_to_lib, remove_from_lib, update_lib, 
       // plugins.rs
-      search, get_chapters, get_plugin_names, get_pages, add_plugin
+      search, get_chapters, get_plugin_names, get_pages, add_plugin,
+      // settings.rs
+      update_settings, get_settings
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");

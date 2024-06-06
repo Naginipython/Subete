@@ -2,8 +2,11 @@
 # TEMPORARY json library database
 library.json
 plugins.json
+settings.json
+history.json
 # random temporary files for testing purposes
 temp/
+plugins/old
 # Script for easily remembering 'NO_STRIP=true cargo tauri build'
 build.sh
 # Feels uneeded

@@ -3,8 +3,6 @@
     // import { faHeart as faOutlineHeart } from '@fortawesome/free-regular-svg-icons';
     import Fa from 'svelte-fa'
     import store from "$lib/store.js";
-    // import { searchManga, getSources } from "$lib/manga_sources/main.js";
-    import { search as mang } from "$lib/manga_sources/manga4life.js";
     import DisplayManga from "./display_manga.svelte";
     import { invoke } from '@tauri-apps/api/tauri';
     import { onMount } from "svelte";
@@ -12,28 +10,41 @@
     let name = '';
     let results = [];
     let sources = [];
-    // todo: save checked_sources to disk
-    let checked_source = {"MangaDex": true};
+    let checked_sources = {"MangaDex": true};
+    let first_run = true;
+    $: if (checked_sources) update_settings();
+    
+    async function update_settings() {
+        if (!first_run) {
+            store.update(json => {
+                json["settings"].quickselect = checked_sources;
+                return json;
+            });
+            await invoke('update_settings', { newSettings: {"quickselect":checked_sources}})
+        }
+        first_run = false;
+        
+    }
 
     onMount(async () => {
         sources = await invoke('get_plugin_names');
+        let s = Object.entries(checked_sources).map(([key, value]) => key);
+        let new_sources = sources.filter(source => !s.includes(source));
+        new_sources.forEach(i => {
+            checked_sources[i] = true;
+        });
     });
 
     store.subscribe(json => {
         results = json["search_results"];
+        checked_sources = json["settings"].quickselect;
         reformatResults();
         return json;
     });
 
     async function search() {
         results = [];
-        let s = [];
-        for (let [key, value] of Object.entries(checked_source)) {
-            if (value) {
-                s.push(key);
-            }
-        }
-        // results = await mang(name);
+        let s = Object.entries(checked_sources).map(([key, value]) => key);
         results = await invoke('search', { query: `${name}`, sources: s });
         console.log(results);
         
@@ -87,7 +98,7 @@
         {#each sources as s, i}
         <div>
             <label for="source-{i}">{s}</label>
-            <input id="source-{i}" type="checkbox" bind:checked={checked_source[s]}>
+            <input id="source-{i}" type="checkbox" bind:checked={checked_sources[s]}>
         </div>
         {/each}
     </div>

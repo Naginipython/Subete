@@ -12,8 +12,10 @@
     let library = [];
     onMount(async () => {
         library = await invoke('get_lib');
+        let settings = await invoke('get_settings');
         store.update(json => {
             json.library = library;
+            json.settings = settings;
             return json;
         });
     });

@@ -7,7 +7,7 @@ const store = writable({
             id: int
             title: string,
             img: string, //url or link?
-            extention: string, //file inside lib/manga_sources without "./" and ".js". e.g. "mangadex"
+            extension: string, //file inside lib/manga_sources without "./" and ".js". e.g. "mangadex"
             authors: string,
             artists: string
             description: string,
@@ -27,7 +27,7 @@ const store = writable({
             id: int
             title: string,
             img: string, //url or link?
-            extention: string, //file inside lib/manga_sources without "./" and ".js". e.g. "mangadex"
+            extension: string, //file inside lib/manga_sources without "./" and ".js". e.g. "mangadex"
             authors: string,
             artists: string
             description: string,
@@ -49,7 +49,7 @@ const store = writable({
             id: int
             title: string,
             img: string, //url or link?
-            extention: string, //file inside lib/manga_sources without "./" and ".js". e.g. "mangadex"
+            extension: string, //file inside lib/manga_sources without "./" and ".js". e.g. "mangadex"
             authors: string,
             artists: string
             description: string,
@@ -63,6 +63,9 @@ const store = writable({
                 }
             ]
         }*/
-    ]
+    ],
+    "settings": {
+        "quickselect": {}, // typically: "[plugin_name]": Boolean, 
+    }
 });
 export default store;
