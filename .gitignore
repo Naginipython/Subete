@@ -7,7 +7,8 @@ temp/
 # Script for easily remembering 'NO_STRIP=true cargo tauri build'
 build.sh
 # Feels uneeded
-frontend/build/
+/frontend/build/
+/frontend/build/*
 
 ## RUST
 debug/
