@@ -1,28 +1,21 @@
 <script>
     import store from "$lib/store.js";
-    import { onMount } from 'svelte';
 
     let library = [];
-    let img_width = '';
 
     store.subscribe(json => {
         library = json["library"];
+        setWidth();
         return library;
-    });
-    onMount(() => {
-        // let img_width = window.getComputedStyle(document.querySelector('.lib-manga-wrap')).getPropertyValue('width');
-        // console.log(img_width)
     });
 
     window.addEventListener('resize', setWidth);
-    setWidth();
 
     function setWidth() {
-        var viewportWidth = window.innerWidth;
-        var newWidth = Math.floor(viewportWidth / 300) * 315;
-        var style = getComputedStyle(document.body).getPropertyValue('--lib-manga-height');
-        console.log(style);
-        console.log(parseInt(style));
+        var style = parseFloat(getComputedStyle(document.body).getPropertyValue('--lib-manga-height'));
+        let imgWidth = 0.5*parseFloat(style) + 50 + 10; // +5 * itemcount
+        let itemCount = Math.floor(window.innerWidth / imgWidth);
+        var newWidth = itemCount * imgWidth;
         document.documentElement.style.setProperty('--calculated-width', `${newWidth}px`);
     }
 </script>
@@ -41,6 +34,7 @@
 <style>
     :root {
         --lib-manga-height: 300px;
+        --lib-manga-width: calc(0.5*var(--lib-manga-height) + 50px);
     }
     #lib-manga-section {
         display: flex;
@@ -61,7 +55,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        width: calc(0.5*var(--lib-manga-height) + 50px);
+        width: var(--lib-manga-width);
         height: var(--lib-manga-height);
         border-radius: 5px;
         overflow: hidden;
@@ -73,7 +67,7 @@
     .lib-manga p {
         margin: 0;
         padding: 0;
-        width: calc(0.5*var(--lib-manga-height) + 50px);
+        width: var(--lib-manga-width);
         height: 1.5em;
         font-size: x-small;
         white-space: nowrap;
