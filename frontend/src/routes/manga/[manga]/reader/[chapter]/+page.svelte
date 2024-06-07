@@ -165,15 +165,18 @@
 </div>
 <!-- PAGES -->
 <div class="center-img-div">
+    <!-- TODO: better prev chap -->
     <p id="prev-chapter" class={curr_page == -1? 'visible' : 'invisible'}>previous chapter?</p>
     {#if chapter.length == 0}
+        <!-- TODO: loading icon -->
         <p style="color: white; font-size: xx-large">loading</p>
     {:else}
         {#each chapters as c, i}
             <img on:load={adjustImage} class={i == curr_page? 'visible' : 'invisible'} src={c} alt="{i} - {manga.title}" />
         {/each}
     {/if}
-        <p id="next-chapter" class={curr_page == chapter.page? 'visible' : 'invisible'}>next chapter?</p>
+    <!-- TODO: better next chap -->
+    <p id="next-chapter" class={curr_page == chapter.page? 'visible' : 'invisible'}>next chapter?</p>
 </div>
 
 <style>

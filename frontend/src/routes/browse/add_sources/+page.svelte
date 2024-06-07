@@ -45,6 +45,8 @@
   }
 </script>
   
+<!-- TODO: style much much better. Also allow for removal, or toggles -->
+<!-- TODO: source specific panic button -->
 <form on:submit={submit}>
     <label for="source">Upload source (.json):</label>
     <input type="file" id="source" bind:files on:change={async () => validateFile(files[0])} />

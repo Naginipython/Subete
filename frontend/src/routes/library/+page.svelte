@@ -20,7 +20,9 @@
     }
 </script>
 
+<!-- TODO: categories -->
 <div id="lib-manga-section">
+<!-- TODO: loading icon -->
 {#each library as l, i}
     <a class="lib-manga" href="/manga/{l.id}">
         <div class="lib-manga-wrap">

@@ -55,6 +55,7 @@ pub fn init_plugins() -> Vec<Plugins> {
 #[derive(Debug, Deserialize, Serialize, Default, Clone)]
 pub struct Plugins {
   pub id: String,
+  // TODO: add type
   pub search_url: String,
   pub search: String,
   pub chapters_url: String,

@@ -77,12 +77,14 @@
             <h3>{manga.title}</h3>
             <p>Author: {manga.authors}</p>
             <p>Extention: {manga.extension}</p>
+            <!-- TODO: fix desc scrolling -->
             <div id="desc"><p>{manga.description}</p></div>
         </div>
     </div>
 </div>
 
 
+<!-- TODO: loading icon -->
 {#each manga['chapters'] as c, i}
 <div class="chapter" style="{manga['chapters'][i].completed? 'color: grey' : ''}">
     <!-- Main Chapter button -->
@@ -109,6 +111,7 @@
         </button>
         <!-- expanded options menu -->
         <div id="i-{i}" style="display:none">
+            <!-- TODO: make work -->
             <button id="bookmark" class="chapter-btn"><Fa icon={faOutlineBookmark} /></button>
             <button id="check-below" class="chapter-btn" on:click={() => check_below(i)}><Fa icon={faAnglesDown} /></button>
             <button id="download" class="chapter-btn"><Fa icon={faCircleDown} /><!--<Fa icon={faCircleCheck} />--></button>

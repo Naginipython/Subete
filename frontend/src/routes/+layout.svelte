@@ -131,6 +131,7 @@
     {:else if nav.includes('add_sources')}
         <button class="snackbar-item" on:click={() => goto('/browse/')}><Fa icon={faArrowLeft} /></button>
     {:else}
+        <!-- TODO: make work -->
         <button id="manga" class="snackbar-item {type=="manga"? 'selected':''}">Manga</button>
         <button id="anime" class="snackbar-item">Anime</button>
         <button id="ln" class="snackbar-item">LN</button>
@@ -153,6 +154,7 @@
             <button class="snackbar-item" on:click={() => goto('/browse/add_sources')}><Fa icon={faBook} /></button>
         {:else}
             <!-- https://fontawesome.com/search -->
+            <!-- TODO: make work -->
             <button class="snackbar-item"><Fa icon={faMagnifyingGlass} /></button>
             <button class="snackbar-item"><Fa icon={faFilter} /></button>
             <button class="snackbar-item"><Fa icon={faEllipsisVertical} /></button>
@@ -166,6 +168,7 @@
 
 <div id="nav-centered">
     <nav class="nav-bar">
+        <!-- TODO: merge with more when possible (for History, stats?, settings) -->
         <a id="/library" class="{path=='/library'? 'selected' : ''}" href="/library">Library</a>
         <a id="/updates" class="{path=='/updates'? 'selected' : ''}" href="/updates">Updates</a>
         <a id="/browse" class="{path.includes('/browse')? 'selected' : ''}" href="/browse">Browse</a>
