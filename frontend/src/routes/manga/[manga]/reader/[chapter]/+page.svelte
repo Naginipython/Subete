@@ -20,6 +20,7 @@
     // Prepares Reader & pages
     async function start_reader(page) {
         chapters = [];
+        chapter = manga['chapters'][data.manga_index];
         imgs = document.getElementsByTagName("img");
         chapters = await invoke('get_pages', { source: manga.extension, id: chapter.id });
         // chapters = await getChapterPages(manga.extention, chapter.id);
@@ -43,6 +44,8 @@
     
     // Updates library backend
     async function update_lib() {
+        console.log(chapter.completed);
+        console.log(chapter.page);
         await invoke('update_lib', { item: manga });
         goto(`/manga/${data.id}`)
     }
@@ -63,14 +66,6 @@
         }
     }
     function toggle_menu() {
-        /*let to_toggle = ["next", "prev", "return", "page-num"]
-        if (document.getElementById("next").style.opacity == "0.5") {
-            to_toggle.forEach(e => document.getElementById(e).style.opacity = "0");
-        } else {
-            to_toggle.forEach(e => document.getElementById(e).style.opacity = "0.5");
-            // exception
-            document.getElementById("page-num").style.opacity = "1"
-        }*/
         if (document.getElementById("chap-menu").style.opacity == "1") {
             document.getElementById("chap-menu").style.opacity = "0";
         } else {
@@ -109,9 +104,9 @@
             let prev = parseInt(data.manga_index)+1;
             if (prev < manga['chapters'].length) {
                 goto(`/manga/${data.id}/reader/${prev}`).then(() => {
-                    invoke('update_lib', { item: manga }).then(() => {
-                        start_reader(Infinity);
-                    });
+                    start_reader(Infinity);
+                    // invoke('update_lib', { item: manga }).then(() => {
+                    // });
                 });
             } else {
                 update_lib()
