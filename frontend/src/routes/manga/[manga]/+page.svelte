@@ -167,6 +167,7 @@
     }
     #desc {
         overflow: scroll;
+        overflow-x: hidden;
     }
     .chapter {
         width: 100vw;
