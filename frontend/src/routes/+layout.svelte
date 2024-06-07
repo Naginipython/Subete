@@ -38,6 +38,7 @@
     $: if($navigating) page_check();
     function page_check() {
         nav = $navigating.to.url.pathname;
+        console.log(nav);
         let from = $navigating.from.url.pathname
         // Highlights nav bar items
         if (selected_valid_links.includes(nav)) {
@@ -101,8 +102,8 @@
             document.getElementById("body").style.height = "100vh";
             document.getElementById("nav-centered").style.display = "none";
         } else {
-            document.getElementById("snackbar").style.display = "block";
             document.getElementById("body").style.height = null;
+            document.getElementById("snackbar").style.display = "block";
             document.getElementById("nav-centered").style.display = "block";
         }
     }

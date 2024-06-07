@@ -82,10 +82,16 @@
             curr_page++;
             adjustImage();
         } else {
-            goto(`/manga/${data.id}/reader/${parseInt(data.manga_index)-1}`).then(() => {
+            let next = parseInt(data.manga_index)-1;
+            if (next >= 0) {
+                goto(`/manga/${data.id}/reader/${next}`).then(() => {
+                    invoke('update_lib', { item: manga }).then(() => {
+                        start_reader(0);
+                    });
+                });
+            } else {
                 update_lib();
-                start_reader(0);
-            });
+            }
         }
     }
     function prev() {
@@ -96,15 +102,22 @@
         } else if (curr_page == 0) {
             curr_page--;
         } else {
-            goto(`/manga/${data.id}/reader/${parseInt(data.manga_index)+1}`).then(() => {
-                update_lib();
-                start_reader(Infinity);
-            });
+            let prev = parseInt(data.manga_index)+1;
+            if (prev < manga['chapters'].length) {
+                goto(`/manga/${data.id}/reader/${prev}`).then(() => {
+                    invoke('update_lib', { item: manga }).then(() => {
+                        start_reader(Infinity);
+                    });
+                });
+            } else {
+                update_lib()
+            }
         }
     }
 
     // Image Fitting
     window.addEventListener('resize', adjustImage);
+    // todo: fix this
     function adjustImage() {
         // console.log("adjustImage start")
         if (imgs[curr_page] != undefined) {
@@ -272,14 +285,6 @@
     }
     #next {
         float: right;
-    }
-    #next-chapter {
-        position: absolute;
-        top: 40vh;
-        width: 100vw;
-        justify-content: center;
-        text-align: center;
-
     }
     #page-num {
         position: absolute;
