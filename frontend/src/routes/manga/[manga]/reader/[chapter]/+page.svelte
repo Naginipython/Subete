@@ -128,14 +128,6 @@
                 imgs[curr_page].style.height = "100vh";
                 imgs[curr_page].style.width = "auto";
             }
-
-            // if (imgs[curr_page].height > imgs[curr_page].width) {
-            //     imgs[curr_page].style.height = "100vh";
-            //     imgs[curr_page].style.width = "auto";
-            // } else {
-            //     imgs[curr_page].style.height = "auto";
-            //     imgs[curr_page].style.width = "100vw";
-            // }
         }
     }
 </script>
