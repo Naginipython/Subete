@@ -1,8 +1,7 @@
 <script>
     import { invoke } from '@tauri-apps/api/tauri';
-    import { faArrowLeft, faBookmark } from '@fortawesome/free-solid-svg-icons';
+    import { faArrowLeft, faBookmark, faEllipsisVertical } from '@fortawesome/free-solid-svg-icons';
     import { faBookmark as faOutlineBookmark } from '@fortawesome/free-regular-svg-icons';
-    // import { getChapterPages } from "$lib/manga_sources/main.js"
     import { find_manga } from "$lib/common.js";
     import { goto } from "$app/navigation";
     import Fa from 'svelte-fa'
@@ -116,7 +115,6 @@
 
     // Image Fitting
     window.addEventListener('resize', adjustImage);
-    // todo: fix this
     function adjustImage() {
         if (imgs[curr_page] != undefined) {
             const imgAspectRatio = imgs[curr_page].naturalWidth / imgs[curr_page].naturalHeight;
@@ -131,49 +129,51 @@
         }
     }
 </script>
-<!-- <svelte:window on:keydown|preventDefault={keyInput} /> -->
-<div>
-    
-    <div id="chap-menu" style="opacity: 0">
-        <div class="menu-background"></div>
-        <div id="chap-snackbar">
-            <button class="chap-snack-item" on:click={update_lib}><Fa icon={faArrowLeft} /></button>
-            <div id="chap-snack-text">
-                <p>{manga.title}</p>
-                <p style="font-size: x-small">
-                    {#if chapter.title == ""}
-                        Chapter {chapter.number}
-                    {:else}
-                        Chapter {chapter.number}: {chapter.title}
-                    {/if}
-                </p>
-            </div>
-            <div class="chap-snack-right">
-                <button class="chap-snack-item"><Fa icon={faOutlineBookmark} /></button>
-            </div>
-        </div>
-        
-        <button id="prev" class="arrow" on:click={prev}>&lt;</button>
-        <button id="show-arrow" on:click={toggle_menu}></button>
-        <button id="next" class="arrow" on:click={next}>&gt;</button>
-        
-        <div id="page-num">
-            <p>
-                {display_page}/{imgs.length}
+
+<!-- SNACKBAR -->
+<div id="chap-menu" style="opacity: 0">
+    <div class="menu-background"></div>
+    <div id="chap-snackbar">
+        <button class="chap-snack-item" on:click={update_lib}><Fa icon={faArrowLeft} /></button>
+        <div id="chap-snack-text">
+            <p>{manga.title}</p>
+            <p style="font-size: x-small">
+                {#if chapter.title == ""}
+                    Chapter {chapter.number}
+                {:else}
+                    Chapter {chapter.number}: {chapter.title}
+                {/if}
             </p>
         </div>
+        <div class="chap-snack-right">
+            <button class="chap-snack-item"><Fa icon={faOutlineBookmark} /></button>
+            <button class="chap-snack-item"><Fa icon={faEllipsisVertical} /></button>
+        </div>
     </div>
-    <div class="center-img-div">
-        <p id="prev-chapter" class={curr_page == -1? 'visible' : 'invisible'}>previous chapter?</p>
-        {#if chapter.length == 0}
-            <p style="color: white; font-size: xx-large">loading</p>
-        {:else}
-            {#each chapters as c, i}
-                <img on:load={adjustImage} class={i == curr_page? 'visible' : 'invisible'} src={c} alt="{i} - {manga.title}" />
-            {/each}
-        {/if}
-            <p id="next-chapter" class={curr_page == chapter.page? 'visible' : 'invisible'}>next chapter?</p>
+    
+    <!-- ARROWS -->
+    <button id="prev" class="arrow" on:click={prev}>&lt;</button>
+    <button id="show-arrow" on:click={toggle_menu}></button>
+    <button id="next" class="arrow" on:click={next}>&gt;</button>
+    
+    <!-- FOOTER -->
+    <div id="page-num">
+        <p>
+            {display_page}/{imgs.length}
+        </p>
     </div>
+</div>
+<!-- PAGES -->
+<div class="center-img-div">
+    <p id="prev-chapter" class={curr_page == -1? 'visible' : 'invisible'}>previous chapter?</p>
+    {#if chapter.length == 0}
+        <p style="color: white; font-size: xx-large">loading</p>
+    {:else}
+        {#each chapters as c, i}
+            <img on:load={adjustImage} class={i == curr_page? 'visible' : 'invisible'} src={c} alt="{i} - {manga.title}" />
+        {/each}
+    {/if}
+        <p id="next-chapter" class={curr_page == chapter.page? 'visible' : 'invisible'}>next chapter?</p>
 </div>
 
 <style>
@@ -237,7 +237,7 @@
         display: inline-flex; 
         height: inherit; 
         flex-direction: column;
-        width: calc(100vw - 2*52px);
+        width: calc(100vw - 3*53px);
     }
     #chap-snack-text p {
         padding: 0;
