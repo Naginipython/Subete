@@ -37,6 +37,7 @@
     function toggle_complete(index) {
         if (manga['chapters'][index].completed) {
             manga['chapters'][index].completed = false;
+            manga['chapters'][index].page = 1;
         } else {
             manga['chapters'][index].completed = true;
         }
