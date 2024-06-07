@@ -118,30 +118,23 @@
     window.addEventListener('resize', adjustImage);
     // todo: fix this
     function adjustImage() {
-        // console.log("adjustImage start")
         if (imgs[curr_page] != undefined) {
-            // Inital sizer
-            if (imgs[curr_page].height > imgs[curr_page].width) {
-            // console.log("height: 100vw");
-                imgs[curr_page].style.height = "100vh";
-                imgs[curr_page].style.width = "auto";
-            } else {
-            // console.log("width: 100vw");
+            const imgAspectRatio = imgs[curr_page].naturalWidth / imgs[curr_page].naturalHeight;
+            const viewportAspectRatio = window.innerWidth / window.innerHeight;
+            if (imgAspectRatio > viewportAspectRatio) {
                 imgs[curr_page].style.height = "auto";
                 imgs[curr_page].style.width = "100vw";
+            } else {
+                imgs[curr_page].style.height = "100vh";
+                imgs[curr_page].style.width = "auto";
             }
-            // double checking size compared to viewport
-            // let height_diff = imgs[curr_page].height - window.innerHeight;
-            // if (height_diff > 0) {
-            // console.log("got here3");
-            //     imgs[curr_page].style.height = "auto";
-            //     imgs[curr_page].style.width = "100vw";
-            // } 
-            // let width_dif = imgs[curr_page].width - window.innerWidth
-            // if (width_dif > 0) {
-            // console.log("got here4");
+
+            // if (imgs[curr_page].height > imgs[curr_page].width) {
             //     imgs[curr_page].style.height = "100vh";
             //     imgs[curr_page].style.width = "auto";
+            // } else {
+            //     imgs[curr_page].style.height = "auto";
+            //     imgs[curr_page].style.width = "100vw";
             // }
         }
     }
