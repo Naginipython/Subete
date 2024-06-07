@@ -15,6 +15,7 @@
     $: if (checked_sources) update_settings();
     
     async function update_settings() {
+        // console.log(checked_sources)
         if (!first_run) {
             store.update(json => {
                 json["settings"].quickselect = checked_sources;
@@ -23,22 +24,32 @@
             await invoke('update_settings', { newSettings: {"quickselect":checked_sources}})
         }
         first_run = false;
-        
     }
 
     onMount(async () => {
+        // sources = await invoke('get_plugin_names');
+        // checked_sources = {"MangaDex": true};
+        // let s = Object.entries(checked_sources).map(([key, value]) => key);
+        // let new_sources = sources.filter(source => !s.includes(source));
+        // new_sources.forEach(i => {
+        //     checked_sources[i] = true;
+        // });
+    });
+
+    store.subscribe(async json => {
+        results = json["search_results"];
+        if (!json["settings"].hasOwnProperty("quickselect")) {
+            checked_sources = {"MangaDex": true};
+        } else {
+            checked_sources = json["settings"].quickselect;
+        }
         sources = await invoke('get_plugin_names');
-        checked_sources = {"MangaDex": true};
+        console.log(sources);
         let s = Object.entries(checked_sources).map(([key, value]) => key);
         let new_sources = sources.filter(source => !s.includes(source));
         new_sources.forEach(i => {
             checked_sources[i] = true;
         });
-    });
-
-    store.subscribe(json => {
-        results = json["search_results"];
-        checked_sources = json["settings"].quickselect;
         reformatResults();
         return json;
     });

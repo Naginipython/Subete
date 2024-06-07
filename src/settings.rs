@@ -33,21 +33,12 @@ pub fn update_settings(new_settings: Value) {
         }
     }
     save(&*settings);
-
-
-//   for entry in lib.iter_mut() {
-//     if entry.id == item.id {
-//         *entry = item;
-//         save(&*lib);
-//         return;
-//     }
-//   }
 }
 
 #[tauri::command]
 pub fn get_settings() -> Value {
   // todo: fix unwraps
-  println!("Getting library...");
+  println!("Getting Settings...");
   let settings = SETTINGS.lock().unwrap();
   serde_json::to_value(&*settings).unwrap()
 }
