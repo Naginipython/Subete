@@ -209,6 +209,10 @@
         overflow: scroll;
         background-color: var(--primary-color);
     }
+    /* Likely lags on firefox */
+    #body::-webkit-scrollbar {
+        display: none; 
+    }
     #nav-centered {
         height: var(--nav-bar-height);
         background-color: var(--secondary-color);

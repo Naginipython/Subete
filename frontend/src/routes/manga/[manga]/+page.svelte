@@ -188,6 +188,11 @@
         color: inherit;
         width: 100%;
         float: left;
+        
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        /* width: idk; TODO */
     }
     .chapter-lower {
         display: inline-flex;

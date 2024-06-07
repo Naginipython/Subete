@@ -65,6 +65,7 @@ pub struct Plugins {
 
 #[tauri::command]
 pub fn get_plugin_names() -> Value {
+  println!("Getting Plugin Names...");
   let plugins = PLUGINS.lock().unwrap();
   let names: Vec<String> = plugins.iter().map(|p| p.id.clone()).collect();
   json!(names)

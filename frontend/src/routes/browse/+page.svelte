@@ -10,7 +10,7 @@
     let name = '';
     let results = [];
     let sources = [];
-    let checked_sources = {"MangaDex": true};
+    let checked_sources;
     let first_run = true;
     $: if (checked_sources) update_settings();
     
@@ -28,6 +28,7 @@
 
     onMount(async () => {
         sources = await invoke('get_plugin_names');
+        checked_sources = {"MangaDex": true};
         let s = Object.entries(checked_sources).map(([key, value]) => key);
         let new_sources = sources.filter(source => !s.includes(source));
         new_sources.forEach(i => {
@@ -44,9 +45,9 @@
 
     async function search() {
         results = [];
-        let s = Object.entries(checked_sources).map(([key, value]) => key);
+        let s = Object.entries(checked_sources).filter(([key, value]) => value).map(([key, value]) => key);
+        console.log(s);
         results = await invoke('search', { query: `${name}`, sources: s });
-        console.log(results);
         
         store.update(json => {
             json.search_results = results;

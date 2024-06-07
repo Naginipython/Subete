@@ -1,11 +1,17 @@
 <script>
     import store from "$lib/store.js";
+    import { onMount } from 'svelte';
 
     let library = [];
+    let img_width = '';
 
     store.subscribe(json => {
         library = json["library"];
         return library;
+    });
+    onMount(() => {
+        // let img_width = window.getComputedStyle(document.querySelector('.lib-manga-wrap')).getPropertyValue('width');
+        // console.log(img_width)
     });
 
     window.addEventListener('resize', setWidth);
@@ -13,8 +19,10 @@
 
     function setWidth() {
         var viewportWidth = window.innerWidth;
-        var newWidth = Math.floor(viewportWidth / 210) * 220;
-        
+        var newWidth = Math.floor(viewportWidth / 300) * 315;
+        var style = getComputedStyle(document.body).getPropertyValue('--lib-manga-height');
+        console.log(style);
+        console.log(parseInt(style));
         document.documentElement.style.setProperty('--calculated-width', `${newWidth}px`);
     }
 </script>
