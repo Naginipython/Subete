@@ -87,9 +87,11 @@
 <div class="chapter" style="{manga['chapters'][i].completed? 'color: grey' : ''}">
     <!-- Main Chapter button -->
     <button class="chapter-link" on:click={() => goto(`/manga/${data.id}/reader/${i}`)}>
-        {#if c.title == ""} Chapter {c.number}
-        {:else} Chapter {c.number} - {c.title}
-        {/if}
+        <p>
+            {#if c.title == ""} Chapter {c.number}
+            {:else} Chapter {c.number} - {c.title}
+            {/if}
+        </p>
         <div class="chapter-lower">
             <p>date - group</p>
             {#if manga['chapters'][i].page-1 != 0 && !manga['chapters'][i].completed}
@@ -179,7 +181,17 @@
     .chapter:hover {
         background-color: var(--selection-color)
     }
+    .chapter-link p {
+        justify-content: left;
+        width: inherit;
+        padding: 0;
+        margin: 0;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
     .chapter-link {
+        text-align: left;
         cursor: pointer;
         display: inline-flex;
         justify-content: left;
