@@ -11,6 +11,7 @@
     let manga = find_manga(data.id);
     let chapter = manga['chapters'][data.manga_index];
     let curr_page = 0;
+    let display_page = 0;
     let imgs = -1;
     let chapters = [];
 
@@ -36,6 +37,9 @@
         if (curr_page >= imgs.length-1) chapter.completed = true;
         else chapter.completed = false;
     }
+
+    // Update display page number, unless it is above or below a threshold
+    $: if (curr_page >= 0 && curr_page < chapters.length) display_page = curr_page+1;
     
     // Updates library backend
     async function update_lib() {
@@ -175,7 +179,7 @@
         
         <div id="page-num">
             <p>
-                {curr_page+1}/{imgs.length}
+                {display_page}/{imgs.length}
             </p>
         </div>
     </div>
