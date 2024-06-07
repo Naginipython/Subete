@@ -1,14 +1,14 @@
 var fs = require('fs');
 
 // This helps one create a JSON that can be inputted for a plugin.
-let result = {};
+let plugin = {};
 
 // Name for your plugin
-result.id = "Manga4Life"; 
+plugin.id = "Manga4Life"; 
 
-result.search_url = "https://manga4life.com/search/?sort=s&desc=false&name={title}"; 
+plugin.search_url = "https://manga4life.com/search/?sort=s&desc=false&name={title}"; 
 
-result.search = `
+plugin.search = `
 function search(json) {
   let data = [];
   let retrieved;
@@ -54,9 +54,9 @@ function search(json) {
 }
 `;
 
-result.chapters_url = "https://manga4life.com/manga/{id}";
+plugin.chapters_url = "https://manga4life.com/manga/{id}";
 
-result.get_chapters = `
+plugin.get_chapters = `
 function getChapters(json) {
   let retrieved;
   const keyword = 'vm.Chapters =';
@@ -97,10 +97,10 @@ function getChapters(json) {
 `;
 
 
-result.pages_url = "https://manga4life.com/read-online/{id}-page-1.html";
+plugin.pages_url = "https://manga4life.com/read-online/{id}-page-1.html";
 
 
-result.get_pages = `
+plugin.get_pages = `
 function getChapterPages(json) {
   let retrieved;
   const keyword = 'vm.CurChapter =';
@@ -136,14 +136,14 @@ function getChapterPages(json) {
       }
   }
   let chapter = retrieved.Chapter.slice(1,-1);
+  let period = retrieved.Chapter[retrieved.Chapter.length -1];
   let pages = parseInt(retrieved.Page);
   let data = [];
   for (let i=1; i < pages+1; i++) {
-    if (chapter.includes('.')) {
-        let period = retrieved.Chapter[retrieved.Chapter.length -1];
-        chapter = chapter + '.' + period;
-        let pad_math = 5 + chapter.split('.')[1].length; 
-        data.push(\`https://\${link}/manga/\${id}/\${chapter.padStart(pad_math, '0')}-\${i.toString().padStart(3, '0')}.png\`)
+    if (period != 0) {
+        let newChap = chapter + '.' + period;
+        let pad_math = 5 + newChap.split('.')[1].length; 
+        data.push(\`https://\${link}/manga/\${id}/\${newChap.padStart(pad_math, '0')}-\${i.toString().padStart(3, '0')}.png\`)
     } else {
         data.push(\`https://\${link}/manga/\${id}/\${chapter.padStart(4, '0')}-\${i.toString().padStart(3, '0')}.png\`)
     }
@@ -155,15 +155,15 @@ function getChapterPages(json) {
 
 
 // Removes /n, extra spaces, and '\' needed for js things
-for (const [key, val] of Object.entries(result)) {
-  result[key] = val.replaceAll('\n', '').replace(/\s+/g, ' ');
+for (const [key, val] of Object.entries(plugin)) {
+  plugin[key] = val.replaceAll('\n', '').replace(/\s+/g, ' ');
 }
 
 async function tests() {
   // Testing if search works
-  const search_res = await fetch(result.search_url.replace("{title}", "one"));
+  const search_res = await fetch(plugin.search_url.replace("{title}", "mashle"));
   const search_data = await search_res.text();
-  const search_test = eval(result.search + `search(${JSON.stringify(search_data)})`);
+  const search_test = eval(plugin.search + `search(${JSON.stringify(search_data)})`);
   if (
     !search_test[0].hasOwnProperty("id") ||
     !search_test[0].hasOwnProperty("title") ||
@@ -179,9 +179,9 @@ async function tests() {
   }
   
   // Testing if getChapters works
-  const chap_res = await fetch(result.chapters_url.replace("{id}", search_test[0].id));
+  const chap_res = await fetch(plugin.chapters_url.replace("{id}", search_test[0].id));
   const chap_data = await chap_res.text();
-  const chap_test = eval(result.get_chapters + `getChapters(${JSON.stringify(chap_data)})`);
+  const chap_test = eval(plugin.get_chapters + `getChapters(${JSON.stringify(chap_data)})`);
   if (
     !chap_test[0].hasOwnProperty("id") ||
     !chap_test[0].hasOwnProperty("number") ||
@@ -194,10 +194,9 @@ async function tests() {
   }
 
   // Testing if getChapters works
-  const page_res = await fetch(result.pages_url.replace("{id}", chap_test[0].id));
-  console.log(result.pages_url.replace("{id}", chap_test[0].id));
+  const page_res = await fetch(plugin.pages_url.replace("{id}", chap_test[0].id));
   const page_data = await page_res.text();
-  const page_test = eval(result.get_pages + `getChapterPages(${JSON.stringify(page_data)})`);
+  const page_test = eval(plugin.get_pages + `getChapterPages(${JSON.stringify(page_data)})`);
   if (page_test.length <= 0) {
     console.log("Search test failed; Missing field.");
     return false;
@@ -209,7 +208,7 @@ async function tests() {
 tests().then((result) => {
   // Writes to a file, to be inserted as a plugin
   if (result) {
-    fs.writeFile(`${result.id}.json`, JSON.stringify(result), (error) => {
+    fs.writeFile(`${plugin.id}.json`, JSON.stringify(plugin), (error) => {
         if (error) {
           console.error(error);
           throw error;
