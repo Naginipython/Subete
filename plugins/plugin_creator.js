@@ -1,15 +1,15 @@
 var fs = require('fs');
 
 // This helps one create a JSON that can be inputted for a plugin.
-let result = {}
+let plugin = {}
 
 // Name for your plugin
-result.id = ""; 
-// result.id = "MangaDex"
+plugin.id = ""; 
+// plugin.id = "MangaDex"
 
 // Url for your plugin. Note that '{title}' is needed to query
-result.search_url = "{title}"; 
-// result.search_url = "https://api.mangadex.org/manga?limit=100&includes[]=cover_art&includes[]=author&includes[]=artist&title={title}";
+plugin.search_url = "{title}"; 
+// plugin.search_url = "https://api.mangadex.org/manga?limit=100&includes[]=cover_art&includes[]=author&includes[]=artist&title={title}";
 
 // JS code needed to search. Will need a param of the raw GET of the search_url, and return:
 // LibraryItem:
@@ -23,8 +23,8 @@ result.search_url = "{title}";
 //     description: String OR none,
 //     chapters: [ ChapterItem ]
 // }
-result.search = "function search(json) { let data = []; return data; }";
-// result.search = `
+plugin.search = "function search(json) { let data = []; return data; }";
+// plugin.search = `
 // function search(json) {
 //     json = JSON.parse(json); 
 //     let data = [];
@@ -48,8 +48,8 @@ result.search = "function search(json) { let data = []; return data; }";
 // `;
 
 // Get Chapters url. Note that '{id}' is needed to query
-result.chapters_url = "{id}";
-// result.chapters_url = "https://api.mangadex.org/manga/{id}/feed?limit=500&order[chapter]=asc&translatedLanguage[]=en";
+plugin.chapters_url = "{id}";
+// plugin.chapters_url = "https://api.mangadex.org/manga/{id}/feed?limit=500&order[chapter]=asc&translatedLanguage[]=en";
 
 // JS code needed to get chapter data. Will need a param of the raw GET of the chapters_url, and return:
 // ChapterItem:
@@ -62,8 +62,8 @@ result.chapters_url = "{id}";
 //         completed: Boolean
 //     }
 // ]
-result.get_chapters = "function getChapters(json) { let data = []; return data; }";
-// result.get_chapters = `
+plugin.get_chapters = "function getChapters(json) { let data = []; return data; }";
+// plugin.get_chapters = `
 // function getChapters(json) {
 //     return json['data'].map(e => {
 //       return {
@@ -78,13 +78,13 @@ result.get_chapters = "function getChapters(json) { let data = []; return data; 
 // `;
 
 // Get Pages url. Note that '{id}' is needed to query
-result.pages_url = "{id}";
-// result.pages_url = "https://api.mangadex.org/at-home/server/{id}";
+plugin.pages_url = "{id}";
+// plugin.pages_url = "https://api.mangadex.org/at-home/server/{id}";
 
 // JS code needed to get page links. Will need a param of the raw GET of the chapters_url, and return:
 // [ String ]
-result.get_pages = "function getChapterPages(json) { let data = []; return data; }";
-// result.get_pages = `
+plugin.get_pages = "function getChapterPages(json) { let data = []; return data; }";
+// plugin.get_pages = `
 // function getChapterPages(json) {
 //     let hash = json['chapter']['hash'];
 //     let data = json['chapter']['data'];
@@ -93,15 +93,15 @@ result.get_pages = "function getChapterPages(json) { let data = []; return data;
 // `;
 
 // Removes /n, extra spaces, and '\' needed for js things
-for (const [key, val] of Object.entries(result)) {
-  result[key] = val.replaceAll('\n', '').replace(/\s+/g, ' ');
+for (const [key, val] of Object.entries(plugin)) {
+  plugin[key] = val.replaceAll('\n', '').replace(/\s+/g, ' ');
 }
 
 async function tests() {
   // Testing if search works
-  const search_res = await fetch(result.search_url.replace("{title}", "one"));
+  const search_res = await fetch(plugin.search_url.replace("{title}", "one"));
   const search_data = await search_res.text();
-  const search_test = eval(result.search + `search(${JSON.stringify(search_data)})`);
+  const search_test = eval(plugin.search + `search(${JSON.stringify(search_data)})`);
   if (
     !search_test[0].hasOwnProperty("id") ||
     !search_test[0].hasOwnProperty("title") ||
@@ -117,9 +117,9 @@ async function tests() {
   }
   
   // Testing if getChapters works
-  const chap_res = await fetch(result.chapters_url.replace("{id}", search_test[0].id));
+  const chap_res = await fetch(plugin.chapters_url.replace("{id}", search_test[0].id));
   const chap_data = await chap_res.text();
-  const chap_test = eval(result.get_chapters + `getChapters(${JSON.stringify(chap_data)})`);
+  const chap_test = eval(plugin.get_chapters + `getChapters(${JSON.stringify(chap_data)})`);
   if (
     !chap_test[0].hasOwnProperty("id") ||
     !chap_test[0].hasOwnProperty("number") ||
@@ -132,10 +132,10 @@ async function tests() {
   }
 
   // Testing if getChapters works
-  const page_res = await fetch(result.pages_url.replace("{id}", chap_test[0].id));
-  console.log(result.pages_url.replace("{id}", chap_test[0].id));
+  const page_res = await fetch(plugin.pages_url.replace("{id}", chap_test[0].id));
+  console.log(plugin.pages_url.replace("{id}", chap_test[0].id));
   const page_data = await page_res.text();
-  const page_test = eval(result.get_pages + `getChapterPages(${JSON.stringify(page_data)})`);
+  const page_test = eval(plugin.get_pages + `getChapterPages(${JSON.stringify(page_data)})`);
   if (page_test.length <= 0) {
     console.log("Search test failed; Missing field.");
     return false;
@@ -147,7 +147,7 @@ async function tests() {
 tests().then((result) => {
   // Writes to a file, to be inserted as a plugin
   if (result) {
-    fs.writeFile(`${result.id}.json`, JSON.stringify(result), (error) => {
+    fs.writeFile(`${plugin.id}.json`, JSON.stringify(plugin), (error) => {
         if (error) {
           console.error(error);
           throw error;
