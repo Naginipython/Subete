@@ -253,10 +253,14 @@
         display: inline-flex; 
         height: inherit; 
         flex-direction: column;
+        width: calc(100vw - 2*52px);
     }
     #chap-snack-text p {
         padding: 0;
         margin: 0;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
     }
     .chap-snack-right {
         float: right; 
