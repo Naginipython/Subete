@@ -44,7 +44,6 @@
             checked_sources = json["settings"].quickselect;
         }
         sources = await invoke('get_plugin_names');
-        console.log(sources);
         let s = Object.entries(checked_sources).map(([key, value]) => key);
         let new_sources = sources.filter(source => !s.includes(source));
         new_sources.forEach(i => {
