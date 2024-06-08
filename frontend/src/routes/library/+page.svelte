@@ -50,7 +50,7 @@
         text-align: center;
         width: fit-content;
         text-decoration: none;
-        color: white;
+        color: var(--text-color);
         margin: 5px;
     }
     .lib-manga-wrap {

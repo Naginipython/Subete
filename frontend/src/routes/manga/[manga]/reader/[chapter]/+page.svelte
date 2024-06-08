@@ -169,7 +169,7 @@
     <p id="prev-chapter" class={curr_page == -1? 'visible' : 'invisible'}>previous chapter?</p>
     {#if chapter.length == 0}
         <!-- TODO: loading icon -->
-        <p style="color: white; font-size: xx-large">loading</p>
+        <p style="color: var(--text-color); font-size: xx-large">loading</p>
     {:else}
         {#each chapters as c, i}
             <img on:load={adjustImage} class={i == curr_page? 'visible' : 'invisible'} src={c} alt="{i} - {manga.title}" />
@@ -225,7 +225,7 @@
         background-color: transparent;
         /* background-color: green; */
         border: 0;
-        color: white;
+        color: var(--text-color);
         font-size: medium;
         height: inherit;
         width: 50px;

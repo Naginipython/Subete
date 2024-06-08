@@ -5,7 +5,6 @@
     import store from "$lib/store.js";
     import DisplayManga from "./display_manga.svelte";
     import { invoke } from '@tauri-apps/api/tauri';
-    import { onMount } from "svelte";
 
     let name = '';
     let results = [];
@@ -25,16 +24,6 @@
         }
         first_run = false;
     }
-
-    onMount(async () => {
-        // sources = await invoke('get_plugin_names');
-        // checked_sources = {"MangaDex": true};
-        // let s = Object.entries(checked_sources).map(([key, value]) => key);
-        // let new_sources = sources.filter(source => !s.includes(source));
-        // new_sources.forEach(i => {
-        //     checked_sources[i] = true;
-        // });
-    });
 
     store.subscribe(async json => {
         results = json["search_results"];
@@ -140,31 +129,30 @@
         border: 1px solid black;
         width: 94vw;
         background-color: var(--secondary-color);
-        color: white;
+        color: var(--text-color);
     }
     #clear_search {
         appearance: none;
-        background-color: white;
+        background-color: var(--text-color);
         text-shadow: none;
         border: 1px solid black;
         padding: 1px 6px;
         border-radius: 5px 0 0 5px;
         margin-left: -5px;
         background-color: var(--secondary-color);
-        color: white;
+        color: var(--text-color);
         width: 4vw;
     }
     #search {
         margin: 0;
         appearance: none;
-        background-color: white;
         text-shadow: none;
         border: 1px solid black;
         padding: 1px 6px;
         border-radius: 0 5px 5px 0;
         margin-left: -5px;
         background-color: var(--secondary-color);
-        color: white;
+        color: var(--text-color);
         width: 4vw;
     }
     .quickselect {

@@ -1,6 +1,6 @@
 <script>
     import { goto } from "$app/navigation";
-    import { faClockRotateLeft, faSun, faMoon } from '@fortawesome/free-solid-svg-icons'
+    import { faClockRotateLeft, faSun, faMoon, faGear } from '@fortawesome/free-solid-svg-icons'
     import Fa from 'svelte-fa'
 
     let special = false;
@@ -36,6 +36,12 @@ more screen
     <button class="more-links" on:click={() => goto('/')}>
         <div class="link-icon"><Fa icon={faClockRotateLeft} /></div>
         <p>History (WIP)</p>
+    </button>
+</div>
+<div class="box more-options">
+    <button class="more-links" on:click={() => goto('/settings')}>
+        <div class="link-icon"><Fa icon={faGear} /></div>
+        <p>Settings</p>
     </button>
 </div>
 
@@ -119,5 +125,6 @@ more screen
         float: right;
         display: flex;
         align-items: center;
+        padding-right: 10px;
     }
 </style>

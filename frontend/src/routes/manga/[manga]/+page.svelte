@@ -235,7 +235,7 @@
         background-color: transparent;
         /* background-color: green; */
         border: 0;
-        color: white;
+        color: var(--text-color);
         font-size: large;
         height: inherit;
         margin: 0 2px;

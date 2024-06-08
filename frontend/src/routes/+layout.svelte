@@ -11,6 +11,7 @@
 
     let library = [];
     onMount(async () => {
+        // GET LIB
         library = await invoke('get_lib');
         let settings = await invoke('get_settings');
         store.update(json => {
@@ -18,6 +19,15 @@
             json.settings = settings;
             return json;
         });
+        // GET AND SET SETTINGS
+        if (settings.hasOwnProperty("app_colors")) {
+            if (settings['app_colors'].hasOwnProperty("secondary")) {
+                document.documentElement.style.setProperty('--secondary-color', `#${settings['app_colors'].secondary}`); 
+            }
+            if (json['settings']['app_colors'].hasOwnProperty("secondary")) {
+                document.documentElement.style.setProperty('--text-color', `#${settings['app_colors'].text}`); 
+            }
+        }
     });
 
     let type = "manga";
@@ -184,6 +194,7 @@
         --secondary-color: #330000;
         --selection-color: maroon;
         --secondary-color-transparent: rgba(51, 0, 0, 0.5);
+        --text-color: white;
     }
     #snackbar {
         height: var(--snackbar-height);
@@ -195,7 +206,7 @@
         background-color: transparent;
         /* background-color: green; */
         border: 0;
-        color: white;
+        color: var(--text-color);
         font-size: medium;
         padding: 0 10px;
         height: inherit;
@@ -209,7 +220,7 @@
     }
     #body {
         height: calc(100vh - var(--snackbar-height) - var(--nav-bar-height));
-        color: white;
+        color: var(--text-color);
         overflow: scroll;
         background-color: var(--primary-color);
         scrollbar-width: none;
@@ -233,7 +244,7 @@
         align-items: center;
     }
     .nav-bar a {
-        color: white;
+        color: var(--text-color);
         text-decoration: none;
         display: flex;
         height: inherit;
