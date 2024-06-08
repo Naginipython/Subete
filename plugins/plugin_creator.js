@@ -17,7 +17,7 @@ plugin.search_url = "{title}";
 //     id: String,
 //     title: String,
 //     img: String,
-//     extension: String,
+//     plugin: String,
 //     authors: String,
 //     artists: String,
 //     description: String OR none,
@@ -34,7 +34,7 @@ plugin.search = "function search(json) { let data = []; return data; }";
 //             temp['title'] = d['attributes']['title']['en'];
 //             let filetemp = d['relationships'].filter(o => o.type == 'cover_art')[0];
 //             temp['img'] = \`https://uploads.mangadex.org/covers/\${temp['id']}/\${filetemp['attributes']['fileName']}\`;
-//             temp['extension'] = 'MangaDex';
+//             temp['plugin'] = 'MangaDex';
 //             temp['description'] = d['attributes']['description']['en'];
 //             temp['chapters'] = [];
 //             let author_names = d['relationships'].filter(x => x.type == 'author').map(y => y['attributes']['name']);
@@ -67,7 +67,7 @@ plugin.get_chapters = "function getChapters(json) { let data = []; return data; 
 // function getChapters(json) {
 //     return json['data'].map(e => {
 //       return {
-//           number: parseInt(e['attributes']['chapter']),
+//           number: parseFloat(e['attributes']['chapter']),
 //           id: e['id'],
 //           title: e['attributes']['title'] == '' || e['attributes']['title'] == null? \`Chapter \${e['attributes']['chapter']}\` : e['attributes']['title'],
 //           page: 1,
@@ -106,7 +106,7 @@ async function tests() {
     !search_test[0].hasOwnProperty("id") ||
     !search_test[0].hasOwnProperty("title") ||
     !search_test[0].hasOwnProperty("img") ||
-    !search_test[0].hasOwnProperty("extension") ||
+    !search_test[0].hasOwnProperty("plugin") ||
     !search_test[0].hasOwnProperty("authors") ||
     !search_test[0].hasOwnProperty("artists") ||
     !search_test[0].hasOwnProperty("description") ||

@@ -26,9 +26,9 @@
 
         // gets chapters, if needed
         if (manga['chapters'].length == 0) {
-            // manga['chapters'] = await getChapters(manga.extension, manga.id);
+            // manga['chapters'] = await getChapters(manga.plugin, manga.id);
             // manga['chapters'].sort((a,b) => b.number-a.number);
-            manga['chapters'] = await invoke('get_chapters', { source: manga.extension, id: manga.id });
+            manga['chapters'] = await invoke('get_chapters', { source: manga.plugin, id: manga.id });
             manga['chapters'].sort((a,b) => b.number-a.number);
         }
     });
@@ -76,7 +76,7 @@
         <div id="text">
             <h3>{manga.title}</h3>
             <p>Author: {manga.authors}</p>
-            <p>Extention: {manga.extension}</p>
+            <p>Plugin: {manga.plugin}</p>
             <!-- TODO: fix desc scrolling -->
             <div id="desc"><p>{manga.description}</p></div>
         </div>

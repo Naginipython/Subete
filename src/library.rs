@@ -19,7 +19,7 @@ pub struct LibraryItem {
   pub id: String,
   pub title: String,
   pub img: String,
-  pub extension: String,
+  pub plugin: String,
   pub authors: String,
   pub artists: String,
   pub description: Option<String>,

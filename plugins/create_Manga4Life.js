@@ -44,7 +44,7 @@ function search(json) {
        'id': e['i'],
        'title': e['s'],
        'img': \`https://temp.compsci88.com/cover/\${e['i']}.jpg\`,
-       'extension': 'Manga4Life',
+       'plugin': 'Manga4Life',
        'authors': e['a'].join(', '),
        'artists': '',
        'description': '',
@@ -168,7 +168,7 @@ async function tests() {
     !search_test[0].hasOwnProperty("id") ||
     !search_test[0].hasOwnProperty("title") ||
     !search_test[0].hasOwnProperty("img") ||
-    !search_test[0].hasOwnProperty("extension") ||
+    !search_test[0].hasOwnProperty("plugin") ||
     !search_test[0].hasOwnProperty("authors") ||
     !search_test[0].hasOwnProperty("artists") ||
     !search_test[0].hasOwnProperty("description") ||

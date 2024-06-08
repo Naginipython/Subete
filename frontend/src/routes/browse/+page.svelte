@@ -68,17 +68,17 @@
     }
 
     function reformatResults() {
-        // Exports the extension name to the outside.
+        // Exports the plugin name to the outside.
         // Turns a array of everything into:
-        // [{extension: string, data: []}]
+        // [{plugin: string, data: []}]
         if (!results.some(a => a.hasOwnProperty('data'))) {
             results = Object.values(
                 results.reduce((result, item) => {
-                    let extension = item.extension;
-                    if (!result[extension]) {
-                        result[extension] = {extension: extension, data: []};
+                    let plugin = item.plugin;
+                    if (!result[plugin]) {
+                        result[plugin] = {plugin: plugin, data: []};
                     }
-                    result[extension]['data'].push(item);
+                    result[plugin]['data'].push(item);
                     return result;
                 }, {})
             );
@@ -117,7 +117,7 @@
 
     <!-- displays manga -->
     {#each results as item, i}
-        <h3>{item.extension}</h3>
+        <h3>{item.plugin}</h3>
         <DisplayManga data={item.data}/>
     {/each}
 

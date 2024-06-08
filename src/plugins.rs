@@ -42,7 +42,7 @@ pub fn init_plugins() -> Vec<Plugins> {
   let plugins = vec![Plugins {
     id: String::from("MangaDex"),
     search_url: String::from("https://api.mangadex.org/manga?limit=100&includes[]=cover_art&includes[]=author&includes[]=artist&title={title}"),
-    search: String::from("function search(json) { json = JSON.parse(json); let data = []; for (let d of json['data']) { let temp = {}; temp['id'] = d['id']; temp['title'] = d['attributes']['title']['en']; let filetemp = d['relationships'].filter(o => o.type == 'cover_art')[0]; temp['img'] = `https://uploads.mangadex.org/covers/${temp['id']}/${filetemp['attributes']['fileName']}`; temp['extension'] = 'MangaDex'; temp['description'] = d['attributes']['description']['en']; temp['chapters'] = []; let author_names = d['relationships'].filter(x => x.type == 'author').map(y => y['attributes']['name']); let artist_names = d['relationships'].filter(x => x.type == 'artist').map(y => y['attributes']['name']); temp['authors'] = author_names.join(', '); temp['artists'] = artist_names.join(', '); data.push(temp); } return data;}"),
+    search: String::from("function search(json) { json = JSON.parse(json); let data = []; for (let d of json['data']) { let temp = {}; temp['id'] = d['id']; temp['title'] = d['attributes']['title']['en']; let filetemp = d['relationships'].filter(o => o.type == 'cover_art')[0]; temp['img'] = `https://uploads.mangadex.org/covers/${temp['id']}/${filetemp['attributes']['fileName']}`; temp['plugin'] = 'MangaDex'; temp['description'] = d['attributes']['description']['en']; temp['chapters'] = []; let author_names = d['relationships'].filter(x => x.type == 'author').map(y => y['attributes']['name']); let artist_names = d['relationships'].filter(x => x.type == 'artist').map(y => y['attributes']['name']); temp['authors'] = author_names.join(', '); temp['artists'] = artist_names.join(', '); data.push(temp); } return data;}"),
     chapters_url: String::from("https://api.mangadex.org/manga/{id}/feed?limit=500&order[chapter]=asc&translatedLanguage[]=en"),
     get_chapters: String::from("function getChapters(json) { json = JSON.parse(json); return json['data'].map(e => { return { number: parseInt(e['attributes']['chapter']), id: e['id'], title: e['attributes']['title'] == '' || e['attributes']['title'] == null? `Chapter ${e['attributes']['chapter']}` : e['attributes']['title'], page: 1, completed: false } }); }"),
     pages_url: String::from("https://api.mangadex.org/at-home/server/{id}"),
@@ -131,6 +131,8 @@ pub async fn get_chapters(source: String, id: String) -> Value {
 
     let mut scope = jstime_core::JSTime::new(jstime_core::Options::default());
     let output = scope.run_script(&chap_func, "jstime").expect("JS Somehow failed");
+    let test: Value = serde_json::from_str(&output).unwrap();
+    println!("{:?}", test);
     result = serde_json::from_str(&output).unwrap();
   }
   json!(result)

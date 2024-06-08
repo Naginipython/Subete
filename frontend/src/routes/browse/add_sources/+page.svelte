@@ -7,8 +7,8 @@
   
   
   async function validateFile(file) {
-    const extension = file.name.split('.').pop().toLowerCase();
-    if (extension !== 'json') {
+    const plugin = file.name.split('.').pop().toLowerCase();
+    if (plugin !== 'json') {
       alert('Only .json files are allowed!');
       return false;
     }

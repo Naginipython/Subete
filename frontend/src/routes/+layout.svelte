@@ -184,7 +184,6 @@
         --secondary-color: #330000;
         --selection-color: maroon;
         --secondary-color-transparent: rgba(51, 0, 0, 0.5);
-        overflow: hidden;
     }
     #snackbar {
         height: var(--snackbar-height);
@@ -217,9 +216,9 @@
         -ms-overflow-style: none;
     }
     /* Likely lags on firefox */
-    #body::-webkit-scrollbar {
+    /* #body::-webkit-scrollbar {
         display: none; 
-    }
+    } */
     #nav-centered {
         height: var(--nav-bar-height);
         background-color: var(--secondary-color);
