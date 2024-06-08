@@ -19,12 +19,12 @@
             json.settings = settings;
             return json;
         });
-        // GET AND SET SETTINGS
+        // GET AND SET SETTINGS, if available
         if (settings.hasOwnProperty("app_colors")) {
             if (settings['app_colors'].hasOwnProperty("secondary")) {
                 document.documentElement.style.setProperty('--secondary-color', `#${settings['app_colors'].secondary}`); 
             }
-            if (json['settings']['app_colors'].hasOwnProperty("secondary")) {
+            if (settings['app_colors'].hasOwnProperty("text")) {
                 document.documentElement.style.setProperty('--text-color', `#${settings['app_colors'].text}`); 
             }
         }
