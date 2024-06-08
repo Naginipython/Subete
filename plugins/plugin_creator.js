@@ -67,7 +67,7 @@ plugin.get_chapters = "function getChapters(json) { let data = []; return data; 
 // function getChapters(json) {
 //     return json['data'].map(e => {
 //       return {
-//           number: parseFloat(e['attributes']['chapter']),
+//           number: parseFloat(e['attributes']['chapter'])? parseFloat(e['attributes']['chapter']) : 0.0,
 //           id: e['id'],
 //           title: e['attributes']['title'] == '' || e['attributes']['title'] == null? \`Chapter \${e['attributes']['chapter']}\` : e['attributes']['title'],
 //           page: 1,
