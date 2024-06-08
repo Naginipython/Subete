@@ -51,7 +51,6 @@ more screen
     }
     .box {
         width: 100vw;
-        padding: 10px 0;
         overflow: auto;
         display: inline-flex;
         background-color: var(--secondary-color);
@@ -70,6 +69,7 @@ more screen
         color: inherit;
         width: 100%;
         float: left;
+        padding: 10px 0;
     }
     .more-links p {
         justify-content: left;

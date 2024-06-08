@@ -14,6 +14,8 @@
     let imgs = -1;
     let chapters = [];
 
+    // Starts when page starts
+    set_colors();
     start_reader(chapter.page-1);
     
     // Prepares Reader & pages
@@ -30,6 +32,25 @@
         } else {
             curr_page = page;
         }
+    }
+
+    function set_colors() {
+        // Sets a background color to have more transparency
+        let secondaryColor = getComputedStyle(document.body).getPropertyValue('--secondary-color').trim();
+        let hex = parseInt(secondaryColor.slice(1), 16);
+        let [r, g, b] = [(hex >> 16) & 255, (hex >> 8) & 255, hex & 255];
+        console.log(r);
+        document.documentElement.style.setProperty('--secondary-color-transparent', `rgba(${r}, ${g}, ${b}, 0.5)`);
+        // Sets text outline to opposite of current
+        let primaryColor = getComputedStyle(document.body).getPropertyValue('--primary-color').trim();
+        if (primaryColor == "#f2f2f2") {
+            document.documentElement.style.setProperty('--text-outline', `1px 0 0 #fff, 0 -1px 0 #fff, 0 1px 0 #fff, -1px 0 0 #fff`);
+        } else if (primaryColor == "#1a1a1a") {
+            document.documentElement.style.setProperty('--text-outline', `1px 0 0 #000, 0 -1px 0 #000, 0 1px 0 #000, -1px 0 0 #000`);
+        } else {
+            document.documentElement.style.setProperty('--text-outline', `0`);
+        }
+        console.log(primaryColor)
     }
 
     // Checks for completion
@@ -283,7 +304,7 @@
         text-align: center;
         /* bottom: -15px; */
         font-weight: 600;
-        text-shadow: 1px 0 0 #000, 0 -1px 0 #000, 0 1px 0 #000, -1px 0 0 #000;
+        text-shadow: var(--text-outline);
     }
     #page-num p {
         padding: 10px;

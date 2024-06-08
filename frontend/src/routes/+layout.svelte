@@ -198,7 +198,7 @@
         --primary-color: #1a1a1a;
         --secondary-color: #330000;
         --selection-color: #800000;
-        --secondary-color-transparent: rgba(51, 0, 0, 0.5);
+        /* --secondary-color-transparent: rgba(51, 0, 0, 0.5); */
         --text-color: white;
     }
     #snackbar {

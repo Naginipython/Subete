@@ -44,6 +44,7 @@ import store from "$lib/store.js";
             switch (color_text.primary) {
                 case "1a1a1a": primary_color_select = "Dark"; break;
                 case "f2f2f2": primary_color_select = "Light"; break;
+                default: primary_color_select = "Other";
             }
             switch (color_text.secondary) {
                 case "330000": secondary_color_select = "Shitty Red"; break;
@@ -52,6 +53,7 @@ import store from "$lib/store.js";
                 case "003300": secondary_color_select = "Shitty Green"; break;
                 case "000033": secondary_color_select = "Shitty Blue"; break;
                 case "1a0033": secondary_color_select = "Shitty Purple"; break;
+                default: secondary_color_select = "Other";
             }
             switch (color_text.selection) {
                 case "800000": selection_color_select = "Shitty Red"; break;
@@ -60,10 +62,12 @@ import store from "$lib/store.js";
                 case "008000": selection_color_select = "Shitty Green"; break;
                 case "000080": selection_color_select = "Shitty Blue"; break;
                 case "1a0080": selection_color_select = "Shitty Purple"; break;
+                default: selection_color_select = "Other";
             }
             switch (color_text.text) {
                 case "ffffff": text_color_select = "White"; break;
                 case "000000": text_color_select = "Black"; break;
+                default: text_color_select = "Other";
             }
         }
         return json;
@@ -280,6 +284,6 @@ import store from "$lib/store.js";
         padding: 0 5px;
     }
     .theme-option-input {
-        margin: 2px 0;
+        margin-left: 25px;
     }
 </style>
