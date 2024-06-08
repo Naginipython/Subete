@@ -21,8 +21,14 @@
         });
         // GET AND SET SETTINGS, if available
         if (settings.hasOwnProperty("app_colors")) {
+            if (settings['app_colors'].hasOwnProperty("primary")) {
+                document.documentElement.style.setProperty('--primary-color', `#${settings['app_colors'].primary}`); 
+            }
             if (settings['app_colors'].hasOwnProperty("secondary")) {
                 document.documentElement.style.setProperty('--secondary-color', `#${settings['app_colors'].secondary}`); 
+            }
+            if (settings['app_colors'].hasOwnProperty("selection")) {
+                document.documentElement.style.setProperty('--selection-color', `#${settings['app_colors'].selection}`); 
             }
             if (settings['app_colors'].hasOwnProperty("text")) {
                 document.documentElement.style.setProperty('--text-color', `#${settings['app_colors'].text}`); 
@@ -36,7 +42,6 @@
     $: path = $page.url.pathname;
     let scroll_memory = {};
     let in_manga = false;
-    let in_browser = false;
     let manga_data = {
         favorited: false,
         data: {},
@@ -192,7 +197,7 @@
         --nav-bar-height: 50px;
         --primary-color: #1a1a1a;
         --secondary-color: #330000;
-        --selection-color: maroon;
+        --selection-color: #800000;
         --secondary-color-transparent: rgba(51, 0, 0, 0.5);
         --text-color: white;
     }
