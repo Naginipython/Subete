@@ -184,6 +184,7 @@
         --secondary-color: #330000;
         --selection-color: maroon;
         --secondary-color-transparent: rgba(51, 0, 0, 0.5);
+        overflow: hidden;
     }
     #snackbar {
         height: var(--snackbar-height);
@@ -212,6 +213,8 @@
         color: white;
         overflow: scroll;
         background-color: var(--primary-color);
+        scrollbar-width: none;
+        -ms-overflow-style: none;
     }
     /* Likely lags on firefox */
     #body::-webkit-scrollbar {
