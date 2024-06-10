@@ -17,9 +17,10 @@ tauri-build = { version = "1.5.1", features = [] }
 [dependencies]
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
-tauri = { version = "1.6.2", features = [ "http-all", "window-all", "reqwest-client"] }
+tauri = { version = "1.6.2", features = [ "window-all", "http-all", "reqwest-client" ] }
 lazy_static = "1.4.0"
 jstime_core = "0.50.0"
+dirs = "5.0.1"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem and the built-in dev server is disabled.

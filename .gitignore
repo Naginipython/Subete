@@ -12,6 +12,7 @@ build.sh
 # Feels uneeded
 /frontend/build/
 /frontend/build/*
+build/
 
 ## RUST
 debug/
