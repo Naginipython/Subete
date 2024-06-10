@@ -4,13 +4,9 @@
 use std::path::PathBuf;
 use lazy_static::lazy_static;
 use manga::*;
-// use library::*;
-// use plugins::*;
 use settings::*;
 
 mod manga;
-// mod library;
-// mod plugins;
 mod lightnovel;
 mod settings;
 
