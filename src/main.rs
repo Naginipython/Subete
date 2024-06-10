@@ -2,28 +2,21 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use std::path::PathBuf;
-
-// use scrape::*;
-use library::*;
-use plugins::*;
-use settings::*;
 use lazy_static::lazy_static;
+use manga::*;
+// use library::*;
+// use plugins::*;
+use settings::*;
 
-// mod scrape;
-mod library;
-mod plugins;
+mod manga;
+// mod library;
+// mod plugins;
+mod lightnovel;
 mod settings;
 
 lazy_static! {
-  #[derive(Debug)]
-  pub static ref OS: &'static str = std::env::consts::OS;
-  // pub static ref FILE_PATH: &'static str = if (*OS).eq("linux") {
-
-  // } else {
-  //   "./"
-  // }
   pub static ref FILE_PATH: String = {
-    let data_folder: PathBuf = dirs::data_local_dir().unwrap_or_else(|| PathBuf::from("/default/path"));
+    let data_folder: PathBuf = dirs::data_local_dir().unwrap_or_else(|| PathBuf::from("./"));
     let mut str = data_folder.to_str().unwrap_or_default().to_string();
     str.push_str("/omniyomi");
     str
@@ -39,7 +32,7 @@ fn main() {
   tauri::Builder::default()
     .invoke_handler(tauri::generate_handler![
       // library.rs
-      get_lib, add_to_lib, remove_from_lib, update_lib, 
+      get_manga_lib, add_to_manga_lib, remove_from_manga_lib, update_manga_lib, 
       // plugins.rs
       search, get_chapters, get_plugin_names, get_pages, add_plugin,
       // settings.rs

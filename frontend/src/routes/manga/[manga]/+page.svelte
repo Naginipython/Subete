@@ -41,17 +41,17 @@
         } else {
             manga['chapters'][index].completed = true;
         }
-        invoke('update_lib', { item: manga });
+        invoke('update_manga_lib', { item: manga });
     }
     function check_below(index) {
         for (let i = index+1; i < manga['chapters'].length; i++) {
             manga['chapters'][i].completed = true;
         }
-        invoke('update_lib', { item: manga });
+        invoke('update_manga_lib', { item: manga });
     }
     function remove_page(index) {
         manga['chapters'][index].page = 1;
-        invoke('update_lib', { item: manga });
+        invoke('update_manga_lib', { item: manga });
     }
     let opened = [];
     function show_options(index) {

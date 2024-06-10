@@ -1,11 +1,11 @@
-use super::FILE_PATH;
+use crate::FILE_PATH;
 use std::{fs::File, io::Write, sync::Mutex};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use tauri::{api::http::{ClientBuilder, HttpRequestBuilder, ResponseType}, http::header::USER_AGENT};
 use lazy_static::lazy_static;
 
-use crate::{ChapterItem, LibraryItem};
+use super::{ChapterItem, LibraryItem};
 
 lazy_static! {
   pub static ref PLUGINS_PATH: String = {
@@ -50,7 +50,7 @@ pub fn init_plugins() -> Vec<Plugins> {
     search_url: String::from("https://api.mangadex.org/manga?limit=100&includes[]=cover_art&includes[]=author&includes[]=artist&title={title}"),
     search: String::from("function search(json) { json = JSON.parse(json); let data = []; for (let d of json['data']) { let temp = {}; temp['id'] = d['id']; temp['title'] = d['attributes']['title']['en']; let filetemp = d['relationships'].filter(o => o.type == 'cover_art')[0]; temp['img'] = `https://uploads.mangadex.org/covers/${temp['id']}/${filetemp['attributes']['fileName']}`; temp['plugin'] = 'MangaDex'; temp['description'] = d['attributes']['description']['en']; temp['chapters'] = []; let author_names = d['relationships'].filter(x => x.type == 'author').map(y => y['attributes']['name']); let artist_names = d['relationships'].filter(x => x.type == 'artist').map(y => y['attributes']['name']); temp['authors'] = author_names.join(', '); temp['artists'] = artist_names.join(', '); data.push(temp); } return data;}"),
     chapters_url: String::from("https://api.mangadex.org/manga/{id}/feed?limit=500&order[chapter]=asc&translatedLanguage[]=en"),
-    get_chapters: String::from("function getChapters(json) { json = JSON.parse(json); return json['data'].map(e => { return { number: number: parseFloat(e['attributes']['chapter'])? parseFloat(e['attributes']['chapter']) : 0.0, id: e['id'], title: e['attributes']['title'] == '' || e['attributes']['title'] == null? `Chapter ${e['attributes']['chapter']}` : e['attributes']['title'], page: 1, completed: false } }); }"),
+    get_chapters: String::from("function getChapters(json) { json = JSON.parse(json); return json['data'].map(e => { return { number: parseFloat(e['attributes']['chapter'])? parseFloat(e['attributes']['chapter']) : 0.0, id: e['id'], title: e['attributes']['title'] == '' || e['attributes']['title'] == null? `Chapter ${e['attributes']['chapter']}` : e['attributes']['title'], page: 1, completed: false } }); }"),
     pages_url: String::from("https://api.mangadex.org/at-home/server/{id}"),
     get_pages: String::from("function getChapterPages(json) { json = JSON.parse(json); let hash = json['chapter']['hash']; let data = json['chapter']['data']; return data.map(x => `https://uploads.mangadex.org/data/${hash}/${x}`); }"),
   }];

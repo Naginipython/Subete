@@ -1,4 +1,4 @@
-use super::FILE_PATH;
+use crate::FILE_PATH;
 use std::{fs::File, io::Write, sync::Mutex};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -7,7 +7,7 @@ use lazy_static::lazy_static;
 lazy_static! {
   pub static ref LIB_PATH: String = {
     let mut path = (*FILE_PATH).clone();
-    path.push_str("/library.json");
+    path.push_str("/manga_library.json");
     path
   };
   pub static ref LIB: Mutex<Vec<LibraryItem>> = match File::open(&*LIB_PATH) {
@@ -47,7 +47,7 @@ fn save(lib: &Vec<LibraryItem>) {
 }
 
 #[tauri::command]
-pub fn get_lib() -> Value {
+pub fn get_manga_lib() -> Value {
   // todo: fix unwraps
   println!("Getting library...");
   let lib = LIB.lock().unwrap();
@@ -55,7 +55,7 @@ pub fn get_lib() -> Value {
 }
 
 #[tauri::command]
-pub fn add_to_lib(new_item: LibraryItem) {
+pub fn add_to_manga_lib(new_item: LibraryItem) {
   // todo: fix unwraps
   println!("Adding to library...");
   let mut lib = LIB.lock().unwrap();
@@ -66,7 +66,7 @@ pub fn add_to_lib(new_item: LibraryItem) {
 }
 
 #[tauri::command]
-pub fn update_lib(item: LibraryItem) {
+pub fn update_manga_lib(item: LibraryItem) {
   let mut lib = LIB.lock().unwrap();
   for entry in lib.iter_mut() {
     if entry.id == item.id {
@@ -80,7 +80,7 @@ pub fn update_lib(item: LibraryItem) {
 }
 
 #[tauri::command]
-pub fn remove_from_lib(id: String) {
+pub fn remove_from_manga_lib(id: String) {
   // todo: fix unwraps
   println!("Removing from library...");
   let mut lib = LIB.lock().unwrap();

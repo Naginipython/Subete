@@ -28,13 +28,13 @@ export function in_lib(id) {
 export async function toggle_favorite(manga) {
     console.log(manga);
     if (!in_lib(manga.id)) {
-        await invoke('add_to_lib', { newItem: manga });
+        await invoke('add_to_manga_lib', { newItem: manga });
         store.update(_json => {
             _json.library.push(manga);
             return _json;
         });
     } else {
-        await invoke('remove_from_lib', { id: manga.id });
+        await invoke('remove_from_manga_lib', { id: manga.id });
         store.update(_json => {
             _json.library = _json.library.filter(m => m.id != manga.id);
             return _json;

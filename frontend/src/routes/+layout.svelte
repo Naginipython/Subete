@@ -12,7 +12,7 @@
     let library = [];
     onMount(async () => {
         // GET LIB
-        library = await invoke('get_lib');
+        library = await invoke('get_manga_lib');
         let settings = await invoke('get_settings');
         store.update(json => {
             json.library = library;
@@ -198,7 +198,6 @@
         --primary-color: #1a1a1a;
         --secondary-color: #330000;
         --selection-color: #800000;
-        /* --secondary-color-transparent: rgba(51, 0, 0, 0.5); */
         --text-color: white;
     }
     #snackbar {

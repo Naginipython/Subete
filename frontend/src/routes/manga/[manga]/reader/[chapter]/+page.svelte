@@ -66,7 +66,7 @@
     async function update_lib() {
         console.log(chapter.completed);
         console.log(chapter.page);
-        await invoke('update_lib', { item: manga });
+        await invoke('update_manga_lib', { item: manga });
         goto(`/manga/${data.id}`)
     }
 
@@ -104,7 +104,7 @@
             let next = parseInt(data.manga_index)-1;
             if (next >= 0) {
                 goto(`/manga/${data.id}/reader/${next}`).then(() => {
-                    invoke('update_lib', { item: manga }).then(() => {
+                    invoke('update_manga_lib', { item: manga }).then(() => {
                         start_reader(0);
                     });
                 });
@@ -124,9 +124,9 @@
             let prev = parseInt(data.manga_index)+1;
             if (prev < manga['chapters'].length) {
                 goto(`/manga/${data.id}/reader/${prev}`).then(() => {
-                    start_reader(Infinity);
-                    // invoke('update_lib', { item: manga }).then(() => {
-                    // });
+                    invoke('update_manga_lib', { item: manga }).then(() => {
+                        start_reader(Infinity);
+                    });
                 });
             } else {
                 update_lib()
