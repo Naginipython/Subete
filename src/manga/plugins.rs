@@ -10,13 +10,13 @@ use super::{ChapterItem, LibraryItem};
 lazy_static! {
   pub static ref PLUGINS_PATH: String = {
     let mut path = (*FILE_PATH).clone();
-    path.push_str("/plugins.json");
+    path.push_str("/manga_plugins.json");
     path
   };
-  static ref PLUGINS: Mutex<Vec<Plugins>> = match File::open(&*PLUGINS_PATH) {
+  static ref MANGA_PLUGINS: Mutex<Vec<Plugins>> = match File::open(&*PLUGINS_PATH) {
     Ok(file) => Mutex::new(serde_json::from_reader(file).unwrap_or_default()),
     Err(_e) => {
-      let plugins = init_plugins();
+      let plugins = init_manga_plugins();
       Mutex::new(plugins)
     }
   };
@@ -30,20 +30,20 @@ fn save(lib: &Vec<Plugins>) {
 fn get_plugins() -> Vec<Plugins> {
   match File::open(&*PLUGINS_PATH) {
       Ok(file) => serde_json::from_reader(file).unwrap_or_default(),
-      Err(_e) => init_plugins()
+      Err(_e) => init_manga_plugins()
   }
 }
 #[tauri::command]
-pub fn add_plugin(new_plugin: Plugins) {
+pub fn add_manga_plugin(new_plugin: Plugins) {
   println!("Adding plugin...");
-  let mut plugins = PLUGINS.lock().unwrap();
+  let mut plugins = MANGA_PLUGINS.lock().unwrap();
   let names: Vec<String> = plugins.iter().map(|p| p.id.clone()).collect();
   if !names.contains(&new_plugin.id) {
     plugins.push(new_plugin);
     save(&*plugins);
   }
 }
-pub fn init_plugins() -> Vec<Plugins> {
+pub fn init_manga_plugins() -> Vec<Plugins> {
   File::create(&*PLUGINS_PATH).unwrap();
   let plugins = vec![Plugins {
     id: String::from("MangaDex"),
@@ -71,9 +71,9 @@ pub struct Plugins {
 }
 
 #[tauri::command]
-pub fn get_plugin_names() -> Value {
+pub fn get_manga_plugin_names() -> Value {
   println!("Getting Plugin Names...");
-  let plugins = PLUGINS.lock().unwrap();
+  let plugins = MANGA_PLUGINS.lock().unwrap();
   let names: Vec<String> = plugins.iter().map(|p| p.id.clone()).collect();
   json!(names)
 }
@@ -97,7 +97,7 @@ async fn fetch(url: String) -> Value {
 }
 
 #[tauri::command]
-pub async fn search(query: String, sources: Vec<String>) -> Value {
+pub async fn manga_search(query: String, sources: Vec<String>) -> Value {
   println!("Searching...");
   let mut result: Vec<LibraryItem> = Vec::new();
   let plugins = get_plugins();
@@ -122,7 +122,7 @@ pub async fn search(query: String, sources: Vec<String>) -> Value {
 }
 
 #[tauri::command]
-pub async fn get_chapters(source: String, id: String) -> Value {
+pub async fn get_manga_chapters(source: String, id: String) -> Value {
   println!("Getting chapters...");
   let mut result: Vec<ChapterItem> = Vec::new();
   let plugins = get_plugins();
@@ -145,7 +145,7 @@ pub async fn get_chapters(source: String, id: String) -> Value {
 }
 
 #[tauri::command]
-pub async fn get_pages(source: String, id: String) -> Value {
+pub async fn get_manga_pages(source: String, id: String) -> Value {
   println!("Getting pages...");
   let mut result: Vec<String> = Vec::new();
   let plugins = get_plugins();

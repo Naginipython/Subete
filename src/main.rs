@@ -7,7 +7,7 @@ use manga::*;
 use settings::*;
 
 mod manga;
-mod lightnovel;
+mod ln;
 mod settings;
 
 lazy_static! {
@@ -30,7 +30,7 @@ fn main() {
       // library.rs
       get_manga_lib, add_to_manga_lib, remove_from_manga_lib, update_manga_lib, 
       // plugins.rs
-      search, get_chapters, get_plugin_names, get_pages, add_plugin,
+      manga_search, get_manga_chapters, get_manga_plugin_names, get_manga_pages, add_manga_plugin,
       // settings.rs
       update_settings, get_settings
     ])
