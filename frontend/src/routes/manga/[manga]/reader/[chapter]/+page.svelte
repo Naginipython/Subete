@@ -23,7 +23,7 @@
         chapters = [];
         chapter = manga['chapters'][data.manga_index];
         imgs = document.getElementsByTagName("img");
-        chapters = await invoke('get_pages', { source: manga.plugin, id: chapter.id });
+        chapters = await invoke('get_manga_pages', { source: manga.plugin, id: chapter.id });
         // chapters = await getChapterPages(manga.extention, chapter.id);
         if (chapter.completed && page != Infinity) {
             curr_page = 0;

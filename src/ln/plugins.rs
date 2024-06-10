@@ -5,7 +5,7 @@ use serde_json::{json, Value};
 use tauri::{api::http::{ClientBuilder, HttpRequestBuilder, ResponseType}, http::header::USER_AGENT};
 use lazy_static::lazy_static;
 
-use super::{ChapterItem, LibraryItem};
+use super::library::{ChapterItem, LibraryItem};
 
 lazy_static! {
   pub static ref PLUGINS_PATH: String = {

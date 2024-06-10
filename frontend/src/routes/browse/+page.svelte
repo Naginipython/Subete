@@ -32,7 +32,7 @@
         } else {
             checked_sources = json["settings"].quickselect;
         }
-        sources = await invoke('get_plugin_names');
+        sources = await invoke('get_manga_plugin_names');
         let s = Object.entries(checked_sources).map(([key, value]) => key);
         let new_sources = sources.filter(source => !s.includes(source));
         new_sources.forEach(i => {
@@ -46,7 +46,7 @@
         results = [];
         let s = Object.entries(checked_sources).filter(([key, value]) => value).map(([key, value]) => key);
         console.log(s);
-        results = await invoke('search', { query: `${name}`, sources: s });
+        results = await invoke('manga_search', { query: `${name}`, sources: s });
         
         store.update(json => {
             json.search_results = results;

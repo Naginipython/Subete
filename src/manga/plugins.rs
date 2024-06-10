@@ -101,7 +101,6 @@ pub async fn manga_search(query: String, sources: Vec<String>) -> Value {
   println!("Searching...");
   let mut result: Vec<LibraryItem> = Vec::new();
   let plugins = get_plugins();
-  println!("{:?}", sources);
   for p in plugins {
     if sources.contains(&p.id) {
       // Fetching page data

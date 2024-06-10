@@ -40,7 +40,7 @@
     // Replace with actual server-side logic for saving the file
     console.log('File uploaded:', files[0]);
     delete json.error;
-    await invoke('add_plugin', { newPlugin: json });
+    await invoke('add_manga_plugin', { newPlugin: json });
     json.error = "";
   }
 </script>

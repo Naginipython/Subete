@@ -3,8 +3,10 @@
 
 use std::path::PathBuf;
 use lazy_static::lazy_static;
-use manga::*;
+// use manga::*;
 use settings::*;
+use manga::library::*;
+use manga::plugins::*;
 
 mod manga;
 mod ln;
@@ -23,7 +25,6 @@ fn main() {
   // geckodriver
   // let _driver = Command::new("geckodriver").spawn().map_err(|e| format!("Failed to start Geckodriver: {}", e)).expect("Error: Couldn't start Geckodriver");
   jstime_core::init(None);
-  println!("{:?}", *FILE_PATH);
 
   tauri::Builder::default()
     .invoke_handler(tauri::generate_handler![

@@ -28,7 +28,7 @@
         if (manga['chapters'].length == 0) {
             // manga['chapters'] = await getChapters(manga.plugin, manga.id);
             // manga['chapters'].sort((a,b) => b.number-a.number);
-            manga['chapters'] = await invoke('get_chapters', { source: manga.plugin, id: manga.id });
+            manga['chapters'] = await invoke('get_manga_chapters', { source: manga.plugin, id: manga.id });
             manga['chapters'].sort((a,b) => b.number-a.number);
         }
     });
