@@ -1,20 +1,40 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use std::path::PathBuf;
+
 // use scrape::*;
 use library::*;
 use plugins::*;
 use settings::*;
+use lazy_static::lazy_static;
 
 // mod scrape;
 mod library;
 mod plugins;
 mod settings;
 
+lazy_static! {
+  #[derive(Debug)]
+  pub static ref OS: &'static str = std::env::consts::OS;
+  // pub static ref FILE_PATH: &'static str = if (*OS).eq("linux") {
+
+  // } else {
+  //   "./"
+  // }
+  pub static ref FILE_PATH: String = {
+    let data_folder: PathBuf = dirs::data_local_dir().unwrap_or_else(|| PathBuf::from("/default/path"));
+    let mut str = data_folder.to_str().unwrap_or_default().to_string();
+    str.push_str("/omniyomi");
+    str
+  };
+}
+
 fn main() {
   // geckodriver
   // let _driver = Command::new("geckodriver").spawn().map_err(|e| format!("Failed to start Geckodriver: {}", e)).expect("Error: Couldn't start Geckodriver");
   jstime_core::init(None);
+  println!("{:?}", *FILE_PATH);
 
   tauri::Builder::default()
     .invoke_handler(tauri::generate_handler![

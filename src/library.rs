@@ -1,16 +1,22 @@
+use super::FILE_PATH;
 use std::{fs::File, io::Write, sync::Mutex};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use lazy_static::lazy_static;
 
 lazy_static! {
-    pub static ref LIB: Mutex<Vec<LibraryItem>> = match File::open("library.json") {
-        Ok(file) => Mutex::new(serde_json::from_reader(file).unwrap_or_default()),
-        Err(_e) => {
-          File::create("library.json").unwrap();
-          Mutex::new(Vec::new())
-        }
-    };
+  pub static ref LIB_PATH: String = {
+    let mut path = (*FILE_PATH).clone();
+    path.push_str("/library.json");
+    path
+  };
+  pub static ref LIB: Mutex<Vec<LibraryItem>> = match File::open(&*LIB_PATH) {
+      Ok(file) => Mutex::new(serde_json::from_reader(file).unwrap_or_default()),
+      Err(_e) => {
+        File::create(&*LIB_PATH).unwrap();
+        Mutex::new(Vec::new())
+      }
+  };
 }
 
 
@@ -35,7 +41,7 @@ pub struct ChapterItem {
 }
 
 fn save(lib: &Vec<LibraryItem>) {
-  let mut file = File::create("library.json").unwrap();
+  let mut file = File::create(&*LIB_PATH).unwrap();
   let json = serde_json::to_string(&*lib).unwrap();
   file.write_all(json.as_bytes()).unwrap();
 }

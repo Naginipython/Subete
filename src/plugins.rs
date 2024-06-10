@@ -1,3 +1,4 @@
+use super::FILE_PATH;
 use std::{fs::File, io::Write, sync::Mutex};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
@@ -7,7 +8,12 @@ use lazy_static::lazy_static;
 use crate::{ChapterItem, LibraryItem};
 
 lazy_static! {
-  static ref PLUGINS: Mutex<Vec<Plugins>> = match File::open("plugins.json") {
+  pub static ref PLUGINS_PATH: String = {
+    let mut path = (*FILE_PATH).clone();
+    path.push_str("/plugins.json");
+    path
+  };
+  static ref PLUGINS: Mutex<Vec<Plugins>> = match File::open(&*PLUGINS_PATH) {
     Ok(file) => Mutex::new(serde_json::from_reader(file).unwrap_or_default()),
     Err(_e) => {
       let plugins = init_plugins();
@@ -17,12 +23,12 @@ lazy_static! {
 }
 
 fn save(lib: &Vec<Plugins>) {
-  let mut file = File::create("plugins.json").unwrap();
+  let mut file = File::create(&*PLUGINS_PATH).unwrap();
   let json = serde_json::to_string(&*lib).unwrap();
   file.write_all(json.as_bytes()).unwrap();
 }
 fn get_plugins() -> Vec<Plugins> {
-  match File::open("plugins.json") {
+  match File::open(&*PLUGINS_PATH) {
       Ok(file) => serde_json::from_reader(file).unwrap_or_default(),
       Err(_e) => init_plugins()
   }
@@ -38,7 +44,7 @@ pub fn add_plugin(new_plugin: Plugins) {
   }
 }
 pub fn init_plugins() -> Vec<Plugins> {
-  File::create("plugins.json").unwrap();
+  File::create(&*PLUGINS_PATH).unwrap();
   let plugins = vec![Plugins {
     id: String::from("MangaDex"),
     search_url: String::from("https://api.mangadex.org/manga?limit=100&includes[]=cover_art&includes[]=author&includes[]=artist&title={title}"),
