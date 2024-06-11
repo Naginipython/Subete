@@ -23,12 +23,12 @@ plugin.search_url = "{title}";
 //     description: String OR none,
 //     chapters: [ ChapterItem ]
 // }
-plugin.search = "function search(json) { let data = []; return data; }";
+plugin.search = "function search(html) { let data = []; return data; }";
 // plugin.search = `
-// function search(json) {
-//     json = JSON.parse(json); 
+// function search(html) {
+//     html = JSON.parse(json); 
 //     let data = [];
-//         for (let d of json['data']) {
+//         for (let d of html['data']) {
 //             let temp = {};
 //             temp['id'] = d['id'];
 //             temp['title'] = d['attributes']['title']['en'];
@@ -62,10 +62,10 @@ plugin.chapters_url = "{id}";
 //         completed: Boolean
 //     }
 // ]
-plugin.get_chapters = "function getChapters(json) { let data = []; return data; }";
+plugin.get_chapters = "function getChapters(html) { let data = []; return data; }";
 // plugin.get_chapters = `
-// function getChapters(json) {
-//     return json['data'].map(e => {
+// function getChapters(html) {
+//     return html['data'].map(e => {
 //       return {
 //           number: parseFloat(e['attributes']['chapter'])? parseFloat(e['attributes']['chapter']) : 0.0,
 //           id: e['id'],
@@ -83,11 +83,11 @@ plugin.pages_url = "{id}";
 
 // JS code needed to get page links. Will need a param of the raw GET of the chapters_url, and return:
 // [ String ]
-plugin.get_pages = "function getChapterPages(json) { let data = []; return data; }";
+plugin.get_pages = "function getChapterPages(html) { let data = []; return data; }";
 // plugin.get_pages = `
-// function getChapterPages(json) {
-//     let hash = json['chapter']['hash'];
-//     let data = json['chapter']['data'];
+// function getChapterPages(html) {
+//     let hash = html['chapter']['hash'];
+//     let data = html['chapter']['data'];
 //     return data.map(x => \`https://uploads.mangadex.org/data/\${hash}/\${x}\`);
 //   }
 // `;
