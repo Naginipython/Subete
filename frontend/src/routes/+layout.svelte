@@ -9,14 +9,19 @@
     import store from "$lib/store.js";
     import { find_manga,in_lib,toggle_favorite } from "$lib/common.js";
 
-    let library = [];
+    let manga_library = [];
+    let ln_library = [];
+    let type = "manga";
     onMount(async () => {
         // GET LIB
-        library = await invoke('get_manga_lib');
+        manga_library = await invoke('get_manga_lib');
+        // ln_library = await invoke('get_ln_lib');
         let settings = await invoke('get_settings');
         store.update(json => {
-            json.library = library;
+            json.manga_library = manga_library;
+            json.ln_library = ln_library;
             json.settings = settings;
+            json.media_screen = type;
             return json;
         });
         // GET AND SET SETTINGS, if available
@@ -36,7 +41,6 @@
         }
     });
 
-    let type = "manga";
     let nav = '';
     let selected_valid_links = ["/library", "/updates", "/browse", "/more"];
     $: path = $page.url.pathname;
@@ -95,13 +99,10 @@
 
         // --- MANGA ---
         // Changes the top nav for manga
-        if (nav.includes("manga") && !nav.includes("reader")) {
+        if (nav.includes("manga/") && !nav.includes("reader")) {
             in_manga = true;
-            switch (from) {
-                case "/library":
-                case "/updates":
-                case "/browse":
-                    manga_data.back = from;
+            if (from.includes('library') || from=='/updates' || from=='/browse') {
+                manga_data.back = from;
             }
             manga_data.data = find_manga($navigating.to.params.manga);
             manga_data.favorited = in_lib(manga_data.data.id)
@@ -137,6 +138,18 @@
         manga_data.favorited = !manga_data.favorited;
         await toggle_favorite(manga_data.data);
     }
+
+    // MEDIA TYPE CHANGE
+    function change_media(media) {
+        type = media;
+        store.update(json => {
+            json.media_screen = type;
+            return json;
+        });
+        if (nav.includes('library')) {
+            goto(`/${type}_library`);
+        }
+    }
 </script>
 
 <div id="snackbar">
@@ -147,10 +160,9 @@
         <button class="snackbar-item" on:click={() => goto('/browse/')}><Fa icon={faArrowLeft} /></button>
     {:else}
         <!-- TODO: make work -->
-        <button id="manga" class="snackbar-item {type=="manga"? 'selected':''}">Manga</button>
-        <button id="anime" class="snackbar-item">Anime</button>
-        <button id="ln" class="snackbar-item">LN</button>
-        <p class="snackbar-item" style="margin:0;padding:0;display:linline-flex;">Nothing here done</p>
+        <button id="manga" class="snackbar-item {type=="manga"? 'selected':''}" on:click={() => change_media("manga")}>Manga</button>
+        <button id="anime" class="snackbar-item {type=="anime"? 'selected':''}">Anime (WIP)</button>
+        <button id="ln" class="snackbar-item {type=="ln"? 'selected':''}" on:click={() => change_media("ln")}>LN</button>
     {/if}
     
     <!-- right side -->
@@ -184,7 +196,10 @@
 <div id="nav-centered">
     <nav class="nav-bar">
         <!-- TODO: merge with more when possible (for History, stats?, settings) -->
-        <a id="/library" class="{path=='/library'? 'selected' : ''}" href="/library">Library</a>
+        <a id="/library" class="{path.includes('library')? 'selected' : ''}" 
+            href="/{type}_library">
+            Library
+        </a>
         <a id="/updates" class="{path=='/updates'? 'selected' : ''}" href="/updates">Updates</a>
         <a id="/browse" class="{path.includes('/browse')? 'selected' : ''}" href="/browse">Browse</a>
         <a id="/more" class="{path=='/more'? 'selected' : ''}" href="/more">More</a>

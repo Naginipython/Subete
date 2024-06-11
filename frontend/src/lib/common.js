@@ -8,7 +8,7 @@ store.subscribe(_json => {
 
 export function find_manga(id) {
     let manga;
-    let manga_test = json.library.find(m => m.id == id);
+    let manga_test = json.manga_library.find(m => m.id == id);
     if (manga_test == undefined) {
         let search_test = json.search_results.find(m => m.id == id);
         if (search_test == undefined) {
@@ -22,7 +22,7 @@ export function find_manga(id) {
     return manga;
 }
 export function in_lib(id) {
-    return json.library.some(m => m.id == id);
+    return json.manga_library.some(m => m.id == id);
 }
 
 export async function toggle_favorite(manga) {
@@ -30,13 +30,13 @@ export async function toggle_favorite(manga) {
     if (!in_lib(manga.id)) {
         await invoke('add_to_manga_lib', { newItem: manga });
         store.update(_json => {
-            _json.library.push(manga);
+            _json.manga_library.push(manga);
             return _json;
         });
     } else {
         await invoke('remove_from_manga_lib', { id: manga.id });
         store.update(_json => {
-            _json.library = _json.library.filter(m => m.id != manga.id);
+            _json.manga_library = _json.manga_library.filter(m => m.id != manga.id);
             return _json;
         });
     }

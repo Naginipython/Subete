@@ -4,9 +4,8 @@
     let library = [];
 
     store.subscribe(json => {
-        library = json["library"];
+        library = json["manga_library"];
         setWidth();
-        return library;
     });
 
     window.addEventListener('resize', setWidth);

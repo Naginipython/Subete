@@ -10,6 +10,7 @@
     let results = [];
     let sources = [];
     let checked_sources;
+    let media_screen = "manga";
     let first_run = true;
     $: if (checked_sources) update_settings();
     
@@ -26,13 +27,26 @@
     }
 
     store.subscribe(async json => {
+        media_screen = json["media_screen"];
         results = json["search_results"];
         if (!json["settings"].hasOwnProperty("quickselect")) {
             checked_sources = {"MangaDex": true};
         } else {
             checked_sources = json["settings"].quickselect;
         }
-        sources = await invoke('get_manga_plugin_names');
+        switch (media_screen) {
+            case "manga":
+                sources = await invoke('get_manga_plugin_names');
+                break;
+            case "ln":
+                // sources = await invoke('get_ln_plugin_names');
+                sources = [];
+                break;
+            case "anime":
+                // sources = await invoke('get_ln_plugin_names');
+                sources = [];
+                break;
+        }
         let s = Object.entries(checked_sources).map(([key, value]) => key);
         let new_sources = sources.filter(source => !s.includes(source));
         new_sources.forEach(i => {

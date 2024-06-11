@@ -1,7 +1,7 @@
 import { writable } from 'svelte/store';
 // Note: Ideally, this is the overall structure of the store
 const store = writable({
-    "manga_return": "/",
+    "media_screen": "manga",
     "search_results": [
         /*{
             id: int
@@ -22,7 +22,7 @@ const store = writable({
             ]
         }*/
     ],
-    "library": [
+    "manga_library": [
         /*{
             id: int
             title: string,
