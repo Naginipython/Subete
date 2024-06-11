@@ -1,6 +1,6 @@
 <script>
-import store from "$lib/store.js";
-    import { invoke } from '@tauri-apps/api/tauri';
+    import store from "$lib/store.js";
+    import { invoke } from "@tauri-apps/api/core";
 
     let color_text = {
         primary: '',

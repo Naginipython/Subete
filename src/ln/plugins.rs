@@ -2,8 +2,9 @@ use crate::FILE_PATH;
 use std::{fs::File, io::Write, sync::Mutex};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
-use tauri::{api::http::{ClientBuilder, HttpRequestBuilder, ResponseType}, http::header::USER_AGENT};
+// use tauri::{api::http::{ClientBuilder, HttpRequestBuilder, ResponseType}, http::header::USER_AGENT};
 use lazy_static::lazy_static;
+use tauri_plugin_http::reqwest;
 
 use super::library::{ChapterItem, LibraryItem};
 
@@ -81,19 +82,24 @@ pub struct Plugins {
 // fn replace_url(url: &String, placeholder: &str, replace: &str) -> String {
 //   url.replace(placeholder, replace)
 // }
-// async fn fetch(url: String) -> Value {
+// async fn fetch(url: String) -> String {
 //   // Fetching page data
-//   let user_agent = "Mozilla/5.0 (Linux; Android 13; SM-S901U) AppleWebkit/537.36 (KHTML, like Gecko Chrome/112.0.0.0 Mobile Safari/537.36";
-//   let client = ClientBuilder::new()
-//       .max_redirections(3)
-//       .build().unwrap();
-//   let request = HttpRequestBuilder::new("GET", url).unwrap()
-//       .header(USER_AGENT, user_agent).unwrap()
-//       .response_type(ResponseType::Text);
+//   // let user_agent = "Mozilla/5.0 (Linux; Android 13; SM-S901U) AppleWebkit/537.36 (KHTML, like Gecko Chrome/112.0.0.0 Mobile Safari/537.36";
+//   // let client = ClientBuilder::new().max_redirections(3).build().unwrap();
+//   // let request = HttpRequestBuilder::new("GET", url)
+//   //     .unwrap()
+//   //     .header(USER_AGENT, user_agent)
+//   //     .unwrap()
+//   //     .response_type(ResponseType::Text);
 
 //   // Sends the request and gets the data
-//   let res = client.send(request).await.unwrap();
-//   res.read().await.unwrap().data
+//   // let res = client.send(request).await.unwrap();
+//   // res.read().await.unwrap().data
+//   let body = reqwest::get(url)
+//     .await.unwrap()
+//     .text()
+//     .await.unwrap();
+//   body
 // }
 
 // #[tauri::command]

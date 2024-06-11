@@ -1,5 +1,5 @@
 // Commonly used functions
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from "@tauri-apps/api/core";
 import store from "./store.js";
 let json;
 store.subscribe(_json => {

@@ -2,7 +2,7 @@
     import { navigating, page } from '$app/stores';
     import { goto } from "$app/navigation";
     import { onMount } from "svelte";
-    import { invoke } from '@tauri-apps/api/tauri';
+    import { invoke } from "@tauri-apps/api/core";
     import { faFilter, faMagnifyingGlass, faEllipsisVertical, faArrowLeft, faHeart, faBook } from '@fortawesome/free-solid-svg-icons'
     import { faHeart as faOutlineHeart } from '@fortawesome/free-regular-svg-icons';
     import Fa from 'svelte-fa'

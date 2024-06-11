@@ -1,5 +1,5 @@
 <script>
-    import { invoke } from '@tauri-apps/api/tauri';
+    import { invoke } from "@tauri-apps/api/core";
     import { goto } from "$app/navigation";
     import { faEllipsisVertical, faBookmark, faAnglesDown, faCircleCheck, faSquareCheck, faCheck, faArrowTurnDown, faXmark } from '@fortawesome/free-solid-svg-icons'
     import { faCircleDown, faBookmark as faOutlineBookmark, faSquare } from '@fortawesome/free-regular-svg-icons';

@@ -1,105 +1,34 @@
 {
+  "productName": "omniyomi",
+  "version": "0.0.0",
+  "identifier": "com.tauri.dev",
   "build": {
-    "beforeBuildCommand": "npm run build",
     "beforeDevCommand": "npm run dev",
-    "devPath": "http://localhost:5173",
-    "distDir": "./frontend/build"
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../build"
   },
-  "package": {
-    "productName": "omniyomi",
-    "version": "0.1.0"
-  },
-  "tauri": {
-    "allowlist": {
-      "all": false,
-      "http": {
-        "all": true,
-        "scope": ["https://**"]
-      },
-      "window": {
-        "all": true,
-        "create": true,
-        "center": true,
-        "requestUserAttention": true,
-        "setResizable": true,
-        "setMaximizable": true,
-        "setMinimizable": true,
-        "setClosable": true,
-        "setTitle": true,
-        "maximize": true,
-        "unmaximize": true,
-        "minimize": true,
-        "unminimize": true,
-        "show": true,
-        "hide": true,
-        "close": true,
-        "setDecorations": true,
-        "setAlwaysOnTop": true,
-        "setContentProtected": true,
-        "setSize": true,
-        "setMinSize": true,
-        "setMaxSize": true,
-        "setPosition": true,
-        "setFullscreen": true,
-        "setFocus": true,
-        "setIcon": true,
-        "setSkipTaskbar": true,
-        "setCursorGrab": true,
-        "setCursorVisible": true,
-        "setCursorIcon": true,
-        "setCursorPosition": true,
-        "setIgnoreCursorEvents": true,
-        "startDragging": true,
-        "print": true
-      }
-    },
-    "bundle": {
-      "active": true,
-      "category": "DeveloperTool",
-      "copyright": "",
-      "deb": {
-        "depends": []
-      },
-      "externalBin": [],
-      "icon": [
-        "icons/32x32.png",
-        "icons/128x128.png",
-        "icons/128x128@2x.png",
-        "icons/icon.icns",
-        "icons/icon.ico"
-      ],
-      "identifier": "com.omniyomi.dev",
-      "longDescription": "",
-      "macOS": {
-        "entitlements": null,
-        "exceptionDomain": "",
-        "frameworks": [],
-        "providerShortName": null,
-        "signingIdentity": null
-      },
-      "resources": [],
-      "shortDescription": "",
-      "targets": "all",
-      "windows": {
-        "certificateThumbprint": null,
-        "digestAlgorithm": "sha256",
-        "timestampUrl": ""
-      }
-    },
-    "security": {
-      "csp": null
-    },
-    "updater": {
-      "active": false
-    },
+  "app": {
     "windows": [
       {
-        "fullscreen": false,
-        "height": 600,
-        "resizable": true,
-        "title": "Omniyomi",
-        "width": 800
+        "title": "omniyomi",
+        "width": 800,
+        "height": 600
       }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
     ]
   }
 }

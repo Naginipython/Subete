@@ -1,5 +1,5 @@
 <script>
-    import { invoke } from '@tauri-apps/api/tauri';
+    import { invoke } from "@tauri-apps/api/core";
     import { faArrowLeft, faBookmark, faEllipsisVertical } from '@fortawesome/free-solid-svg-icons';
     import { faBookmark as faOutlineBookmark } from '@fortawesome/free-regular-svg-icons';
     import { find_manga } from "$lib/common.js";

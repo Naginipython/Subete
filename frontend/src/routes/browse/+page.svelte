@@ -4,7 +4,7 @@
     import Fa from 'svelte-fa'
     import store from "$lib/store.js";
     import DisplayManga from "./display_manga.svelte";
-    import { invoke } from '@tauri-apps/api/tauri';
+    import { invoke } from "@tauri-apps/api/core";
 
     let name = '';
     let results = [];
