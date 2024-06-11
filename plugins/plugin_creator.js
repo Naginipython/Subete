@@ -7,6 +7,10 @@ let plugin = {}
 plugin.id = ""; 
 // plugin.id = "MangaDex"
 
+// Media type of the plugin. Valid types are "manga", "anime", and "ln"
+plugin.media_type = "";
+// plugin.media_type = "manga";
+
 // Url for your plugin. Note that '{title}' is needed to query
 plugin.search_url = "{title}"; 
 // plugin.search_url = "https://api.mangadex.org/manga?limit=100&includes[]=cover_art&includes[]=author&includes[]=artist&title={title}";

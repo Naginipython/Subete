@@ -3,8 +3,9 @@ var fs = require('fs');
 // This helps one create a JSON that can be inputted for a plugin.
 let plugin = {};
 
-// Name for your plugin
 plugin.id = "Manga4Life"; 
+
+plugin.media_type = "manga"
 
 plugin.search_url = "https://manga4life.com/search/?sort=s&desc=false&name={title}"; 
 
