@@ -2,7 +2,7 @@
 
 A personal project attempting to create a Tachiyomi/Aniyomi-like for desktop from scratch. Currently features manga reading, library, and app setting modification, soon to be implementing Light Novel support
 
-Currently only has a built-in MangaDex plugin, but features a plugin creator in `plugins/` to help creating plugins for this app. Due to limitation on how JavaScript code runs within the Rust code, do not rely on npm packages unless they are hard-coded, and avoid odd symbols because of JSON parsing (e.g. \\\\)
+Currently only has a built-in MangaDex plugin, but features a plugin creator in `plugins/` to help creating plugins for this app. Due to limitation on how JavaScript code runs within the Rust code, do not rely on npm packages unless they are hard-coded, and avoid odd symbols because of JSON parsing (e.g. \\\\. \\\' seems fine)
 
 To-Build:\
 Install node & rust (rustup) (Note: on Manjaro Linux, I also needed webkit2gtk)\
