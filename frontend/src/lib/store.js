@@ -2,7 +2,7 @@ import { writable } from 'svelte/store';
 // Note: Ideally, this is the overall structure of the store
 const store = writable({
     "media_screen": "manga",
-    "search_results": [
+    "manga_search_results": [
         /*{
             id: int
             title: string,
@@ -44,7 +44,9 @@ const store = writable({
             // language?
         }*/
     ],
-    "history": [
+    "ln_search_results": [],
+    "ln_library": [],
+    "manga_history": [
         /*{
             id: int
             title: string,
@@ -64,6 +66,7 @@ const store = writable({
             ]
         }*/
     ],
+    "ln_history": [],
     "settings": {
         "quickselect": {}, // typically: "[plugin_name]": Boolean, 
     }

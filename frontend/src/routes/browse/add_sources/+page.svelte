@@ -4,6 +4,7 @@
   let json = {
     error: "",
   };
+  let media_type = "manga";
   
   
   async function validateFile(file) {
@@ -18,18 +19,23 @@
       const test_json = JSON.parse(text);
       if (
         test_json.hasOwnProperty("id") &&
+        test_json.hasOwnProperty("media_type") &&
         test_json.hasOwnProperty("search_url") &&
         test_json.hasOwnProperty("search") &&
+        test_json.hasOwnProperty("search_extra") &&
         test_json.hasOwnProperty("chapters_url") &&
         test_json.hasOwnProperty("get_chapters") &&
+        test_json.hasOwnProperty("chapters_extra") &&
         test_json.hasOwnProperty("pages_url") &&
-        test_json.hasOwnProperty("get_pages")
+        test_json.hasOwnProperty("get_pages") &&
+        test_json.hasOwnProperty("pages_extra")
       ) {
         json = test_json;
+        media_type = test_json.media_type;
         json.error = "";
       } else {
         json.error = "ERROR: Does not contain needed field(s)"
-        console.log("ERROR: Does not contain needed fields");
+        console.log(test_json);
       }
     } catch (error) {
       console.error('Invalid JSON file:', error);
@@ -40,7 +46,16 @@
     // Replace with actual server-side logic for saving the file
     console.log('File uploaded:', files[0]);
     delete json.error;
-    await invoke('add_manga_plugin', { newPlugin: json });
+    switch (media_type) {
+      case "manga":
+        await invoke('add_manga_plugin', { newPlugin: json });
+        break;
+      case "ln":
+        await invoke('add_ln_plugin', { newPlugin: json });
+      default:
+        json.error = "ERROR: media_type is invalid";
+    }
+    
     json.error = "";
   }
 </script>

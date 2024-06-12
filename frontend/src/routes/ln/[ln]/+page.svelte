@@ -5,53 +5,53 @@
     import { faCircleDown, faBookmark as faOutlineBookmark, faSquare } from '@fortawesome/free-regular-svg-icons';
     import Fa from 'svelte-fa'
     import store from "$lib/store.js"
-    // import { getChapters } from "$lib/manga_sources/main.js";
-    import { find_manga } from "$lib/manga_common.js";
+    import { find_ln } from "$lib/ln_common.js";
 
     export let data;
 
-    let manga = {};
+    let ln = {};
 
     // Adds to history when data is available
-    $: if (Object.keys(manga).length != 0) {
+    $: if (Object.keys(ln).length != 0) {
         store.update(json => {
-            json.manga_history.push(manga);
+            json.ln_history.push(ln);
             return json;
         });
     }
     
     store.subscribe(async (json) => {
-        // gets manga search details
-        manga = find_manga(data.id);
+        // gets ln search details
+        ln = find_ln(data.id);
 
         // gets chapters, if needed
-        if (manga['chapters'].length == 0) {
-            let c = await invoke('get_manga_chapters', { source: manga.plugin, id: manga.id });
+        if (ln['chapters'].length == 0) {
+            let c = await invoke('get_ln_chapters', { source: ln.plugin, id: ln.id });
             let html = await invoke('fetch', {url: c.url});
-            manga['chapters'] = eval(c.getChapters + `getChapters(${JSON.stringify(html)})`);
-            manga['chapters'].sort((a,b) => b.number-a.number);
+            ln['chapters'] = eval(c.getChapters + `getChapters(${JSON.stringify(html)})`);
+            console.log(ln['chapters']);
+            ln['chapters'].sort((a,b) => b.number-a.number);
         }
     });
 
     // CHAPTER OPTION BUTTONS
     function toggle_complete(index) {
-        if (manga['chapters'][index].completed) {
-            manga['chapters'][index].completed = false;
-            manga['chapters'][index].page = 1;
+        if (ln['chapters'][index].completed) {
+            ln['chapters'][index].completed = false;
+            ln['chapters'][index].page = 1;
         } else {
-            manga['chapters'][index].completed = true;
+            ln['chapters'][index].completed = true;
         }
-        invoke('update_manga_lib', { item: manga });
+        invoke('update_ln_lib', { item: ln });
     }
     function check_below(index) {
-        for (let i = index+1; i < manga['chapters'].length; i++) {
-            manga['chapters'][i].completed = true;
+        for (let i = index+1; i < ln['chapters'].length; i++) {
+            ln['chapters'][i].completed = true;
         }
-        invoke('update_manga_lib', { item: manga });
+        invoke('update_ln_lib', { item: ln });
     }
     function remove_page(index) {
-        manga['chapters'][index].page = 1;
-        invoke('update_manga_lib', { item: manga });
+        ln['chapters'][index].page = 1;
+        invoke('update_ln_lib', { item: ln });
     }
     let opened = [];
     function show_options(index) {
@@ -70,25 +70,25 @@
 
 <div id="header" >
     <div id="img-wrapper">
-        <img id="img" src="{manga.img}" alt="{manga.title}"/>
+        <img id="img" src="{ln.img}" alt="{ln.title}"/>
     </div>
     <div id="header-content">
         <div id="text">
-            <h3>{manga.title}</h3>
-            <p>Author: {manga.authors}</p>
-            <p>Plugin: {manga.plugin}</p>
+            <h3>{ln.title}</h3>
+            <p>Author: {ln.authors}</p>
+            <p>Plugin: {ln.plugin}</p>
             <!-- TODO: fix desc scrolling -->
-            <div id="desc"><p>{manga.description}</p></div>
+            <div id="desc"><p>{ln.description}</p></div>
         </div>
     </div>
 </div>
 
 
 <!-- TODO: loading icon -->
-{#each manga['chapters'] as c, i}
-<div class="chapter" style="{manga['chapters'][i].completed? 'color: grey' : ''}">
+{#each ln['chapters'] as c, i}
+<div class="chapter" style="{ln['chapters'][i].completed? 'color: grey' : ''}">
     <!-- Main Chapter button -->
-    <button class="chapter-link" on:click={() => goto(`/manga/${data.id}/reader/${i}`)}>
+    <button class="chapter-link" on:click={() => goto(`/ln/${data.id}/reader/${i}`)}>
         <p>
             {#if c.title == ""} Chapter {c.number}
             {:else} Chapter {c.number} - {c.title}
@@ -96,8 +96,8 @@
         </p>
         <div class="chapter-lower">
             <p>date - group</p>
-            {#if manga['chapters'][i].page-1 != 0 && !manga['chapters'][i].completed}
-                <p class="progress">&emsp;(page: {manga['chapters'][i].page})</p>
+            {#if ln['chapters'][i].page-1 != 0 && !ln['chapters'][i].completed}
+                <p class="progress">&emsp;(page: {ln['chapters'][i].page})</p>
             {/if}
         </div>
     </button>
@@ -105,7 +105,7 @@
     <div class="chap-btns">
         <!-- simple check icon -->
         <button id="check" class="chapter-btn" on:click={() => toggle_complete(i)}>
-            {#if manga['chapters'][i].completed} <Fa icon={faXmark} />
+            {#if ln['chapters'][i].completed} <Fa icon={faXmark} />
             {:else} <Fa icon={faCheck} />
             {/if}
         </button>
@@ -116,7 +116,7 @@
             <button id="check-below" class="chapter-btn" on:click={() => check_below(i)}><Fa icon={faAnglesDown} /></button>
             <button id="download" class="chapter-btn"><Fa icon={faCircleDown} /><!--<Fa icon={faCircleCheck} />--></button>
             <button id="select" class="chapter-btn"><Fa icon={faSquare} /><!--<Fa icon={faSquareCheck} />--></button>
-            {#if manga['chapters'][i].page-1 != 0}
+            {#if ln['chapters'][i].page-1 != 0}
             <button id="uncheck" class="chapter-btn" on:click={() => remove_page(i)}>
                 <Fa icon={faXmark} />
             </button>

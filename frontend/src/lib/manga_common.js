@@ -10,9 +10,9 @@ export function find_manga(id) {
     let manga;
     let manga_test = json.manga_library.find(m => m.id == id);
     if (manga_test == undefined) {
-        let search_test = json.search_results.find(m => m.id == id);
+        let search_test = json.manga_search_results.find(m => m.id == id);
         if (search_test == undefined) {
-            manga = json.history.find(m => m.id == id);
+            manga = json.manga_history.find(m => m.id == id);
         } else {
             manga = search_test;
         }

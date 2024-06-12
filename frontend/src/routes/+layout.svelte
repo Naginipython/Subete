@@ -7,7 +7,7 @@
     import { faHeart as faOutlineHeart } from '@fortawesome/free-regular-svg-icons';
     import Fa from 'svelte-fa'
     import store from "$lib/store.js";
-    import { find_manga,in_lib,toggle_favorite } from "$lib/common.js";
+    import { find_manga,in_lib,toggle_favorite } from "$lib/manga_common.js";
 
     let manga_library = [];
     let ln_library = [];

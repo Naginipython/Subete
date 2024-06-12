@@ -2,6 +2,7 @@ var fs = require('fs');
 let plugin = {}
 
 plugin.id = "Asura Light Novel";
+plugin.media_type = "ln";
 
 plugin.search_url = "https://asuralightnovel.com/?s={title}&post_type=wp-manga";
 
@@ -11,10 +12,11 @@ function search(html) {
   html = html.replaceAll('\\n', ' ').replace(new RegExp('\\\\s+', 'g'), ' ');
   const regex = new RegExp(\`<div class="row c-tabs-item__content">(.*?)</span></div></div></div></div></div>\`, 'gi');
   let data_to_parse = [];
+  let match;
   while ((match = regex.exec(html)) !== null) {
     data_to_parse.push(match[1]);
   }
-  for (item of data_to_parse) {
+  for (let item of data_to_parse) {
     let lib_item = {};
     const id_regex = new RegExp(\`<h3 class="h4"><a href="https://asuralightnovel.com/novel/(.*?)/">(.*?)</a>\`, 'gi');
     let reg = id_regex.exec(item);
@@ -43,11 +45,11 @@ function getChapters(html) {
   html = html.replaceAll('\\n', ' ').replace(new RegExp('\\\\s+', 'g'), ' ');
   const regex = new RegExp(\`<li class="wp-manga-chapter "> (.*?) </li>\`, 'gi');
   let data_to_parse = [];
+  let match;
   while ((match = regex.exec(html)) !== null) {
     data_to_parse.push(match[1]);
   }
-
-  for (item of data_to_parse) {
+  for (let item of data_to_parse) {
     let lib_item = {};
     const id_regex = new RegExp(\`<a href="https://asuralightnovel.com/novel/(.*?)/(.*?)/"> (.*?) </a>\`, 'gi');
     let reg = id_regex.exec(item);
@@ -70,6 +72,7 @@ function getChapterPages(html) {
   let data = [];
   html = html.replaceAll('\\n', ' ').replace(new RegExp('\\\\s+', 'g'), ' ');
   const regex = new RegExp(\`<p>(.*?)</p>\`, 'gi');
+  let match;
   while ((match = regex.exec(html)) !== null) {
     if (!match[1].includes(\`<\`) && match[1] != '' && match[1] != "© 2021 Asura Light Novel Inc. All rights reserved") {
       data.push(match[1]);

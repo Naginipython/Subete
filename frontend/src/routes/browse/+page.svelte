@@ -1,9 +1,8 @@
 <script>
     import { faMagnifyingGlass, faXmark } from '@fortawesome/free-solid-svg-icons'
-    // import { faHeart as faOutlineHeart } from '@fortawesome/free-regular-svg-icons';
     import Fa from 'svelte-fa'
     import store from "$lib/store.js";
-    import DisplayManga from "./display_manga.svelte";
+    import Display from "./display.svelte";
     import { invoke } from "@tauri-apps/api/core";
 
     let name = '';
@@ -11,9 +10,9 @@
     let sources = [];
     let checked_sources;
     let media_screen = "manga";
-    let first_run = true;
-    $: if (checked_sources) update_settings();
     
+    $: if (checked_sources) update_settings();
+    let first_run = true;
     async function update_settings() {
         if (!first_run) {
             store.update(json => {
@@ -27,7 +26,6 @@
 
     store.subscribe(async json => {
         media_screen = json["media_screen"];
-        results = json["search_results"];
         if (!json["settings"].hasOwnProperty("quickselect")) {
             checked_sources = {"MangaDex": true};
         } else {
@@ -35,11 +33,12 @@
         }
         switch (media_screen) {
             case "manga":
+                results = json["manga_search_results"];
                 sources = await invoke('get_manga_plugin_names');
                 break;
             case "ln":
-                // sources = await invoke('get_ln_plugin_names');
-                sources = [];
+                results = json["ln_search_results"];
+                sources = await invoke('get_ln_plugin_names');
                 break;
             case "anime":
                 // sources = await invoke('get_ln_plugin_names');
@@ -58,20 +57,41 @@
     async function search() {
         results = [];
         let s = Object.entries(checked_sources).filter(([key, value]) => value).map(([key, value]) => key);
-        let d = await invoke('manga_search', { query: `${name}`, sources: s });
+        s = s.filter(x => sources.includes(x));
         let result = [];
-        for (const s of d) {
-            let html = await invoke('fetch', {url: s.url});
-            let data = eval(s.search + `search(${JSON.stringify(html)})`);
-            results.push({plugin: data[0].plugin, data: data});
-            result = result.concat(data);
+        switch (media_screen) {
+            case "manga":
+                console.log("Search Manga");
+                let m = await invoke('manga_search', { query: `${name}`, sources: s });
+                for (const s of m) {
+                    let html = await invoke('fetch', {url: s.url});
+                    let data = eval(s.search + `search(${JSON.stringify(html)})`);
+                    results.push({plugin: data[0].plugin, data: data});
+                    result = result.concat(data);
+                }
+                store.update(json => {
+                    json.manga_search_results = result;
+                    return json;
+                });
+                break;
+            case "ln":
+                console.log("Search Ln");
+                let l = await invoke('ln_search', { query: `${name}`, sources: s });
+                for (const s of l) {
+                    let html = await invoke('fetch', {url: s.url});
+                    let data = eval(s.search + `search(${JSON.stringify(html)})`);
+                    results.push({plugin: data[0].plugin, data: data});
+                    result = result.concat(data);
+                }
+                store.update(json => {
+                    json.ln_search_results = result;
+                    return json;
+                });
+                break;
+            case "anime":
+                // sources = await invoke('get_ln_plugin_names');
+                break;
         }
-        // results = result;
-
-        store.update(json => {
-            json.search_results = result;
-            return json;
-        });
         // reformatResults();
     }
 
@@ -95,7 +115,18 @@
     function clear_search() {
         results = [];
         store.update(json => {
-            json.search_results = results;
+            switch (media_screen) {
+                case "manga":
+                    json.manga_search_results = result;
+                    break;
+                case "ln":
+                    json.ln_search_results = result;
+                    break;
+                case "anime":
+                    // sources = await invoke('get_ln_plugin_names');
+                    sources = [];
+                    break;
+            }
             return json;
         });
     }
@@ -126,7 +157,7 @@
     <!-- displays manga -->
     {#each results as item, i}
         <h3>{item.plugin}</h3>
-        <DisplayManga data={item.data}/>
+        <Display data={item.data} media_screen={media_screen}/>
     {/each}
 
 </div>

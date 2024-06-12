@@ -1,5 +1,6 @@
 <script>
     export let data = [];
+    export let media_screen = "manga";
 
     // Drag Scrolling
     let scrollContainer;
@@ -38,7 +39,7 @@
     role="group">
     {#each data as d, i} <!-- can change d to {varname varname}, example {img, title}. i exists to find index -->
 
-        <a class="manga" href="/manga/{d.id}">
+        <a class="manga" href="/{media_screen}/{d.id}">
             <div class="manga-wrap">
                 <img src={d.img} alt={d.title}/>
             </div>

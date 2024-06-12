@@ -2,7 +2,7 @@
     import { invoke } from "@tauri-apps/api/core";
     import { faArrowLeft, faBookmark, faEllipsisVertical } from '@fortawesome/free-solid-svg-icons';
     import { faBookmark as faOutlineBookmark } from '@fortawesome/free-regular-svg-icons';
-    import { find_manga } from "$lib/common.js";
+    import { find_manga } from "$lib/manga_common.js";
     import { goto } from "$app/navigation";
     import Fa from 'svelte-fa'
     export let data;

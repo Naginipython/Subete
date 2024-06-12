@@ -2,11 +2,7 @@ use crate::FILE_PATH;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::{fs::File, io::Write, sync::Mutex};
-// use tauri::{api::http::{ClientBuilder, HttpRequestBuilder, ResponseType}, http::header::USER_AGENT};
 use lazy_static::lazy_static;
-use tauri_plugin_http::reqwest;
-
-use super::{ChapterItem, LibraryItem};
 
 lazy_static! {
     pub static ref PLUGINS_PATH: String = {
@@ -36,7 +32,7 @@ fn get_plugins() -> Vec<Plugins> {
 }
 #[tauri::command]
 pub fn add_manga_plugin(new_plugin: Plugins) {
-    println!("Adding plugin...");
+    println!("Adding Manga plugin...");
     let mut plugins = MANGA_PLUGINS.lock().unwrap();
     let names: Vec<String> = plugins.iter().map(|p| p.id.clone()).collect();
     if !names.contains(&new_plugin.id) {
@@ -93,7 +89,7 @@ impl Default for Media {
 
 #[tauri::command]
 pub fn get_manga_plugin_names() -> Value {
-    println!("Getting Plugin Names...");
+    println!("Getting Manga Plugin Names...");
     let plugins = MANGA_PLUGINS.lock().unwrap();
     let names: Vec<String> = plugins.iter().map(|p| p.id.clone()).collect();
     json!(names)
@@ -102,32 +98,10 @@ pub fn get_manga_plugin_names() -> Value {
 fn replace_url(url: &String, placeholder: &str, replace: &str) -> String {
     url.replace(placeholder, replace)
 }
-#[tauri::command]
-pub async fn fetch(url: String) -> String {
-    // Fetching page data
-    let user_agent = "Mozilla/5.0 (Linux; Android 13; SM-S901U) AppleWebkit/537.36 (KHTML, like Gecko Chrome/112.0.0.0 Mobile Safari/537.36";
-    // let client = ClientBuilder::new().max_redirections(3).build().unwrap();
-    // let request = HttpRequestBuilder::new("GET", url)
-    //     .unwrap()
-    //     .header(USER_AGENT, user_agent)
-    //     .unwrap()
-    //     .response_type(ResponseType::Text);
-
-    // Sends the request and gets the data
-    // let res = client.send(request).await.unwrap();
-    // res.read().await.unwrap().data
-    let client = reqwest::Client::new();
-    let response = client.get(url)
-        .header(reqwest::header::USER_AGENT, user_agent)
-        .send()
-        .await.unwrap();
-    let body = response.text().await.unwrap();
-    body
-}
 
 #[tauri::command]
 pub async fn manga_search(query: String, sources: Vec<String>) -> Value {
-    println!("Searching...");
+    println!("Searching Manga(s)...");
     let mut result: Vec<Value> = Vec::new();
     let plugins = get_plugins();
     for p in plugins {
