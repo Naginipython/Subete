@@ -41,7 +41,6 @@
         let secondaryColor = getComputedStyle(document.body).getPropertyValue('--secondary-color').trim();
         let hex = parseInt(secondaryColor.slice(1), 16);
         let [r, g, b] = [(hex >> 16) & 255, (hex >> 8) & 255, hex & 255];
-        console.log(r);
         document.documentElement.style.setProperty('--secondary-color-transparent', `rgba(${r}, ${g}, ${b}, 0.5)`);
         // Sets text outline to opposite of current
         let primaryColor = getComputedStyle(document.body).getPropertyValue('--primary-color').trim();
@@ -52,13 +51,6 @@
         } else {
             document.documentElement.style.setProperty('--text-outline', `0`);
         }
-        console.log(primaryColor)
-    }
-
-    // Checks for completion
-    $: if (imgs.length > 0 && !chapter.completed) {
-        if (curr_page >= imgs.length-1) chapter.completed = true;
-        else chapter.completed = false;
     }
 
     // Update display page number, unless it is above or below a threshold
@@ -66,8 +58,7 @@
     
     // Updates library backend
     async function update_lib() {
-        console.log(chapter.completed);
-        console.log(chapter.page);
+        if (curr_page >= imgs.length-1) chapter.completed = true;
         await invoke('update_manga_lib', { item: manga });
         goto(`/manga/${data.id}`)
     }
@@ -75,7 +66,6 @@
     // ----- INPUT -----
     // window.addEventListener('keydown', keyInput);
     function keyInput(event) {
-        console.log(event.key);
         switch (event.key) {
             case "ArrowRight":
             case 'd':
@@ -107,6 +97,7 @@
             let next = parseInt(data.manga_index)-1;
             if (next >= 0) {
                 goto(`/manga/${data.id}/reader/${next}`).then(() => {
+                    chapter.completed = true;
                     invoke('update_manga_lib', { item: manga }).then(() => {
                         start_reader(0);
                     });
