@@ -23,7 +23,9 @@
         chapters = [];
         chapter = manga['chapters'][data.manga_index];
         imgs = document.getElementsByTagName("img");
-        chapters = await invoke('get_manga_pages', { source: manga.plugin, id: chapter.id });
+        let c = await invoke('get_manga_pages', { source: manga.plugin, id: chapter.id });
+        let html = await invoke('fetch', {url: c.url});
+        chapters = eval(c.getChapterPages + `getChapterPages(${JSON.stringify(html)})`);
         // chapters = await getChapterPages(manga.extention, chapter.id);
         if (chapter.completed && page != Infinity) {
             curr_page = 0;
@@ -71,16 +73,17 @@
     }
 
     // ----- INPUT -----
-    window.addEventListener('keydown', keyInput);
-    function keyInput(key) {
-        switch (key.keyCode) {
-            case 39: // left
-            case 'd': // d
-            case 32: // space
+    // window.addEventListener('keydown', keyInput);
+    function keyInput(event) {
+        console.log(event.key);
+        switch (event.key) {
+            case "ArrowRight":
+            case 'd':
+            case " ":
                 next();
                 break;
-            case 37: //right
-            case 'a': // a
+            case "ArrowLeft":
+            case 'a':
                 prev();
                 break;
         }
@@ -151,6 +154,7 @@
     }
 </script>
 
+<svelte:window on:keydown={keyInput} />
 <!-- SNACKBAR -->
 <div id="chap-menu" style="opacity: 0">
     <div class="menu-background"></div>

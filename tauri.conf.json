@@ -1,12 +1,12 @@
 {
   "productName": "omniyomi",
   "version": "0.0.0",
-  "identifier": "com.tauri.dev",
+  "identifier": "com.omniyomi.dev",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
     "beforeBuildCommand": "npm run build",
-    "frontendDist": "../build"
+    "frontendDist": "./frontend/build"
   },
   "app": {
     "windows": [

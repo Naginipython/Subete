@@ -15,7 +15,6 @@
     $: if (checked_sources) update_settings();
     
     async function update_settings() {
-        // console.log(checked_sources)
         if (!first_run) {
             store.update(json => {
                 json["settings"].quickselect = checked_sources;
@@ -59,15 +58,21 @@
     async function search() {
         results = [];
         let s = Object.entries(checked_sources).filter(([key, value]) => value).map(([key, value]) => key);
-        console.log(s);
-        results = await invoke('manga_search', { query: `${name}`, sources: s });
-        
+        let d = await invoke('manga_search', { query: `${name}`, sources: s });
+        let result = [];
+        for (const s of d) {
+            let html = await invoke('fetch', {url: s.url});
+            let data = eval(s.search + `search(${JSON.stringify(html)})`);
+            results.push({plugin: data[0].plugin, data: data});
+            result = result.concat(data);
+        }
+        // results = result;
+
         store.update(json => {
-            json.search_results = results;
+            json.search_results = result;
             return json;
         });
-        
-        reformatResults();
+        // reformatResults();
     }
 
     function reformatResults() {

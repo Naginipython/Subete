@@ -26,9 +26,9 @@
 
         // gets chapters, if needed
         if (manga['chapters'].length == 0) {
-            // manga['chapters'] = await getChapters(manga.plugin, manga.id);
-            // manga['chapters'].sort((a,b) => b.number-a.number);
-            manga['chapters'] = await invoke('get_manga_chapters', { source: manga.plugin, id: manga.id });
+            let c = await invoke('get_manga_chapters', { source: manga.plugin, id: manga.id });
+            let html = await invoke('fetch', {url: c.url});
+            manga['chapters'] = eval(c.getChapters + `getChapters(${JSON.stringify(html)})`);
             manga['chapters'].sort((a,b) => b.number-a.number);
         }
     });
@@ -139,7 +139,7 @@
     #header {
         padding: 10px;
         overflow: hidden;
-        border: 1px solid black;
+        border-bottom: 1px solid black;
     }
     #img-wrapper {
         width: 200px;
@@ -180,6 +180,8 @@
         padding: 5px 0;
         overflow: auto;
         display: inline-flex;
+        background-color: var(--primary-color);
+        filter: brightness(0.95)
     }
     .chapter:hover {
         background-color: var(--selection-color)

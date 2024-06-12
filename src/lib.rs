@@ -24,6 +24,7 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
+            fetch,
             // library.rs
             get_manga_lib, add_to_manga_lib, remove_from_manga_lib, update_manga_lib, 
             // plugins.rs

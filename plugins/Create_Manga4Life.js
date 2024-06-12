@@ -54,6 +54,7 @@ function search(json) {
  });
 }
 `;
+plugin.search_extra = {};
 
 plugin.chapters_url = "https://manga4life.com/manga/{id}";
 
@@ -96,10 +97,9 @@ function getChapters(json) {
   return data;
 }
 `;
-
+plugin.chapters_extra = {};
 
 plugin.pages_url = "https://manga4life.com/read-online/{id}-page-1.html";
-
 
 plugin.get_pages = `
 function getChapterPages(json) {
@@ -152,12 +152,14 @@ function getChapterPages(json) {
   return data;
 }
 `;
-
+plugin.pages_extra = {};
 
 
 // Removes /n, extra spaces, and '\' needed for js things
 for (const [key, val] of Object.entries(plugin)) {
-  plugin[key] = val.replaceAll('\n', '').replace(/\s+/g, ' ');
+  if (typeof val == "string") {
+    plugin[key] = val.replaceAll('\n', '').replace(/\s+/g, ' ');
+  }
 }
 
 async function tests() {
@@ -209,7 +211,7 @@ async function tests() {
 tests().then((result) => {
   // Writes to a file, to be inserted as a plugin
   if (result) {
-    fs.writeFile(`${plugin.id}.json`, JSON.stringify(plugin), (error) => {
+    fs.writeFile(`plugins/${plugin.id}.json`, JSON.stringify(plugin), (error) => {
         if (error) {
           console.error(error);
           throw error;

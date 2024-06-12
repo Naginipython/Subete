@@ -1,64 +1,61 @@
 var fs = require('fs');
 
-// This helps one create a JSON that can be inputted for a plugin.
 let plugin = {}
 
-// Name for your plugin
-plugin.id = "";
+plugin.id = "MangaDex"
+plugin.media_type = "manga";
 
-// Media type of the plugin. Valid types are "manga", "anime", and "ln"
-plugin.media_type = "";
-
-// Url for your plugin. Note that '{title}' is needed to query
-plugin.search_url = "{title}"; 
-
-// JS code needed to search. Will need a param of the raw GET of the search_url, and return:
-// LibraryItem:
-// {
-//     id: String,
-//     title: String,
-//     img: String,
-//     plugin: String,
-//     authors: String,
-//     artists: String,
-//     description: String OR none,
-//     chapters: [ ChapterItem ]
-// }
-plugin.search = "function search(html) { let data = []; return data; }";
-
-// A field that adds more functionality to the fetch requests. Current usable fields:
-// request: String  - Used to change the fetch to "post"
+plugin.search_url = "https://api.mangadex.org/manga?limit=100&includes[]=cover_art&includes[]=author&includes[]=artist&title={title}";
+plugin.search = `
+function search(html) {
+    html = JSON.parse(html); 
+    let data = [];
+        for (let d of html['data']) {
+            let temp = {};
+            temp['id'] = d['id'];
+            temp['title'] = d['attributes']['title']['en'];
+            let filetemp = d['relationships'].filter(o => o.type == 'cover_art')[0];
+            temp['img'] = \`https://uploads.mangadex.org/covers/\${temp['id']}/\${filetemp['attributes']['fileName']}\`;
+            temp['plugin'] = 'MangaDex';
+            temp['description'] = d['attributes']['description']['en'];
+            temp['chapters'] = [];
+            let author_names = d['relationships'].filter(x => x.type == 'author').map(y => y['attributes']['name']);
+            let artist_names = d['relationships'].filter(x => x.type == 'artist').map(y => y['attributes']['name']);
+            temp['authors'] = author_names.join(', ');
+            temp['artists'] = artist_names.join(', ');
+            data.push(temp);
+        }
+    return data;
+}
+`;
 plugin.search_extra = {}
 
-// Get Chapters url. Note that '{id}' is the part of the link that is the specific item's url
-plugin.chapters_url = "{id}";
-
-// JS code needed to get chapter data. Will need a param of the raw GET of the chapters_url, and return:
-// ChapterItem:
-// [
-//     {
-//         id: String,
-//         number: Float,
-//         title: String,
-//         page: Number,
-//         completed: Boolean
-//     }
-// ]
-plugin.get_chapters = "function getChapters(html) { let data = []; return data; }";
-
-// A field that adds more functionality to the fetch requests. Current usable fields:
-// request: String  - Used to change the fetch to "post"
+plugin.chapters_url = "https://api.mangadex.org/manga/{id}/feed?limit=500&order[chapter]=asc&translatedLanguage[]=en";
+plugin.get_chapters = `
+function getChapters(html) {
+    html = JSON.parse(html); 
+    return html['data'].map(e => {
+      return {
+          number: parseFloat(e['attributes']['chapter'])? parseFloat(e['attributes']['chapter']) : 0.0,
+          id: e['id'],
+          title: e['attributes']['title'] == '' || e['attributes']['title'] == null? \`Chapter \${e['attributes']['chapter']}\` : e['attributes']['title'],
+          page: 1,
+          completed: false
+      }
+    });
+  }
+`;
 plugin.chapters_extra = {}
 
-// Get Pages url. Note that '{id}' is the part of the link that is the specific item's chapter url
-plugin.pages_url = "{id}";
-
-// JS code needed to get page links. Will need a param of the raw GET of the chapters_url, and return:
-// [ String ]
-plugin.get_pages = "function getChapterPages(html) { let data = []; return data; }";
-
-// A field that adds more functionality to the fetch requests. Current usable fields:
-// request: String  - Used to change the fetch to "post"
+plugin.pages_url = "https://api.mangadex.org/at-home/server/{id}";
+plugin.get_pages = `
+function getChapterPages(html) {
+    html = JSON.parse(html); 
+    let hash = html['chapter']['hash'];
+    let data = html['chapter']['data'];
+    return data.map(x => \`https://uploads.mangadex.org/data/\${hash}/\${x}\`);
+  }
+`;
 plugin.pages_extra = {}
 
 // Removes /n, extra spaces, and '\' needed for js things
@@ -104,7 +101,6 @@ async function tests() {
 
   // Testing if getChapters works
   const page_res = await fetch(plugin.pages_url.replace("{id}", chap_test[0].id));
-  console.log(plugin.pages_url.replace("{id}", chap_test[0].id));
   const page_data = await page_res.text();
   const page_test = eval(plugin.get_pages + `getChapterPages(${JSON.stringify(page_data)})`);
   if (page_test.length <= 0) {
