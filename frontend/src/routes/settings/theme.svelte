@@ -3,11 +3,13 @@
     import { invoke } from "@tauri-apps/api/core";
 
     let color_text = {
+        theme: '',
         primary: '',
         secondary: '',
         selection: '',
         text: '',
     };
+    let custom = false;
     let primary_color_select = "Dark";
     let secondary_color_select = "Shitty Red";
     let selection_color_select = "Shitty Red";
@@ -16,8 +18,13 @@
 
     store.subscribe(async json => {
         if (!json["settings"].hasOwnProperty("app_colors")) {
-            color_text = {primary: "1a1a1a", secondary: "330000", selection: "800000", text: "ffffff"};
+            color_text = {theme: "Nagini's dark", primary: "1a1a1a", secondary: "330000", selection: "800000", text: "ffffff"};
         } else {
+            if (!json['settings']['app_colors'].hasOwnProperty("theme")) {
+                color_text.theme = "Nagini's dark";
+            } else {
+                color_text.theme = json["settings"]["app_colors"].theme;
+            }
             if (!json['settings']['app_colors'].hasOwnProperty("primary")) {
                 color_text.primary = "1a1a1a";
             } else {
@@ -41,6 +48,7 @@
         }
         if (init) {
             init = false;
+            if (color_text.theme == "Custom") custom = true;
             switch (color_text.primary) {
                 case "1a1a1a": primary_color_select = "Dark"; break;
                 case "f2f2f2": primary_color_select = "Light"; break;
@@ -73,6 +81,47 @@
         return json;
     });
 
+    async function change_theme() {
+        custom = false;
+        switch (color_text.theme) {
+            case "Nagini's dark":
+                primary_color_select = "Dark";
+                color_text.primary = "1a1a1a";
+                document.documentElement.style.setProperty('--primary-color', `#1a1a1a`);
+                secondary_color_select = "Shitty Red";
+                color_text.secondary = "330000";
+                document.documentElement.style.setProperty('--secondary-color', `#330000`); 
+                selection_color_select = "Shitty Red";
+                color_text.selection = "800000";
+                document.documentElement.style.setProperty('--selection-color', `#800000`); 
+                text_color_select = "White"
+                color_text.text = "ffffff";
+                document.documentElement.style.setProperty('--text-color', `#ffffff`); 
+                break;
+            case "Nagini's light":
+                primary_color_select = "Light"
+                color_text.primary = "f2f2f2";
+                document.documentElement.style.setProperty('--primary-color', `#f2f2f2`); 
+                secondary_color_select = "Other";
+                color_text.secondary = "ffffcc";
+                document.documentElement.style.setProperty('--secondary-color', `#ffffcc`); 
+                selection_color_select = "Shitty Yellow";
+                color_text.selection = "808000";
+                document.documentElement.style.setProperty('--selection-color', `#808000`); 
+                text_color_select = "Black";
+                color_text.text = "000000";
+                document.documentElement.style.setProperty('--text-color', `#000000`); 
+                break;
+            default:
+                custom = true;
+        }
+        store.update(json => {
+            json["settings"].app_colors = color_text;
+            return json;
+        });
+        await invoke('update_settings', { newSettings: {"app_colors":color_text}})
+    }
+
     // PRIMARY COLOR
     async function change_primary_color() {
         switch (primary_color_select) {
@@ -91,7 +140,6 @@
         }
         store.update(json => {
             json["settings"].app_colors = color_text;
-            console.log(json['settings']);
             return json;
         });
         await invoke('update_settings', { newSettings: {"app_colors":color_text}})
@@ -131,7 +179,6 @@
         }
         store.update(json => {
             json["settings"].app_colors = color_text;
-            console.log(json['settings']);
             return json;
         });
         await invoke('update_settings', { newSettings: {"app_colors":color_text}})
@@ -171,7 +218,6 @@
         }
         store.update(json => {
             json["settings"].app_colors = color_text;
-            console.log(json['settings']);
             return json;
         });
         await invoke('update_settings', { newSettings: {"app_colors":color_text}})
@@ -202,71 +248,81 @@
 </script>
 
 <div class="theme-box">
-    <label for="primary-color">Choose Primary Color: </label>
-    <select id="primary-color" bind:value={primary_color_select} on:change={async () => change_primary_color()}>
-        <option>Dark</option>
-        <option>Light</option>
-        <option>Other</option>
-    </select>
-    {#if primary_color_select == "Other"}
-        <form on:submit={change_primary_color} class="theme-option-input">
-            <span>#</span><input id="input-primary-color" bind:value={color_text.primary} on:change={async () => change_primary_color()} />
-            <input type="button" value="Apply"/>
-        </form>
-    {/if}
+    <label for="presets">Presets: </label>
+    <select id="presets" bind:value={color_text.theme} on:change={async () => change_theme()}>
+        <option>Nagini's dark</option>
+        <option>Nagini's light</option>
+        <option>Custom</option>
 </div>
 
-<div class="theme-box">
-    <label for="secondary-color">Choose Secondary Color: </label>
-    <select id="secondary-color" bind:value={secondary_color_select} on:change={async () => change_secondary_color()}>
-        <option>Shitty Red</option>
-        <option>Shitty Orange</option>
-        <option>Shitty Yellow</option>
-        <option>Shitty Green</option>
-        <option>Shitty Blue</option>
-        <option>Shitty Purple</option>
-        <option>Other</option>
-    </select>
-    {#if secondary_color_select == "Other"}
-        <form on:submit={change_secondary_color} class="theme-option-input">
-            <span>#</span><input id="input-secondary-color" bind:value={color_text.secondary} on:change={async () => change_secondary_color()} />
-            <input type="button" value="Apply"/>
-        </form>
-    {/if}
-</div>
+<div style='{custom? '' : 'display: none'} '>
+    <div class="theme-box">
+        <label for="primary-color">Choose Primary Color: </label>
+        <select id="primary-color" bind:value={primary_color_select} on:change={async () => change_primary_color()}>
+            <option>Dark</option>
+            <option>Light</option>
+            <option>Other</option>
+        </select>
+        {#if primary_color_select == "Other"}
+            <form on:submit={change_primary_color}>
+                <span>#</span><input id="input-primary-color" bind:value={color_text.primary} />
+                <input type="button" value="Apply"/>
+            </form>
+        {/if}
+    </div>
 
-<div class="theme-box">
-    <label for="selection-color">Choose selection Color: </label>
-    <select id="selection-color" bind:value={selection_color_select} on:change={async () => change_selection_color()}>
-        <option>Shitty Red</option>
-        <option>Shitty Orange</option>
-        <option>Shitty Yellow</option>
-        <option>Shitty Green</option>
-        <option>Shitty Blue</option>
-        <option>Shitty Purple</option>
-        <option>Other</option>
-    </select>
-    {#if selection_color_select == "Other"}
-        <form on:submit={change_selection_color} class="theme-option-input">
-            <span>#</span><input id="input-selection-color" bind:value={color_text.selection} on:change={async () => change_selection_color()} />
-            <input type="button" value="Apply"/>
-        </form>
-    {/if}
-</div>
+    <div class="theme-box">
+        <label for="secondary-color">Choose Secondary Color: </label>
+        <select id="secondary-color" bind:value={secondary_color_select} on:change={async () => change_secondary_color()}>
+            <option>Shitty Red</option>
+            <option>Shitty Orange</option>
+            <option>Shitty Yellow</option>
+            <option>Shitty Green</option>
+            <option>Shitty Blue</option>
+            <option>Shitty Purple</option>
+            <option>Other</option>
+        </select>
+        {#if secondary_color_select == "Other"}
+            <form on:submit={change_secondary_color}>
+                <span>#</span><input id="input-secondary-color" bind:value={color_text.secondary} />
+                <input type="button" value="Apply"/>
+            </form>
+        {/if}
+    </div>
 
-<div class="theme-box">
-    <label for="text-color">Choose Text Color: </label>
-    <select id="text-color" bind:value={text_color_select} on:change={async () => change_text_color()}>
-        <option>Black</option>
-        <option>White</option>
-        <option>Other</option>
-    </select>
-    {#if text_color_select == "Other"}
-        <form on:submit={async () => change_text_color()} class="theme-option-input">
-            <span>#</span><input id="input-text-color" bind:value={color_text.text} on:change={async () => change_text_color()} />
-            <input type="button" value="Apply"/>
-        </form>
-    {/if}
+    <div class="theme-box">
+        <label for="selection-color">Choose selection Color: </label>
+        <select id="selection-color" bind:value={selection_color_select} on:change={async () => change_selection_color()}>
+            <option>Shitty Red</option>
+            <option>Shitty Orange</option>
+            <option>Shitty Yellow</option>
+            <option>Shitty Green</option>
+            <option>Shitty Blue</option>
+            <option>Shitty Purple</option>
+            <option>Other</option>
+        </select>
+        {#if selection_color_select == "Other"}
+            <form on:submit={change_selection_color}>
+                <span>#</span><input id="input-selection-color" bind:value={color_text.selection} />
+                <input type="button" value="Apply"/>
+            </form>
+        {/if}
+    </div>
+
+    <div class="theme-box">
+        <label for="text-color">Choose Text Color: </label>
+        <select id="text-color" bind:value={text_color_select} on:change={async () => change_text_color()}>
+            <option>Black</option>
+            <option>White</option>
+            <option>Other</option>
+        </select>
+        {#if text_color_select == "Other"}
+            <form on:submit={async () => change_text_color()}>
+                <span>#</span><input id="input-text-color" bind:value={color_text.text} />
+                <input type="button" value="Apply"/>
+            </form>
+        {/if}
+    </div>
 </div>
 
 <style>
@@ -283,7 +339,7 @@
         height: fit-content;
         padding: 0 5px;
     }
-    .theme-option-input {
+    .theme-box form {
         margin-left: 25px;
     }
 </style>

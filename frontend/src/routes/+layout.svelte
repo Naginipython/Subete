@@ -40,6 +40,17 @@
                 document.documentElement.style.setProperty('--text-color', `#${settings['app_colors'].text}`); 
             }
         }
+        if (settings.hasOwnProperty("library_widths")) {
+            if (settings["library_widths"].hasOwnProperty("manga")) {
+                document.documentElement.style.setProperty('--lib-manga-width', `${settings['library_widths'].manga}px`); 
+            }
+            if (settings["library_widths"].hasOwnProperty("ln")) {
+                document.documentElement.style.setProperty('--lib-ln-width', `${settings['library_widths'].ln}px`); 
+            }
+            // if (settings["library_widths"].hasOwnProperty("anime")) {
+                
+            // }
+        }
     });
 
     let nav = '';
@@ -246,6 +257,12 @@
         --secondary-color: #330000;
         --selection-color: #800000;
         --text-color: white;
+
+        --lib-manga-width: 200px;
+        --lib-manga-height: calc((var(--lib-manga-width) - 50px) * 2);
+
+        --lib-ln-width: 150px;
+        --lib-ln-height: calc((var(--lib-ln-width) - 50px) * 2);
     }
     #snackbar {
         height: var(--snackbar-height);

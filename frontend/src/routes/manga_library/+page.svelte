@@ -2,17 +2,22 @@
     import store from "$lib/store.js";
 
     let library = [];
+    let width = "200";
 
     store.subscribe(json => {
         library = json["manga_library"];
+        if (json["settings"]["library_widths"].hasOwnProperty("manga")) {
+            width = json["settings"]["library_widths"].manga;
+        }
         setWidth();
     });
 
     window.addEventListener('resize', setWidth);
 
     function setWidth() {
-        var style = parseFloat(getComputedStyle(document.body).getPropertyValue('--lib-manga-height'));
-        let imgWidth = 0.5*parseFloat(style) + 50 + 10; // +5 * itemcount
+        // var style = parseFloat(getComputedStyle(document.body).getPropertyValue('--lib-manga-height'));
+        // let imgWidth = 0.5*parseFloat(style) + 50 + 10;
+        let imgWidth = parseFloat(width) + 10;
         let itemCount = Math.floor(window.innerWidth / imgWidth);
         var newWidth = itemCount * imgWidth;
         document.documentElement.style.setProperty('--calculated-width', `${newWidth}px`);
@@ -33,10 +38,6 @@
 </div>
 
 <style>
-    :root {
-        --lib-manga-height: 300px;
-        --lib-manga-width: calc(0.5*var(--lib-manga-height) + 50px);
-    }
     #lib-manga-section {
         display: flex;
         flex-wrap: wrap;

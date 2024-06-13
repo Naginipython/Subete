@@ -69,6 +69,7 @@ const store = writable({
     "ln_history": [],
     "settings": {
         "quickselect": {}, // typically: "[plugin_name]": Boolean, 
+        "library_widths": {}, // "manga", "ln", and "anime", equal to a string of the width #
     }
 });
 export default store;
