@@ -19,17 +19,25 @@
         });
     }
     
+    let tries = 30;
     store.subscribe(async (json) => {
         // gets ln search details
         ln = find_ln(data.id);
 
         // gets chapters, if needed
-        if (ln['chapters'].length == 0) {
+        if (ln['chapters'].length == 0 && tries > 0) {
             let c = await invoke('get_ln_chapters', { source: ln.plugin, id: ln.id });
-            let html = await invoke('fetch', {url: c.url});
+            let html = '';
+            if (c.extra.hasOwnProperty("request")) {
+                if (c.extra.request == "post") {
+                    html = await invoke('post_fetch', {url: c.url});
+                }
+            } else {
+                html = await invoke('fetch', {url: c.url});
+            }
             ln['chapters'] = eval(c.getChapters + `getChapters(${JSON.stringify(html)})`);
-            console.log(ln['chapters']);
             ln['chapters'].sort((a,b) => b.number-a.number);
+            tries--;
         }
     });
 

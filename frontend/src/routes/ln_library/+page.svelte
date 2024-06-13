@@ -23,7 +23,7 @@
 <div id="lib-manga-section">
 <!-- TODO: loading icon -->
 {#each library as l, i}
-    <a class="lib-manga" href="/manga/{l.id}">
+    <a class="lib-manga" href="/ln/{l.id}">
         <div class="lib-manga-wrap">
             <img src={l.img} alt={l.title}/>
         </div>

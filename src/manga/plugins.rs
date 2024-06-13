@@ -115,7 +115,7 @@ pub async fn manga_search(query: String, sources: Vec<String>) -> Value {
 
 #[tauri::command]
 pub async fn get_manga_chapters(source: String, id: String) -> Value {
-    println!("Getting chapters...");
+    println!("Getting manga chapters...");
     let mut result: Value = json!({});
     let plugins = get_plugins();
     let plugin = plugins.iter().find(|p| p.id == source);
@@ -128,7 +128,7 @@ pub async fn get_manga_chapters(source: String, id: String) -> Value {
 
 #[tauri::command]
 pub async fn get_manga_pages(source: String, id: String) -> Value {
-    println!("Getting pages...");
+    println!("Getting manga pages...");
     let mut result: Value = json!({});
     let plugins = get_plugins();
     let plugin = plugins.iter().find(|p| p.id == source);

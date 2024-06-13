@@ -7,7 +7,8 @@
     import { faHeart as faOutlineHeart } from '@fortawesome/free-regular-svg-icons';
     import Fa from 'svelte-fa'
     import store from "$lib/store.js";
-    import { find_manga,in_lib,toggle_favorite } from "$lib/manga_common.js";
+    import { find_manga,in_lib as in_manga_lib, toggle_favorite as toggle_manga_favorite } from "$lib/manga_common.js";
+    import { find_ln, in_lib as in_ln_lib, toggle_favorite as toggle_ln_favorite } from "$lib/ln_common.js";
 
     let manga_library = [];
     let ln_library = [];
@@ -15,7 +16,7 @@
     onMount(async () => {
         // GET LIB
         manga_library = await invoke('get_manga_lib');
-        // ln_library = await invoke('get_ln_lib');
+        ln_library = await invoke('get_ln_lib');
         let settings = await invoke('get_settings');
         store.update(json => {
             json.manga_library = manga_library;
@@ -45,11 +46,16 @@
     let selected_valid_links = ["/library", "/updates", "/browse", "/more"];
     $: path = $page.url.pathname;
     let scroll_memory = {};
+    let back = "/";
     let in_manga = false;
     let manga_data = {
         favorited: false,
-        data: {},
-        back: "/"
+        data: {}
+    };
+    let in_ln= false;
+    let ln_data = {
+        favorited: false,
+        data: {}
     };
 
     // ----- REDIRECT MANAGER -----
@@ -102,14 +108,13 @@
         if (nav.includes("manga/") && !nav.includes("reader")) {
             in_manga = true;
             if (from.includes('library') || from=='/updates' || from=='/browse') {
-                manga_data.back = from;
+                back = from;
             }
             manga_data.data = find_manga($navigating.to.params.manga);
-            manga_data.favorited = in_lib(manga_data.data.id)
+            manga_data.favorited = in_manga_lib(manga_data.data.id)
         } else {
             in_manga = false;
         }
-
         // --- READER ---
         // Removes snackbar and nav for reader
         if (nav.includes("reader")) {
@@ -120,6 +125,19 @@
             document.getElementById("body").style.height = null;
             document.getElementById("snackbar").style.display = "block";
             document.getElementById("nav-centered").style.display = "block";
+        }
+
+        // --- LN ---
+        // Changes the top nav for ln
+        if (nav.includes("ln/") && !nav.includes("reader")) {
+            in_ln = true;
+            if (from.includes('library') || from=='/updates' || from=='/browse') {
+                back = from;
+            }
+            ln_data.data = find_ln($navigating.to.params.ln);
+            ln_data.favorited = in_ln_lib(ln_data.data.id)
+        } else {
+            in_ln = false;
         }
     }
 
@@ -134,9 +152,13 @@
     }
 
     // BACKEND CALLS
-    async function toggle_fav() {
+    async function toggle_manga_fav() {
         manga_data.favorited = !manga_data.favorited;
-        await toggle_favorite(manga_data.data);
+        await toggle_manga_favorite(manga_data.data);
+    }
+    async function toggle_ln_fav() {
+        ln_data.favorited = !ln_data.favorited;
+        await toggle_ln_favorite(ln_data.data);
     }
 
     // MEDIA TYPE CHANGE
@@ -146,7 +168,7 @@
             json.media_screen = type;
             return json;
         });
-        if (nav.includes('library')) {
+        if (nav.includes('library') || nav == '') {
             goto(`/${type}_library`);
         }
     }
@@ -154,8 +176,8 @@
 
 <div id="snackbar">
     <!-- left side -->
-    {#if in_manga}
-        <button class="snackbar-item" on:click={async () => goto(manga_data.back)}><Fa icon={faArrowLeft} /></button>
+    {#if in_manga || in_ln}
+        <button class="snackbar-item" on:click={async () => goto(back)}><Fa icon={faArrowLeft} /></button>
     {:else if nav.includes('add_sources')}
         <button class="snackbar-item" on:click={() => goto('/browse/')}><Fa icon={faArrowLeft} /></button>
     {:else}
@@ -168,8 +190,18 @@
     <!-- right side -->
     <div class="snackbar-right">
         {#if in_manga}
-            <button class="snackbar-item" on:click={async () => toggle_fav()}>
+            <button class="snackbar-item" on:click={async () => toggle_manga_fav()}>
                 {#if manga_data.favorited}
+                <Fa icon={faHeart} />
+                {:else}
+                <Fa icon={faOutlineHeart} />
+                {/if}
+            </button>
+            <button class="snackbar-item"><Fa icon={faFilter} /></button>
+            <button class="snackbar-item"><Fa icon={faEllipsisVertical} /></button>
+        {:else if in_ln}
+            <button class="snackbar-item" on:click={async () => toggle_ln_fav()}>
+                {#if ln_data.favorited}
                 <Fa icon={faHeart} />
                 {:else}
                 <Fa icon={faOutlineHeart} />

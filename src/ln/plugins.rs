@@ -94,7 +94,7 @@ pub async fn ln_search(query: String, sources: Vec<String>) -> Value {
   let plugins = get_plugins();
   for p in plugins {
       if sources.contains(&p.id) {
-          let temp = json!({"url": replace_url(&p.search_url, "{title}", &query), "search": (p.search).to_string()});
+          let temp = json!({"url": replace_url(&p.search_url, "{title}", &query), "search": (p.search).to_string(), "extra": p.search_extra});
           result.push(temp);
       }
   }
@@ -108,29 +108,21 @@ pub async fn get_ln_chapters(source: String, id: String) -> Value {
     let plugins = get_plugins();
     let plugin = plugins.iter().find(|p| p.id == source);
     if let Some(p) = plugin {
-        let temp = json!({"url": replace_url(&p.chapters_url, "{id}", &id), "getChapters": (p.get_chapters).to_string()});
+        let temp = json!({"url": replace_url(&p.chapters_url, "{id}", &id), "getChapters": (p.get_chapters).to_string(), "extra": p.chapters_extra});
         result = temp;
     }
     result
 }
 
-// #[tauri::command]
-// pub async fn get_pages(source: String, id: String) -> Value {
-//   println!("Getting pages...");
-//   let mut result: Vec<String> = Vec::new();
-//   let plugins = get_plugins();
-//   let plugin = plugins.iter().find(|p| p.id == source);
-//   if let Some(p) = plugin {
-//     let url = replace_url(&p.pages_url, "{id}", &id);
-//     let data = fetch(url).await;
-
-//     // Getting from plugins
-//     let mut pages_func = (p.get_pages).to_string();
-//     pages_func.push_str(&format!("JSON.stringify(getChapterPages({}))", data));
-
-//     let mut scope = jstime_core::JSTime::new(jstime_core::Options::default());
-//     let output = scope.run_script(&pages_func, "jstime").expect("JS Somehow failed");
-//     result = serde_json::from_str(&output).unwrap();
-//   }
-//   json!(result)
-// }
+#[tauri::command]
+pub async fn get_ln_pages(source: String, id: String) -> Value {
+  println!("Getting ln pages...");
+    let mut result: Value = json!({});
+    let plugins = get_plugins();
+    let plugin = plugins.iter().find(|p| p.id == source);
+    if let Some(p) = plugin {
+        let temp = json!({"url": replace_url(&p.pages_url, "{id}", &id), "getChapterPages": (p.get_pages).to_string(), "extra": p.chapters_extra});
+        result = temp;
+    }
+    result
+}
