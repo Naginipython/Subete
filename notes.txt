@@ -7,3 +7,10 @@ For Desktop development, run:
 
 For Android development, run:
   npm run tauri android dev
+
+When nav doesnt work:
+rm -rf node_modules
+npm install
+
+OR
+npx svelte-kit sync
