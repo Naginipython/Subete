@@ -11,7 +11,12 @@ lazy_static! {
     pub static ref FILE_PATH: String = {
       let data_folder: PathBuf = dirs::data_local_dir().unwrap_or_else(|| PathBuf::from("./"));
       let mut str = data_folder.to_str().unwrap_or_default().to_string();
-      str.push_str("/omniyomi");
+      if std::env::consts::OS == "windows" {
+        str.push_str("\\omniyomi");
+        std::fs::create_dir_all(&str).unwrap_or_default();
+      } else {
+        str.push_str("/omniyomi");
+      }
       str
     };
   }

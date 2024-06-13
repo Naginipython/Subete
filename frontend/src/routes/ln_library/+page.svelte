@@ -6,8 +6,10 @@
 
     store.subscribe(json => {
         library = json["ln_library"];
-        if (json["settings"]["library_widths"].hasOwnProperty("ln")) {
-            width = json["settings"]["library_widths"].ln;
+        if (json["settings"].hasOwnProperty("library_widths")) {
+            if (json["settings"]["library_widths"].hasOwnProperty("ln")) {
+                width = json["settings"]["library_widths"].ln;
+            }
         }
         setWidth();
     });

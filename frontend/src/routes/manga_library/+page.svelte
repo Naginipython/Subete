@@ -6,8 +6,10 @@
 
     store.subscribe(json => {
         library = json["manga_library"];
-        if (json["settings"]["library_widths"].hasOwnProperty("manga")) {
-            width = json["settings"]["library_widths"].manga;
+        if (json["settings"].hasOwnProperty("library_widths")) {
+            if (json["settings"]["library_widths"].hasOwnProperty("manga")) {
+                width = json["settings"]["library_widths"].manga;
+            }
         }
         setWidth();
     });
