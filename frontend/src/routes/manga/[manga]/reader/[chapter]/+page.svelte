@@ -129,7 +129,7 @@
     }
 
     // Image Fitting
-    window.addEventListener('resize', adjustImage);
+    // window.addEventListener('resize', adjustImage);
     function adjustImage() {
         if (imgs[curr_page] != undefined) {
             const imgAspectRatio = imgs[curr_page].naturalWidth / imgs[curr_page].naturalHeight;
@@ -145,7 +145,7 @@
     }
 </script>
 
-<svelte:window on:keydown={keyInput} />
+<svelte:window on:keydown={keyInput} on:resize={adjustImage}/>
 <!-- SNACKBAR -->
 <div id="chap-menu" style="opacity: 0">
     <div class="menu-background"></div>
@@ -222,7 +222,7 @@
     }
     #chap-snackbar {
         /* opacity: 0.5; */
-        height: calc(var(--snackbar-height)*2);
+        height: calc(var(--snackbar-height)*1.4);
         /* background-color: var(--secondary-color); */
         position: absolute;
         width: 100vw;
@@ -231,7 +231,7 @@
         width: 100vw;
         position: absolute;
         opacity: 0.5;
-        height: calc(var(--snackbar-height)*2);
+        height: calc(var(--snackbar-height)*1.4);
         background-color: var(--secondary-color);
     }
     .chap-snack-item {

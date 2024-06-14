@@ -68,7 +68,7 @@
     }
 </script>
 
-<div id="header" >
+<div id="header">
     <div id="img-wrapper">
         <img id="img" src="{manga.img}" alt="{manga.title}"/>
     </div>
@@ -136,36 +136,49 @@
 {/each}
 
 <style>
+    :root {
+        --manga-img-width: 25vw;
+    }
     #header {
-        padding: 10px;
         overflow: hidden;
         border-bottom: 1px solid black;
+        display: inline-flex;
+        height: calc(var(--manga-img-width) *1.5 + 20px);
+        width: 100vw;
+    }
+    #header #img-wrapper {
+        align-items: center;
     }
     #img-wrapper {
-        width: 200px;
-        height: 300px;
+        width: var(--manga-img-width);
+        height: calc(var(--manga-img-width) *1.5);
         border-radius: 10px;
         overflow: hidden;
         justify-content: center;
         align-items: center;
-        float: left;
+        margin: 10px;
+        display: flex;
     }
     #img {
         height: 105%;
         width: auto;
+        padding: 5px;
+        justify-content: center;
     }
     #header-content {
-        display: flex;
+        display: inline-flex;
         justify-content: left;
-        float: right;
         overflow: hidden;
-        width: calc(100% - 250px);
+        width: calc(100% - var(--manga-img-width));
         padding-right: 10px;
-        height: 300px;
+        flex-direction: column;
     }
     #text {
         height: inherit;
         /* overflow: hidden; */
+    }
+    #text h3 {
+        margin: 10px;
     }
     #text p {
         margin: 10px;

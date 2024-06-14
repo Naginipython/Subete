@@ -184,7 +184,17 @@
             goto(`/${type}_library`);
         }
     }
+
+	$: outerWidth = 0
+	$: outerHeight = 0
+    $: if (outerHeight) {
+        console.log(outerHeight);
+        document.documentElement.style.setProperty('--body-height', `calc(${outerHeight}px - var(--snackbar-height) - var(--nav-bar-height))`);
+        // document.documentElement.style.setProperty('--snack-bar-height', `${outerHeight*.8}px`); 
+        // document.documentElement.style.setProperty('--nav-bar-height', `${outerHeight*.1}px`); 
+    }
 </script>
+<svelte:window bind:outerWidth bind:outerHeight />
 
 <div id="snackbar">
     <!-- left side -->
@@ -254,16 +264,18 @@
     :root {
         --snackbar-height: 35px;
         --nav-bar-height: 50px;
+        --body-height: calc(100vh - var(--snackbar-height) - var(--nav-bar-height));
+
         --primary-color: #1a1a1a;
         --secondary-color: #330000;
         --selection-color: #800000;
         --text-color: white;
 
         --lib-manga-width: 100px;
-        --lib-manga-height: calc((var(--lib-manga-width) - 50px) * 2);
+        --lib-manga-height: calc(var(--lib-manga-width) *1.5);
 
         --lib-ln-width: 100px;
-        --lib-ln-height: calc((var(--lib-ln-width) - 50px) * 2);
+        --lib-ln-height: calc(var(--lib-ln-width) *1.5);
     }
     #snackbar {
         height: var(--snackbar-height);
@@ -288,7 +300,7 @@
         height: inherit
     }
     #body {
-        height: calc(100vh - var(--snackbar-height) - var(--nav-bar-height));
+        height: var(--body-height);
         color: var(--text-color);
         overflow: scroll;
         background-color: var(--primary-color);

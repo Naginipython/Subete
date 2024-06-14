@@ -1,6 +1,5 @@
 use std::{fs::File, io::{Read, Write}, path::PathBuf};
 use lazy_static::lazy_static;
-use serde_json::{json, Value};
 use settings::*;
 use tauri_plugin_http::reqwest;
 use tauri_plugin_sql::{Migration, MigrationKind};
@@ -20,7 +19,7 @@ lazy_static! {
       } else if os == "android" {
         str = "/data/data/com.omniyomi.dev/files/".to_string();
         std::fs::create_dir_all(&str).unwrap_or_default();
-      }else {
+      } else {
         str.push_str("/omniyomi");
       }
       str
