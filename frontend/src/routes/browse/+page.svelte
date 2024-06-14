@@ -117,10 +117,10 @@
         store.update(json => {
             switch (media_screen) {
                 case "manga":
-                    json.manga_search_results = result;
+                    json.manga_search_results = results;
                     break;
                 case "ln":
-                    json.ln_search_results = result;
+                    json.ln_search_results = results;
                     break;
                 case "anime":
                     // sources = await invoke('get_ln_plugin_names');

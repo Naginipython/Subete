@@ -66,7 +66,7 @@
     }
     .lib-manga-wrap img {
         width: auto;
-        height: 105%;
+        height: 110%;
     }
     .lib-manga p {
         margin: 0;

@@ -24,7 +24,7 @@ const store = writable({
     ],
     "manga_library": [
         /*{
-            id: int
+            id: string
             title: string,
             img: string, //url or link?
             plugin: string, //file inside lib/manga_sources without "./" and ".js". e.g. "mangadex"

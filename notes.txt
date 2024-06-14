@@ -11,6 +11,4 @@ For Android development, run:
 When nav doesnt work:
 rm -rf node_modules
 npm install
-
-OR
 npx svelte-kit sync

@@ -66,7 +66,7 @@
     }
     .lib-ln-wrap img {
         width: auto;
-        height: 105%;
+        height: 110%;
     }
     .lib-ln p {
         margin: 0;

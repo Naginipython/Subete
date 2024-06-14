@@ -9,6 +9,7 @@
     import store from "$lib/store.js";
     import { find_manga,in_lib as in_manga_lib, toggle_favorite as toggle_manga_favorite } from "$lib/manga_common.js";
     import { find_ln, in_lib as in_ln_lib, toggle_favorite as toggle_ln_favorite } from "$lib/ln_common.js";
+    import Database from '@tauri-apps/plugin-sql';
 
     let manga_library = [];
     let ln_library = [];
@@ -194,7 +195,7 @@
     {:else}
         <!-- TODO: make work -->
         <button id="manga" class="snackbar-item {type=="manga"? 'selected':''}" on:click={() => change_media("manga")}>Manga</button>
-        <button id="anime" class="snackbar-item {type=="anime"? 'selected':''}">Anime (WIP)</button>
+        <button id="anime" class="snackbar-item {type=="anime"? 'selected':''}">Anime</button>
         <button id="ln" class="snackbar-item {type=="ln"? 'selected':''}" on:click={() => change_media("ln")}>LN</button>
     {/if}
     
@@ -251,17 +252,17 @@
 
 <style>
     :root {
-        --snackbar-height: 25px;
+        --snackbar-height: 35px;
         --nav-bar-height: 50px;
         --primary-color: #1a1a1a;
         --secondary-color: #330000;
         --selection-color: #800000;
         --text-color: white;
 
-        --lib-manga-width: 200px;
+        --lib-manga-width: 100px;
         --lib-manga-height: calc((var(--lib-manga-width) - 50px) * 2);
 
-        --lib-ln-width: 150px;
+        --lib-ln-width: 100px;
         --lib-ln-height: calc((var(--lib-ln-width) - 50px) * 2);
     }
     #snackbar {
@@ -276,7 +277,7 @@
         border: 0;
         color: var(--text-color);
         font-size: medium;
-        padding: 0 10px;
+        padding: 0 8px;
         height: inherit;
     }
     button.snackbar-item:hover {

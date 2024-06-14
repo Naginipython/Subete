@@ -7,6 +7,7 @@ history.json
 # random temporary files for testing purposes
 temp/
 plugins/old
+android.sh
 # Script for easily remembering 'NO_STRIP=true cargo tauri build'
 build.sh
 # Feels uneeded

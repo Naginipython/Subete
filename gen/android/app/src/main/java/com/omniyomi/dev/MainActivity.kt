@@ -1,3 +1,3 @@
-package com.tauri.dev
+package com.omniyomi.dev
 
 class MainActivity : TauriActivity()

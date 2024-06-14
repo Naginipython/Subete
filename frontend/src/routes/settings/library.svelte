@@ -30,19 +30,19 @@
         if (init) {
             init = false;
             switch(library_widths.manga) {
-                case "150": manga_width = "1x"; break;
-                case "200": manga_width = "2x"; break;
-                case "250": manga_width = "3x"; break;
-                case "300": manga_width = "4x"; break;
-                case "350": manga_width = "5x"; break;
+                case "50": manga_width = "1x"; break;
+                case "100": manga_width = "2x"; break;
+                case "150": manga_width = "3x"; break;
+                case "200": manga_width = "4x"; break;
+                case "250": manga_width = "5x"; break;
                 default: manga_width = "Custom";
             }
             switch(library_widths.ln) {
-                case "150": ln_width = "1x"; break;
-                case "200": ln_width = "2x"; break;
-                case "250": ln_width = "3x"; break;
-                case "300": ln_width = "4x"; break;
-                case "350": ln_width = "5x"; break;
+                case "50": ln_width = "1x"; break;
+                case "100": ln_width = "2x"; break;
+                case "150": ln_width = "3x"; break;
+                case "200": ln_width = "4x"; break;
+                case "250": ln_width = "5x"; break;
                 default: ln_width = "Custom";
             }
         }
@@ -51,7 +51,7 @@
     async function change_manga_width() {
         if (manga_width != "Custom") {
             let scale = parseInt(manga_width[0]);
-            library_widths.manga = (100 + 50*scale).toString();
+            library_widths.manga = (50*scale).toString();
         }
         document.documentElement.style.setProperty('--lib-manga-width', `${library_widths.manga}px`);
         store.update(json => {
@@ -63,7 +63,7 @@
     async function change_ln_width() {
         if (ln_width != "Custom") {
             let scale = parseInt(ln_width[0]);
-            library_widths.ln = (100 + 50*scale).toString();
+            library_widths.ln = (50*scale).toString();
         }
         document.documentElement.style.setProperty('--lib-ln-width', `${library_widths.ln}px`);
         store.update(json => {
