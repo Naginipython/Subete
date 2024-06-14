@@ -138,7 +138,7 @@
         <!-- todo: center content in this properly -->
         <div id="form-input">
             <input id="clear_search" on:click="{clear_search}" style="{results.length == 0? 'display:none':''}" type="reset" value="X">
-            <input id="input" placeholder="Enter a title..." bind:value="{name}" style="{results.length == 0? '':'width:90%'}" />
+            <input id="input" placeholder="Enter a title..." bind:value="{name}" style="{results.length == 0? '':'width:80%'}" />
             <button id="search" on:click="{search}"><Fa icon={faMagnifyingGlass} /></button><br>
         </div>
     </form>
@@ -181,7 +181,7 @@
         appearance: none;
         border: 1px solid black;
         /* width: 94vw; */
-        width: 95%;
+        width: 90%;
         background-color: var(--secondary-color);
         color: var(--text-color);
         font-size: large;
@@ -196,7 +196,7 @@
         margin-left: -5px;
         background-color: var(--secondary-color);
         color: var(--text-color);
-        width: 5%;
+        width: 10%;
     }
     #search {
         margin: 0;
@@ -209,7 +209,7 @@
         background-color: var(--secondary-color);
         color: var(--text-color);
         /* width: 4vw; */
-        width: 5%;
+        width: 10%;
     }
     .quickselect {
         display: inline-flex;
