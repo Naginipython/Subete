@@ -23,7 +23,7 @@ Cargo.lock
 
 ## TAURI
 # Beta personal guesses
-gen/
+/gen
 # Logs
 logs
 *.log
