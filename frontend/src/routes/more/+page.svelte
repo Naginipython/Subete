@@ -1,6 +1,7 @@
 <script>
     import { goto } from "$app/navigation";
     import { faClockRotateLeft, faSun, faMoon, faGear } from '@fortawesome/free-solid-svg-icons'
+    import { faEye, faEyeSlash } from '@fortawesome/free-regular-svg-icons';
     import Fa from 'svelte-fa'
 
     let special = false;
@@ -15,8 +16,8 @@ more screen
     <div class="box">
         <div class="more-links">
             <div class="link-icon">
-                {#if special}<Fa icon={faMoon} />
-                {:else}<Fa icon={faSun} />
+                {#if special}<Fa icon={faEye} />
+                {:else}<Fa icon={faEyeSlash} />
                 {/if}
             </div>
             <p>Toggle Special (WIP)</p>
