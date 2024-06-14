@@ -14,14 +14,13 @@ lazy_static! {
       let mut str = data_folder.to_str().unwrap_or_default().to_string();
       let os = std::env::consts::OS;
       if os == "windows" {
-        str.push_str("\\omniyomi");
-        std::fs::create_dir_all(&str).unwrap_or_default();
+        str.push_str("\\subete");
       } else if os == "android" {
-        str = "/data/data/com.omniyomi.dev/files/".to_string();
-        std::fs::create_dir_all(&str).unwrap_or_default();
+        str = "/data/data/com.subete.dev/files/".to_string();
       } else {
-        str.push_str("/omniyomi");
+        str.push_str("/subete");
       }
+      std::fs::create_dir_all(&str).unwrap_or_default();
       str
     };
   }
@@ -109,13 +108,13 @@ async fn post_fetch(url: String) -> String {
 
 #[tauri::command]
 fn test_write() {
-  let mut file = File::create("/data/data/com.omniyomi.dev/files/test.txt").unwrap();
+  let mut file = File::create("/data/data/com.subete.dev/files/test.txt").unwrap();
   let test = "test".as_bytes();
   file.write_all(test).unwrap();
 }
 #[tauri::command]
 fn test_read() -> String {
-  let mut file = File::open("/data/data/com.omniyomi.dev/files/test.txt").unwrap();
+  let mut file = File::open("/data/data/com.subete.dev/files/test.txt").unwrap();
   let mut buf: Vec<u8> = Vec::new();
   file.read_to_end(&mut buf).unwrap();
   String::from_utf8(buf).expect("");

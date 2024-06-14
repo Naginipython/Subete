@@ -138,7 +138,7 @@
         <!-- todo: center content in this properly -->
         <div id="form-input">
             <input id="clear_search" on:click="{clear_search}" style="{results.length == 0? 'display:none':''}" type="reset" value="X">
-            <input id="input" placeholder="Enter a title..." bind:value="{name}" style="{results.length == 0? '':'width:90vw'}" />
+            <input id="input" placeholder="Enter a title..." bind:value="{name}" style="{results.length == 0? '':'width:90%'}" />
             <button id="search" on:click="{search}"><Fa icon={faMagnifyingGlass} /></button><br>
         </div>
     </form>
@@ -163,7 +163,8 @@
 </div>
 <style>
     #form {
-        width: 100vw;
+        width: 98vw;
+        margin: auto;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -171,15 +172,19 @@
     /* Searchbox (TO CHANGE) */
     #form-input {
         display: inline-flex;
+        height: 35px;
         margin-top: 10px;
-        width: 98vw;
+        /* width: 98vw; */
+        width: 100%;
     }
     #input {
         appearance: none;
         border: 1px solid black;
-        width: 94vw;
+        /* width: 94vw; */
+        width: 95%;
         background-color: var(--secondary-color);
         color: var(--text-color);
+        font-size: large;
     }
     #clear_search {
         appearance: none;
@@ -191,7 +196,7 @@
         margin-left: -5px;
         background-color: var(--secondary-color);
         color: var(--text-color);
-        width: 4vw;
+        width: 5%;
     }
     #search {
         margin: 0;
@@ -203,7 +208,8 @@
         margin-left: -5px;
         background-color: var(--secondary-color);
         color: var(--text-color);
-        width: 4vw;
+        /* width: 4vw; */
+        width: 5%;
     }
     .quickselect {
         display: inline-flex;

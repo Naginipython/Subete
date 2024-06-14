@@ -13,6 +13,7 @@ lazy_static! {
     pub static ref MANGA_LIB: Mutex<Vec<LibraryItem>> = match File::open(&*LIB_PATH) {
         Ok(file) => Mutex::new(serde_json::from_reader(file).unwrap_or_default()),
         Err(_e) => {
+            println!("{:?}", *LIB_PATH);
             File::create(&*LIB_PATH).unwrap();
             Mutex::new(Vec::new())
         }
