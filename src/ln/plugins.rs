@@ -1,14 +1,14 @@
 use crate::FILE_PATH;
-use std::{fs::File, io::Write, sync::Mutex};
+use std::{fs::File, io::Write, path::PathBuf, sync::Mutex};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use lazy_static::lazy_static;
 
 
 lazy_static! {
-  pub static ref PLUGINS_PATH: String = {
+  pub static ref PLUGINS_PATH: PathBuf = {
     let mut path = (*FILE_PATH).clone();
-    path.push_str("/ln_plugins.json");
+    path.push("ln_plugins.json");
     path
   };
   static ref PLUGINS: Mutex<Vec<Plugins>> = match File::open(&*PLUGINS_PATH) {
@@ -22,7 +22,7 @@ lazy_static! {
 
 fn save(lib: &Vec<Plugins>) {
   let mut file = File::create(&*PLUGINS_PATH).unwrap();
-  let json = serde_json::to_string(&*lib).unwrap();
+  let json = serde_json::to_string(lib).unwrap();
   file.write_all(json.as_bytes()).unwrap();
 }
 fn get_plugins() -> Vec<Plugins> {
@@ -38,7 +38,7 @@ pub fn add_ln_plugin(new_plugin: Plugins) {
   let names: Vec<String> = plugins.iter().map(|p| p.id.clone()).collect();
   if !names.contains(&new_plugin.id) {
     plugins.push(new_plugin);
-    save(&*plugins);
+    save(&plugins);
   }
 }
 fn init_plugins() -> Vec<Plugins> {
@@ -62,17 +62,15 @@ pub struct Plugins {
     pub get_pages: String,
     pub pages_extra: Value,
 }
-#[derive(Debug, Deserialize, Serialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone, Default)]
 pub enum Media {
     #[serde(rename = "manga")]
+    #[default]
     Manga, 
     #[serde(rename = "ln")]
     Ln, 
     #[serde(rename = "anime")]
     Anime
-}
-impl Default for Media {
-    fn default() -> Self { Media::Manga }
 }
 
 #[tauri::command]
@@ -83,7 +81,7 @@ pub fn get_ln_plugin_names() -> Value {
   json!(names)
 }
 
-fn replace_url(url: &String, placeholder: &str, replace: &str) -> String {
+fn replace_url(url: &str, placeholder: &str, replace: &str) -> String {
   url.replace(placeholder, replace)
 }
 

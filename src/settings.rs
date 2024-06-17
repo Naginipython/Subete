@@ -1,12 +1,12 @@
 use super::FILE_PATH;
 use lazy_static::lazy_static;
 use serde_json::{json, Value};
-use std::{fs::File, io::Write, sync::Mutex};
+use std::{fs::File, io::Write, path::PathBuf, sync::Mutex};
 
 lazy_static! {
-    pub static ref SETTINGS_PATH: String = {
+    pub static ref SETTINGS_PATH: PathBuf = {
         let mut path = (*FILE_PATH).clone();
-        path.push_str("/settings.json");
+        path.push("settings.json");
         path
     };
     pub static ref SETTINGS: Mutex<Value> = match File::open(&*SETTINGS_PATH) {
@@ -40,7 +40,7 @@ pub fn update_settings(new_settings: Value) {
             }
         }
     }
-    save(&*settings);
+    save(&settings);
 }
 
 #[tauri::command]

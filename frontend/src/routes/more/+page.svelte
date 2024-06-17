@@ -8,7 +8,7 @@
 
 </script>
 
-more screen
+<h3>more screen</h3>
 
 <hr>
 
@@ -26,7 +26,7 @@ more screen
             <label class="switch">
                 <input type="checkbox" bind:checked={special}>
                 <span class="slider"></span>
-            </label>
+            </label>~
         </div>
     </div>
 </div>

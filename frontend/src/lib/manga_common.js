@@ -26,7 +26,6 @@ export function in_lib(id) {
 }
 
 export async function toggle_favorite(manga) {
-    console.log(manga);
     if (!in_lib(manga.id)) {
         await invoke('add_to_manga_lib', { newItem: manga });
         store.update(_json => {
@@ -40,4 +39,8 @@ export async function toggle_favorite(manga) {
             return _json;
         });
     }
+}
+
+export async function update_lib() {
+    // re-fetch every manga chapter, comapre to what we have, add to manga_updates
 }

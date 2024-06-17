@@ -2,12 +2,12 @@ use crate::FILE_PATH;
 use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use std::{fs::File, io::Write, sync::Mutex};
+use std::{fs::File, io::Write, path::PathBuf, sync::Mutex};
 
 lazy_static! {
-    pub static ref LIB_PATH: String = {
+    pub static ref LIB_PATH: PathBuf = {
         let mut path = (*FILE_PATH).clone();
-        path.push_str("/manga_library.json");
+        path.push("manga_library.json");
         path
     };
     pub static ref MANGA_LIB: Mutex<Vec<LibraryItem>> = match File::open(&*LIB_PATH) {
@@ -42,7 +42,7 @@ pub struct ChapterItem {
 
 fn save(lib: &Vec<LibraryItem>) {
     let mut file = File::create(&*LIB_PATH).unwrap();
-    let json = serde_json::to_string(&*lib).unwrap();
+    let json = serde_json::to_string(lib).unwrap();
     file.write_all(json.as_bytes()).unwrap();
 }
 
@@ -61,7 +61,7 @@ pub fn add_to_manga_lib(new_item: LibraryItem) {
     let mut lib = MANGA_LIB.lock().unwrap();
     if !lib.iter().any(|l| l.id.eq(&new_item.id)) {
         lib.push(new_item);
-        save(&*lib);
+        save(&lib);
     }
 }
 
@@ -71,7 +71,7 @@ pub fn update_manga_lib(item: LibraryItem) {
     for entry in lib.iter_mut() {
         if entry.id == item.id {
             *entry = item;
-            save(&*lib);
+            save(&lib);
             return;
         }
     }
@@ -85,15 +85,12 @@ pub fn remove_from_manga_lib(id: String) {
     println!("Removing from manga library...");
     let mut lib = MANGA_LIB.lock().unwrap();
     lib.retain(|l| l.id != id);
-    save(&*lib);
+    save(&lib);
 }
 
 #[allow(dead_code)]
 pub fn find_manga(id: String) -> Option<LibraryItem> {
     let lib = MANGA_LIB.lock().unwrap();
     let found_item = lib.iter().find(|item| item.id == id);
-    match found_item {
-        Some(item) => Some(item.clone()),
-        None => None,
-    }
+    found_item.cloned()
 }

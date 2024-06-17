@@ -12,8 +12,6 @@
     "resources:default",
     "menu:default",
     "tray:default",
-    "shell:allow-open",
-    "sql:allow-load", 
-    "sql:allow-execute"
+    "shell:allow-open"
   ]
 }

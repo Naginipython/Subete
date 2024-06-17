@@ -3,13 +3,25 @@
     import { goto } from "$app/navigation";
     import { onMount } from "svelte";
     import { invoke } from "@tauri-apps/api/core";
-    import { faFilter, faMagnifyingGlass, faEllipsisVertical, faArrowLeft, faHeart, faBook } from '@fortawesome/free-solid-svg-icons'
-    import { faHeart as faOutlineHeart } from '@fortawesome/free-regular-svg-icons';
     import Fa from 'svelte-fa'
     import store from "$lib/store.js";
-    import { find_manga,in_lib as in_manga_lib, toggle_favorite as toggle_manga_favorite } from "$lib/manga_common.js";
-    import { find_ln, in_lib as in_ln_lib, toggle_favorite as toggle_ln_favorite } from "$lib/ln_common.js";
-    import Database from '@tauri-apps/plugin-sql';
+    import { 
+        faFilter, faMagnifyingGlass, 
+        faEllipsisVertical, faArrowLeft, 
+        faHeart, faBook, faRotateRight 
+    } from '@fortawesome/free-solid-svg-icons'
+    import { faHeart as faOutlineHeart } from '@fortawesome/free-regular-svg-icons';
+    import { 
+        find_manga,
+        in_lib as in_manga_lib, 
+        toggle_favorite as toggle_manga_favorite, 
+        update_lib as manga_update
+    } from "$lib/manga_common.js";
+    import { 
+        find_ln, 
+        in_lib as in_ln_lib, 
+        toggle_favorite as toggle_ln_favorite 
+    } from "$lib/ln_common.js";
 
     let manga_library = [];
     let ln_library = [];
@@ -154,12 +166,16 @@
     }
 
     // ----- PRIMARY APP COMMANDS & KEYS ----- 
-    window.addEventListener('keydown', handleKeydown);
     function handleKeydown(event) {
-        if (event.ctrlKey && event.key === 'a') {
-        // Prevent the default browser action (select all)
+        if (event.ctrlKey && event.key === 'm') {
             event.preventDefault();
-            console.log("interesting")
+            change_media("manga");
+            goto('/manga_library');
+        }
+        if (event.ctrlKey && event.key === 'l') {
+            event.preventDefault();
+            change_media("ln");
+            goto('/ln_library');
         }
     }
 
@@ -171,6 +187,13 @@
     async function toggle_ln_fav() {
         ln_data.favorited = !ln_data.favorited;
         await toggle_ln_favorite(ln_data.data);
+    }
+    async function update_lib() {
+        switch (media_screen) {
+            case "manga": manga_update(); break;
+            case "anime": /*anime_update();*/ break;
+            case "ln": /*ln_update();*/ break;
+        }
     }
 
     // MEDIA TYPE CHANGE
@@ -185,16 +208,14 @@
         }
     }
 
-	$: outerWidth = 0
+    // Keeps the bottom nav at the bottom of the screen (keyboards move it)
 	$: outerHeight = 0
     $: if (outerHeight) {
         console.log(outerHeight);
         document.documentElement.style.setProperty('--body-height', `calc(${outerHeight}px - var(--snackbar-height) - var(--nav-bar-height))`);
-        // document.documentElement.style.setProperty('--snack-bar-height', `${outerHeight*.8}px`); 
-        // document.documentElement.style.setProperty('--nav-bar-height', `${outerHeight*.1}px`); 
     }
 </script>
-<svelte:window bind:outerWidth bind:outerHeight />
+<svelte:window bind:outerHeight on:keydown={handleKeydown} />
 
 <div id="snackbar">
     <!-- left side -->
@@ -233,6 +254,8 @@
             <button class="snackbar-item"><Fa icon={faEllipsisVertical} /></button>
         {:else if nav.includes('browse')}
             <button class="snackbar-item" on:click={() => goto('/browse/add_sources')}><Fa icon={faBook} /></button>
+        {:else if nav.includes('update')}
+            <!-- <button class="snackbar-item" on:click={async () => update_lib()}><Fa icon={faRotateRight} /></button> -->
         {:else}
             <!-- https://fontawesome.com/search -->
             <!-- TODO: make work -->

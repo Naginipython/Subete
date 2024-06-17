@@ -44,8 +44,6 @@ const store = writable({
             // language?
         }*/
     ],
-    "ln_search_results": [],
-    "ln_library": [],
     "manga_history": [
         /*{
             id: int
@@ -66,7 +64,23 @@ const store = writable({
             ]
         }*/
     ],
+    "manga_updates": [
+        {
+            // manga_id: string
+            // chapter: {
+            //     id: string,
+            //     num: int,
+            //     title: string,
+            //     page: int,
+            //     completed: boolean
+            // }
+            // receieved: int // Date.now()
+        }
+    ],
+    "ln_search_results": [],
+    "ln_library": [],
     "ln_history": [],
+    "ln_updates": [],
     "settings": {
         "quickselect": {}, // typically: "[plugin_name]": Boolean, 
         "library_widths": {}, // "manga", "ln", and "anime", equal to a string of the width #
