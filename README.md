@@ -17,6 +17,9 @@ https://github.com/Naginipython/Subete/assets/42967504/260dfcf2-4acc-40cb-b75d-c
 - [ ] Icons for nav bar
 - [ ] nav bar more items when able
 - [ ] Hide Navbar when none selected (aka, manga/settings screen
+- [ ] Run app in background (& Auto-update)
+- [ ] Update result notifications
+- [ ] Fullscreen on Android for Reader (maybe not possible)
 - [ ] Library Features:
   - [ ] Search
   - [ ] Search plugin
