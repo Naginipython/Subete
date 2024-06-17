@@ -4,6 +4,64 @@ A personal project attempting to create a Tachiyomi/Aniyomi-like for desktop fro
 
 Currently only has a built-in MangaDex plugin, but features a plugin creator in `plugins/` to help creating plugins for this app. Due to limitation on how JavaScript code runs within the Rust code, do not rely on npm packages unless they are hard-coded, and avoid odd symbols because of JSON parsing (e.g. \\\\. \\\' seems fine)
 
+Video featuring major features as of 06/17/24:
+
+https://github.com/Naginipython/Subete/assets/42967504/260dfcf2-4acc-40cb-b75d-c54c9afe8216
+
+
+## Goals
+- [ ] Updates. Cute progress bar for updates
+- [ ] General loading icons for pages, browse.
+- [ ] Make manga & ln snackbar a toggle. Also make browse include a manga/ln/anime quickselect, with the ability to shut off certain types.
+- [ ] App initialize loading icon
+- [ ] Icons for nav bar
+- [ ] nav bar more items when able
+- [ ] Hide Navbar when none selected (aka, manga/settings screen
+- [ ] Library Features:
+  - [ ] Search
+  - [ ] Search plugin
+  - [ ] Filter (completed, started, unseed)
+  - [ ] Sort (alphabetically, total chap, last seen, last updated, unseen #, date added)
+  - [ ] Setting: Togglable: Set # per row
+  - [ ] Categories
+  - [ ] Open Random
+- [ ] Manga/Ln features:
+  - [ ] Tracking (MyAnimeList)
+  - [ ] Bookmark
+  - [ ] Download
+  - [ ] Select
+  - [ ] Check down (all below)
+  - [ ] Sort Asc or Desc
+  - [ ] Filter: Unread, Downloaded, Bookmarked
+  - [ ] Settings: Sort & Filter per item, button to set as global setting
+  - [ ] Send to Web
+  - [ ] Title hold sends to clipboard
+  - [ ] Fix Description
+  - [ ] fav button to start/resume
+- [ ] Manga Reader features:
+  - [ ] Swipe turn
+  - [ ] Bookmark
+  - [ ] Cuter bottom page changer
+  - [ ] Cuter Prev/Next screen
+  - [ ] Open in Web
+  - [ ] Next/Prev chap arrow
+  - [ ] Page read type:  l-to-r, r-to-l, strip
+  - [ ] Zoom
+  - [ ] Zoom into large image toggle
+  - [ ] tap area size change?
+  - [ ] Jpn to English help
+- [ ] LN Reader features:
+  - [ ] progress (scrollTop %?)
+  - [ ] next/prev chapter
+  - [ ] bookmark
+  - [ ] open in web
+  - [ ] drag speed
+  - [ ] top areas
+  - [ ] next/prev chapter
+- [ ] Anime
+
+## Installation
+
 To-Build Pt.1:\
 Install node & rust (rustup) (Note: on Manjaro Linux, I also needed webkit2gtk)\
 In a command line, install tauri-cli: `cargo install tauri-cli@^2.0.0-beta` (note: may need quotation)\
@@ -20,4 +78,11 @@ Optionally, go into `.cargo` and change `target = ` to `x86_64-pc-windows-msvc` 
 NOTE: Some pages randomly don't work first run, finding the page in `frontend/src/routes` and pressing save helps reload it\
 Currently, mostly `frontent/src/routes/library/+page.svelte` has this issue often
 
-Android version does exist with `cargo tauri android dev`, however, I haven't used it yet due to other areas of focus and cannot attest to it's quality
+## Android
+
+Ideally, ensure that the standard installation is completed.\
+In order to build to Android, download Android Studios, and the NDK from the Android Studio installer.\
+Android Studio will have 3 variables to set up, one being the JBR as JAVA_HOME (located where it is installed `./jbr`. example: `export JAVA_HOME=/opt/android-studio/jbr`), the SDK as ANDROID_SDK (`export ANDROID_HOME=$HOME/Android/Sdk`), and the NDK as NDK_HOME (`export NDK_HOME=$HOME/Android/Sdk/ndk/27.0.11902837`).\
+Add Android targets with `rustup`: `rustup target add aarch64-linux-android armv7-linux-androideabi i686-linux-android x86_64-linux-android`\
+In the main directory, run `cargo tauri android init`. Ideally, it will say that it is good to go.\
+`cargo tauri android dev` hasn't really worked for me, I've been using `cargo tauri android build`, going to where the APK is, signing it with `uber-apk-signer`, then installing it on my phone.
