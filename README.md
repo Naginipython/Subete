@@ -21,6 +21,7 @@ https://github.com/Naginipython/Subete/assets/42967504/260dfcf2-4acc-40cb-b75d-c
 - [ ] Run app in background (& Auto-update)
 - [ ] Update result notifications
 - [ ] Fullscreen on Android for Reader (maybe not possible)
+- [ ] Extension General Feed (Front page, if available)
 - [ ] Library Features:
   - [ ] Search
   - [ ] Search plugin
