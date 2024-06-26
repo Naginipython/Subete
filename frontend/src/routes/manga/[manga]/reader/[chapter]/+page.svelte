@@ -4,6 +4,7 @@
     import { faBookmark as faOutlineBookmark } from '@fortawesome/free-regular-svg-icons';
     import { find_manga } from "$lib/manga_common.js";
     import { goto } from "$app/navigation";
+    import { Moon } from 'svelte-loading-spinners';
     import Fa from 'svelte-fa'
     export let data;
 
@@ -13,6 +14,7 @@
     let display_page = 0;
     let imgs = -1;
     let chapters = [];
+    let is_loading = false;
 
     // Starts when page starts
     set_colors();
@@ -20,6 +22,7 @@
     
     // Prepares Reader & pages
     async function start_reader(page) {
+        is_loading = true;
         chapters = [];
         chapter = manga['chapters'][data.manga_index];
         imgs = document.getElementsByTagName("img");
@@ -34,6 +37,7 @@
         } else {
             curr_page = page;
         }
+        is_loading = false;
     }
 
     function set_colors() {
@@ -181,16 +185,15 @@
 </div>
 <!-- PAGES -->
 <div class="center-img-div">
+    
     <!-- TODO: better prev chap -->
     <p id="prev-chapter" class={curr_page == -1? 'visible' : 'invisible'}>previous chapter?</p>
-    {#if chapter.length == 0}
-        <!-- TODO: loading icon -->
-        <p style="color: var(--text-color); font-size: xx-large">loading</p>
-    {:else}
-        {#each chapters as c, i}
-            <img on:load={adjustImage} class={i == curr_page? 'visible' : 'invisible'} src={c} alt="{i} - {manga.title}" />
-        {/each}
-    {/if}
+    <div style="width:fit-content; position: absolute; display: {is_loading? 'block' : 'none'}">
+        <Moon color="var(--selection-color)" size="30" />
+    </div>
+    {#each chapters as c, i}
+        <img on:load={adjustImage} class={i == curr_page? 'visible' : 'invisible'} src={c} alt="{i} - {manga.title}" />
+    {/each}
     <!-- TODO: better next chap -->
     <p id="next-chapter" class={curr_page == chapter.page? 'visible' : 'invisible'}>next chapter?</p>
 </div>
@@ -210,6 +213,7 @@
         justify-content: center; 
         height: 100vh;
         overflow: hidden;
+        align-items: center;
     }
     .center-img-div img {
         /* Purely to look better when it pops in */

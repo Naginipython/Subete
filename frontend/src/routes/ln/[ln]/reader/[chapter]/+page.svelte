@@ -4,6 +4,7 @@
     import { faBookmark as faOutlineBookmark } from '@fortawesome/free-regular-svg-icons';
     import { find_ln } from "$lib/ln_common.js";
     import { goto } from "$app/navigation";
+    import { Moon } from 'svelte-loading-spinners';
     import Fa from 'svelte-fa'
     export let data;
 
@@ -13,6 +14,7 @@
     let display_page = 0;
     let imgs = -1;
     let paragraphs = [];
+    let is_loading = false;
 
     // Starts when page starts
     set_colors();
@@ -20,6 +22,7 @@
     
     // Prepares Reader & pages
     async function start_reader(page) {
+        is_loading = true;
         paragraphs = [];
         chapter = ln['chapters'][data.ln_index];
         imgs = document.getElementsByTagName("img");
@@ -34,6 +37,7 @@
         // } else {
         //     curr_page = page;
         // }
+        is_loading = false;
     }
 
     function set_colors() {
@@ -167,6 +171,9 @@
 
 <!-- PAGES -->
 <div class="content">
+    <div class="loading" style="display: {is_loading? 'flex' : 'none'}">
+        <Moon color="var(--selection-color)" size="30" />
+    </div>
     {#each paragraphs as p, i}
         <p>{p}</p>
     {/each}
@@ -177,6 +184,13 @@
     .content {
         margin: 0 20px;
     }
+    .loading {
+        display: flex;
+        width: 100vw;
+        height: 100vh;
+        justify-content: center;
+        align-items: center;
+    }
     /* arrows */
     #chap-menu {
         position: absolute;
@@ -184,7 +198,7 @@
     }
     #chap-snackbar {
         /* opacity: 0.5; */
-        height: calc(var(--snackbar-height)*2);
+        height: calc(var(--snackbar-height)*1.4);
         /* background-color: var(--secondary-color); */
         position: absolute;
         width: 100vw;
@@ -193,7 +207,7 @@
         width: 100vw;
         position: absolute;
         opacity: 0.5;
-        height: calc(var(--snackbar-height)*2);
+        height: calc(var(--snackbar-height)*1.4);
         background-color: var(--secondary-color);
     }
     .chap-snack-item {

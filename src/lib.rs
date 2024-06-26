@@ -59,7 +59,11 @@ async fn fetch(url: String) -> String {
       .header(reqwest::header::USER_AGENT, user_agent)
       .send()
       .await.unwrap();
-  response.text().await.unwrap()
+  let mut data = response.text().await.unwrap();
+  data = data.replace("\n", " ").replace('`', "").replace("${", "S").replace("\\\"", "'");
+  let re = regex::Regex::new(r"\s+").unwrap();
+  data = re.replace_all(&data, " ").to_string();
+  data
 }
 
 #[tauri::command]
@@ -70,5 +74,9 @@ async fn post_fetch(url: String) -> String {
       .header(reqwest::header::USER_AGENT, user_agent)
       .send()
       .await.unwrap();
-  response.text().await.unwrap()
+  let mut data = response.text().await.unwrap();
+  data = data.replace("\n", " ").replace('`', "").replace("${", "S").replace("\\\"", "'");
+  let re = regex::Regex::new(r"\s+").unwrap();
+  data = re.replace_all(&data, " ").to_string();
+  data
 }

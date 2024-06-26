@@ -6,10 +6,12 @@
     import Fa from 'svelte-fa'
     import store from "$lib/store.js"
     import { find_ln } from "$lib/ln_common.js";
+    import { Moon } from 'svelte-loading-spinners';
 
     export let data;
 
     let ln = {};
+    let loading = false;
 
     // Adds to history when data is available
     $: if (Object.keys(ln).length != 0) {
@@ -26,6 +28,7 @@
 
         // gets chapters, if needed
         if (ln['chapters'].length == 0 && tries > 0) {
+            loading = true;
             let c = await invoke('get_ln_chapters', { source: ln.plugin, id: ln.id });
             let html = '';
             if (c.extra.hasOwnProperty("request")) {
@@ -38,6 +41,7 @@
             ln['chapters'] = eval(c.getChapters + `getChapters(${JSON.stringify(html)})`);
             ln['chapters'].sort((a,b) => b.number-a.number);
             tries--;
+            loading = false;
         }
     });
 
@@ -91,8 +95,11 @@
     </div>
 </div>
 
+<!-- Loading icon -->
+<div style="margin: auto; width: fit-content; display: {loading? 'block' : 'none'}">
+    <Moon color="var(--selection-color)" size="30" />
+</div>
 
-<!-- TODO: loading icon -->
 {#each ln['chapters'] as c, i}
 <div class="chapter" style="{ln['chapters'][i].completed? 'color: grey' : ''}">
     <!-- Main Chapter button -->

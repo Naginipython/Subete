@@ -7,10 +7,12 @@
     import store from "$lib/store.js"
     // import { getChapters } from "$lib/manga_sources/main.js";
     import { find_manga } from "$lib/manga_common.js";
+    import { Moon } from 'svelte-loading-spinners';
 
     export let data;
 
     let manga = {};
+    let loading = false;
 
     // Adds to history when data is available
     $: if (Object.keys(manga).length != 0) {
@@ -20,16 +22,20 @@
         });
     }
     
+    let tries = 30;
     store.subscribe(async (json) => {
         // gets manga search details
         manga = find_manga(data.id);
 
         // gets chapters, if needed
-        if (manga['chapters'].length == 0) {
-            let c = await invoke('get_manga_chapters', { source: manga.plugin, id: manga.id });
+        if (manga['chapters'].length == 0 && tries > 0) {
+            loading = true;
+            let c = await invoke('get_manga_chapters', { manga });
             let html = await invoke('fetch', {url: c.url});
-            manga['chapters'] = eval(c.getChapters + `getChapters(${JSON.stringify(html)})`);
+            manga['chapters'] = eval(c.getChapters + `getChapters(${manga}, ${JSON.stringify(html)})`);
             manga['chapters'].sort((a,b) => b.number-a.number);
+            tries--;
+            loading = false;
         }
     });
 
@@ -83,8 +89,11 @@
     </div>
 </div>
 
+<!-- Loading icon -->
+<div style="margin: auto; width: fit-content; display: {loading? 'block' : 'none'}">
+    <Moon color="var(--selection-color)" size="30" />
+</div>
 
-<!-- TODO: loading icon -->
 {#each manga['chapters'] as c, i}
 <div class="chapter" style="{manga['chapters'][i].completed? 'color: grey' : ''}">
     <!-- Main Chapter button -->

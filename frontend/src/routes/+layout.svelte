@@ -22,10 +22,12 @@
         in_lib as in_ln_lib, 
         toggle_favorite as toggle_ln_favorite 
     } from "$lib/ln_common.js";
+    import logo from "$lib/logo.png"
 
     let manga_library = [];
     let ln_library = [];
     let type = "manga";
+    let loading = true;
     onMount(async () => {
         // GET LIB
         manga_library = await invoke('get_manga_lib');
@@ -64,6 +66,7 @@
                 
             // }
         }
+        loading = false;
     });
 
     let nav = '';
@@ -86,8 +89,11 @@
     $: if($navigating) page_check();
     function page_check() {
         nav = $navigating.to.url.pathname;
-        console.log(nav);
         let from = $navigating.from.url.pathname
+        console.log(nav);
+
+        // Starting splashscreen
+
         // Highlights nav bar items
         if (selected_valid_links.includes(nav)) {
             // removes selected first from all
@@ -95,6 +101,9 @@
                 document.getElementById(link).classList.remove("selected");
             });
             document.getElementById(nav).classList.add("selected");
+        }
+        if (!selected_valid_links.every(link => document.getElementById(link).classList.contains("selected"))) {
+            console.log("test");
         }
 
         // todo: Side scroll nav
@@ -217,6 +226,10 @@
 </script>
 <svelte:window bind:outerHeight on:keydown={handleKeydown} />
 
+<div id="splashscreen" style="display: {loading? 'flex' : 'none'}">
+    <img src={logo} alt="logo">
+</div>
+
 <div id="snackbar">
     <!-- left side -->
     {#if in_manga || in_ln}
@@ -284,6 +297,20 @@
 </div>
 
 <style>
+    #splashscreen {
+        position: fixed;
+        width: 100vw;
+        height: 100vh;
+        background-color: #2B76AF;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    #splashscreen img {
+        /* margin: auto; */
+        height: 20vh;
+        width: auto;
+    }
     :root {
         --snackbar-height: 35px;
         --nav-bar-height: 50px;

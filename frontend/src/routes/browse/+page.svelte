@@ -4,6 +4,7 @@
     import store from "$lib/store.js";
     import Display from "./display.svelte";
     import { invoke } from "@tauri-apps/api/core";
+    import { Moon } from 'svelte-loading-spinners';
 
     let name = '';
     let results = [];
@@ -54,7 +55,9 @@
         return json;
     });
 
+    let is_searching = false;
     async function search() {
+        is_searching = true;
         results = [];
         let s = Object.entries(checked_sources).filter(([key, value]) => value).map(([key, value]) => key);
         s = s.filter(x => sources.includes(x));
@@ -62,13 +65,7 @@
         switch (media_screen) {
             case "manga":
                 console.log("Search Manga");
-                let m = await invoke('manga_search', { query: `${name}`, sources: s });
-                for (const s of m) {
-                    let html = await invoke('fetch', {url: s.url});
-                    let data = eval(s.search + `search(${JSON.stringify(html)})`);
-                    results.push({plugin: data[0].plugin, data: data});
-                    result = result.concat(data);
-                }
+                result = await invoke('manga_search', { query: `${name}`, sources: s });
                 store.update(json => {
                     json.manga_search_results = result;
                     return json;
@@ -89,9 +86,9 @@
                 });
                 break;
             case "anime":
-                // sources = await invoke('get_ln_plugin_names');
                 break;
         }
+        is_searching = false;
         // reformatResults();
     }
 
@@ -123,7 +120,6 @@
                     json.ln_search_results = results;
                     break;
                 case "anime":
-                    // sources = await invoke('get_ln_plugin_names');
                     sources = [];
                     break;
             }
@@ -142,16 +138,20 @@
             <button id="search" on:click="{search}"><Fa icon={faMagnifyingGlass} /></button><br>
         </div>
     </form>
-    {#if results.length == 0}
-    <div class="quickselect">
-        <p>Source Quickselect</p>
-        {#each sources as s, i}
-        <div>
-            <label for="source-{i}">{s}</label>
-            <input id="source-{i}" type="checkbox" bind:checked={checked_sources[s]}>
+    {#if results.length == 0 && !is_searching}
+        <div class="quickselect">
+            <p>Source Quickselect</p>
+            {#each sources as s, i}
+            <div>
+                <label for="source-{i}">{s}</label>
+                <input id="source-{i}" type="checkbox" bind:checked={checked_sources[s]}>
+            </div>
+            {/each}
         </div>
-        {/each}
-    </div>
+    {:else if is_searching}
+        <div class="loading">
+            <Moon color="var(--selection-color)" size="30" />
+        </div>
     {/if}
 
     <!-- displays manga -->
@@ -216,5 +216,10 @@
         justify-content: left;
         flex-direction: column;
         margin: 10px;
+    }
+    .loading {
+        padding: 20px;
+        margin: auto;
+        width: fit-content;
     }
 </style>
