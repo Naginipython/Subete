@@ -25,7 +25,7 @@
         is_loading = true;
         chapters = [];
         chapter = manga['chapters'][data.manga_index];
-        imgs = document.getElementsByTagName("img");
+        imgs = document.getElementsByClassName("chap-page");
         let c = await invoke('get_manga_pages', { source: manga.plugin, id: chapter.id });
         let html = await invoke('fetch', {url: c.url});
         chapters = eval(c.getChapterPages + `getChapterPages(${JSON.stringify(html)})`);
@@ -37,6 +37,7 @@
         } else {
             curr_page = page;
         }
+        console.log(imgs);
         is_loading = false;
     }
 
@@ -188,11 +189,11 @@
     
     <!-- TODO: better prev chap -->
     <p id="prev-chapter" class={curr_page == -1? 'visible' : 'invisible'}>previous chapter?</p>
-    <div style="width:fit-content; position: absolute; display: {is_loading? 'block' : 'none'}">
+    <div style="width:fit-content; display: {is_loading? 'block' : 'none'}">
         <Moon color="var(--selection-color)" size="30" />
     </div>
     {#each chapters as c, i}
-        <img on:load={adjustImage} class={i == curr_page? 'visible' : 'invisible'} src={c} alt="{i} - {manga.title}" />
+        <img on:load={adjustImage} class="chap-page {i == curr_page? 'visible' : 'invisible'}" src={c} alt="{i} - {manga.title}" />
     {/each}
     <!-- TODO: better next chap -->
     <p id="next-chapter" class={curr_page == chapter.page? 'visible' : 'invisible'}>next chapter?</p>
