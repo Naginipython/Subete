@@ -88,6 +88,14 @@ pub fn remove_from_manga_lib(id: String) {
     save(&lib);
 }
 
+#[tauri::command]
+pub fn delete_manga_lib() {
+    println!("Deleting manga lib...");
+    let mut lib = MANGA_LIB.lock().unwrap();
+    *lib = vec![];
+    std::fs::remove_file(&*LIB_PATH).unwrap();
+}
+
 #[allow(dead_code)]
 pub fn find_manga(id: String) -> Option<LibraryItem> {
     let lib = MANGA_LIB.lock().unwrap();

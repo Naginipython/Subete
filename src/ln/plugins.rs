@@ -124,3 +124,11 @@ pub async fn get_ln_pages(source: String, id: String) -> Value {
     }
     result
 }
+
+#[tauri::command]
+pub fn delete_ln_plugins() {
+    println!("Deleting ln plugins...");
+    let mut plugins = PLUGINS.lock().unwrap();
+    *plugins = init_plugins();
+    std::fs::remove_file(&*PLUGINS_PATH).unwrap();
+}

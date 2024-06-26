@@ -37,15 +37,15 @@ pub fn run() {
     .invoke_handler(tauri::generate_handler![
         fetch, post_fetch,
         // manga/library.rs
-        manga::get_manga_lib, manga::add_to_manga_lib, manga::remove_from_manga_lib, manga::update_manga_lib, 
+        manga::get_manga_lib, manga::add_to_manga_lib, manga::remove_from_manga_lib, manga::update_manga_lib, manga::delete_manga_lib,
         // manga/plugins.rs
-        manga::manga_search, manga::get_manga_chapters, manga::get_manga_plugin_names, manga::get_manga_pages, manga::add_manga_plugin,
+        manga::manga_search, manga::get_manga_chapters, manga::get_manga_plugin_names, manga::get_manga_pages, manga::add_manga_plugin, manga::delete_manga_plugins,
         // ln/library.rs
-        ln::get_ln_lib, ln::add_to_ln_lib, ln::remove_from_ln_lib, ln::update_ln_lib, 
+        ln::get_ln_lib, ln::add_to_ln_lib, ln::remove_from_ln_lib, ln::update_ln_lib, ln::delete_ln_lib,
         // ln/plugins.rs
-        ln::ln_search, ln::get_ln_chapters, ln::get_ln_plugin_names, ln::get_ln_pages, ln::add_ln_plugin,
+        ln::ln_search, ln::get_ln_chapters, ln::get_ln_plugin_names, ln::get_ln_pages, ln::add_ln_plugin, ln::delete_ln_plugins,
         // settings.rs
-        update_settings, get_settings
+        update_settings, get_settings, delete_settings
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");

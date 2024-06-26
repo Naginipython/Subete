@@ -1,4 +1,4 @@
-use crate::{fetch, post_fetch, FILE_PATH};
+use crate::{fetch, FILE_PATH};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::{fs::File, io::Write, path::PathBuf, sync::Mutex};
@@ -45,19 +45,19 @@ pub fn add_manga_plugin(new_plugin: Plugins) {
 pub fn init_manga_plugins() -> Vec<Plugins> {
     File::create(&*PLUGINS_PATH).unwrap();
     let plugins = vec![Plugins {
-    id: String::from("MangaDex"),
-    media_type: Media::Manga,
-    search_url: String::from("https://api.mangadex.org/manga?limit=100&includes[]=cover_art&includes[]=author&includes[]=artist&title={title}"),
-    // TODO: go through every page
-    search: String::from("function search(html) { html = JSON.parse(html); let data = []; for (let d of html['data']) { let temp = {}; temp['id'] = d['id']; temp['title'] = d['attributes']['title']['en']; let filetemp = d['relationships'].filter(o => o.type == 'cover_art')[0]; temp['img'] = `https://uploads.mangadex.org/covers/${temp['id']}/${filetemp['attributes']['fileName']}`; temp['plugin'] = 'MangaDex'; temp['description'] = d['attributes']['description']['en']? d['attributes']['description']['en'] : ''; temp['chapters'] = []; let author_names = d['relationships'].filter(x => x.type == 'author').map(y => y['attributes']['name']); let artist_names = d['relationships'].filter(x => x.type == 'artist').map(y => y['attributes']['name']); temp['authors'] = author_names.join(', '); temp['artists'] = artist_names.join(', '); data.push(temp); } return data; }"),
-    search_extra: json!({}),
-    chapters_url: String::from("https://api.mangadex.org/manga/{id}/feed?limit=500&order[chapter]=asc&translatedLanguage[]=en"),
-    get_chapters: String::from("function getChapters(json, html) { html = JSON.parse(html); json.chapters = html['data'].map(e => { return { number: parseFloat(e['attributes']['chapter'])? parseFloat(e['attributes']['chapter']) : 0.0, id: e['id'], title: e['attributes']['title'] == '' || e['attributes']['title'] == null? `Chapter ${e['attributes']['chapter']}` : e['attributes']['title'], page: 1, completed: false } }); return json; }"),
-    chapters_extra: json!({}),
-    pages_url: String::from("https://api.mangadex.org/at-home/server/{id}"),
-    get_pages: String::from("function getChapterPages(html) { html = JSON.parse(html); let hash = html['chapter']['hash']; let data = html['chapter']['data']; return data.map(x => `https://uploads.mangadex.org/data/${hash}/${x}`); }"),
-    pages_extra: json!({})
-  }];
+        id: String::from("MangaDex"),
+        media_type: Media::Manga,
+        search_url: String::from("https://api.mangadex.org/manga?limit=100&includes[]=cover_art&includes[]=author&includes[]=artist&title={title}"),
+        // TODO: go through every page
+        search: String::from("function search(html) { html = JSON.parse(html); let data = []; for (let d of html['data']) { let temp = {}; temp['id'] = d['id']; temp['title'] = d['attributes']['title']['en']; let filetemp = d['relationships'].filter(o => o.type == 'cover_art')[0]; temp['img'] = `https://uploads.mangadex.org/covers/${temp['id']}/${filetemp['attributes']['fileName']}`; temp['plugin'] = 'MangaDex'; temp['description'] = d['attributes']['description']['en']? d['attributes']['description']['en'] : ''; temp['chapters'] = []; let author_names = d['relationships'].filter(x => x.type == 'author').map(y => y['attributes']['name']); let artist_names = d['relationships'].filter(x => x.type == 'artist').map(y => y['attributes']['name']); temp['authors'] = author_names.join(', '); temp['artists'] = artist_names.join(', '); data.push(temp); } return data; }"),
+        search_extra: json!({}),
+        chapters_url: String::from("https://api.mangadex.org/manga/{id}/feed?limit=500&order[chapter]=asc&translatedLanguage[]=en"),
+        get_chapters: String::from("function getChapters(json, html) { html = JSON.parse(html); json.chapters = html['data'].map(e => { return { number: parseFloat(e['attributes']['chapter'])? parseFloat(e['attributes']['chapter']) : 0.0, id: e['id'], title: e['attributes']['title'] == '' || e['attributes']['title'] == null? `Chapter ${e['attributes']['chapter']}` : e['attributes']['title'], page: 1, completed: false } }); return json; }"),
+        chapters_extra: json!({}),
+        pages_url: String::from("https://api.mangadex.org/at-home/server/{id}"),
+        get_pages: String::from("function getChapterPages(html) { html = JSON.parse(html); let hash = html['chapter']['hash']; let data = html['chapter']['data']; return data.map(x => `https://uploads.mangadex.org/data/${hash}/${x}`); }"),
+        pages_extra: json!({})
+    }];
     save(&plugins);
     plugins
 }
@@ -168,4 +168,12 @@ pub async fn get_manga_pages(source: String, id: String) -> Value {
         result = temp;
     }
     result
+}
+
+#[tauri::command]
+pub fn delete_manga_plugins() {
+    println!("Deleting manga plugins...");
+    let mut plugins = MANGA_PLUGINS.lock().unwrap();
+    *plugins = init_manga_plugins();
+    std::fs::remove_file(&*PLUGINS_PATH).unwrap();
 }

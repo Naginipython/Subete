@@ -88,6 +88,14 @@ pub fn remove_from_ln_lib(id: String) {
   save(&lib);
 }
 
+#[tauri::command]
+pub fn delete_ln_lib() {
+    println!("Deleting ln lib...");
+    let mut lib = LIB.lock().unwrap();
+    *lib = vec![];
+    std::fs::remove_file(&*LIB_PATH).unwrap();
+}
+
 #[allow(dead_code)]
 pub fn find_ln(id: String) -> Option<LibraryItem> {
   let lib = LIB.lock().unwrap();

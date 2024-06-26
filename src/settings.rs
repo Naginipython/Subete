@@ -50,3 +50,11 @@ pub fn get_settings() -> Value {
     let settings = SETTINGS.lock().unwrap();
     serde_json::to_value(&*settings).unwrap()
 }
+
+#[tauri::command]
+pub fn delete_settings() {
+    println!("Deleting settings...");
+    let mut settings = SETTINGS.lock().unwrap();
+    *settings = json!({});
+    std::fs::remove_file(&*SETTINGS_PATH).unwrap();
+}
