@@ -1,5 +1,6 @@
 <script>
     import { invoke } from "@tauri-apps/api/core";
+    import { onMount } from "svelte";
     import { goto } from "$app/navigation";
     import { faEllipsisVertical, faBookmark, faAnglesDown, faCircleCheck, faSquareCheck, faCheck, faArrowTurnDown, faXmark } from '@fortawesome/free-solid-svg-icons'
     import { faCircleDown, faBookmark as faOutlineBookmark, faSquare } from '@fortawesome/free-regular-svg-icons';
@@ -21,22 +22,26 @@
             return json;
         });
     }
+
+    onMount(async () => {
+        if (manga['chapters'].length == 0) {
+            loading = true;
+            let updated_manga = await invoke('get_manga_chapters', { manga });
+            console.log(updated_manga);
+            // let html = await invoke('fetch', {url: c.url});
+            // manga['chapters'] = eval(c.getChapters + `getChapters(${manga}, ${JSON.stringify(html)})`);
+            updated_manga['chapters'].sort((a,b) => b.number-a.number);
+            manga.author = updated_manga.author;
+            manga.artist = updated_manga.artist;
+            manga.description = updated_manga.description;
+            manga.chapters = updated_manga.chapters;
+            loading = false;
+        }
+    });
     
-    let tries = 30;
     store.subscribe(async (json) => {
         // gets manga search details
         manga = find_manga(data.id);
-
-        // gets chapters, if needed
-        if (manga['chapters'].length == 0 && tries > 0) {
-            loading = true;
-            let c = await invoke('get_manga_chapters', { manga });
-            let html = await invoke('fetch', {url: c.url});
-            manga['chapters'] = eval(c.getChapters + `getChapters(${manga}, ${JSON.stringify(html)})`);
-            manga['chapters'].sort((a,b) => b.number-a.number);
-            tries--;
-            loading = false;
-        }
     });
 
     // CHAPTER OPTION BUTTONS

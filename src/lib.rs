@@ -2,7 +2,8 @@ use std::path::PathBuf;
 use lazy_static::lazy_static;
 use settings::*;
 use tauri_plugin_http::reqwest;
-// use tauri::Manager;
+use quickjs_rs::JsValue;
+use serde_json::{Value as JsonValue, Map as JsonMap, Number as JsonNumber};
 
 mod manga;
 mod ln;
@@ -79,4 +80,25 @@ async fn post_fetch(url: String) -> String {
   let re = regex::Regex::new(r"\s+").unwrap();
   data = re.replace_all(&data, " ").to_string();
   data
+}
+
+pub fn js_value_to_serde_json(value: JsValue) -> JsonValue {
+  match value {
+      JsValue::Null => JsonValue::Null,
+      JsValue::Bool(b) => JsonValue::Bool(b),
+      JsValue::Int(i) => JsonValue::Number(JsonNumber::from(i)),
+      JsValue::Float(f) => JsonValue::Number(JsonNumber::from_f64(f).unwrap()),
+      JsValue::String(s) => JsonValue::String(s),
+      JsValue::Array(arr) => {
+          let json_array: Vec<JsonValue> = arr.into_iter().map(js_value_to_serde_json).collect();
+          JsonValue::Array(json_array)
+      },
+      JsValue::Object(obj) => {
+          let json_map: JsonMap<String, JsonValue> = obj.into_iter()
+              .map(|(k, v)| (k, js_value_to_serde_json(v)))
+              .collect();
+          JsonValue::Object(json_map)
+      },
+      _ => unimplemented!("Unsupported JsValue type for conversion"),
+  }
 }

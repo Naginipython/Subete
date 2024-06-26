@@ -70,7 +70,7 @@
     });
 
     let nav = '';
-    let selected_valid_links = ["/library", "/updates", "/browse", "/more"];
+    let selected_valid_links = ["library", "updates", "browse", "more"];
     $: path = $page.url.pathname;
     let scroll_memory = {};
     let back = "/";
@@ -92,18 +92,12 @@
         let from = $navigating.from.url.pathname
         console.log(nav);
 
-        // Starting splashscreen
+        // default is on, other navs can change this
+        snack_nav_on();
 
-        // Highlights nav bar items
-        if (selected_valid_links.includes(nav)) {
-            // removes selected first from all
-            selected_valid_links.forEach(link => {
-                document.getElementById(link).classList.remove("selected");
-            });
-            document.getElementById(nav).classList.add("selected");
-        }
-        if (!selected_valid_links.every(link => document.getElementById(link).classList.contains("selected"))) {
-            console.log("test");
+        // Hides nav bar when not selected
+        if (!selected_valid_links.some(link => nav.includes(link))) {
+            only_snackbar_on();
         }
 
         // todo: Side scroll nav
@@ -151,13 +145,7 @@
         // --- READER ---
         // Removes snackbar and nav for reader
         if (nav.includes("reader")) {
-            document.getElementById("snackbar").style.display = "none";
-            document.getElementById("body").style.height = "100vh";
-            document.getElementById("nav-centered").style.display = "none";
-        } else {
-            document.getElementById("body").style.height = null;
-            document.getElementById("snackbar").style.display = "block";
-            document.getElementById("nav-centered").style.display = "block";
+            snack_nav_off();
         }
 
         // --- LN ---
@@ -215,6 +203,25 @@
         if (nav.includes('library') || nav == '') {
             goto(`/${type}_library`);
         }
+    }
+
+    // BODY, NAV, and SNACKBAR SIZES
+    function snack_nav_off() {
+        document.getElementById("snackbar").style.display = "none";
+        document.getElementById("body").style.height = "100vh";
+        document.getElementById("nav-centered").style.display = "none";
+    }
+    function snack_nav_on() {
+        document.documentElement.style.setProperty('--nav-bar-height', '50px');
+        document.getElementById("body").style.height = null;
+        document.getElementById("snackbar").style.display = "block";
+        document.getElementById("nav-centered").style.display = "block";
+    }
+    function only_snackbar_on() {
+        document.documentElement.style.setProperty('--nav-bar-height', '0px');
+        document.getElementById("nav-centered").style.display = "none";
+        document.getElementById("body").style.height = "calc(100vh - var(--snackbar-height));";
+        document.getElementById("snackbar").style.display = "block";
     }
 
     // Keeps the bottom nav at the bottom of the screen (keyboards move it)

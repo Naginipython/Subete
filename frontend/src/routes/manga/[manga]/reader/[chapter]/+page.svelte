@@ -26,9 +26,9 @@
         chapters = [];
         chapter = manga['chapters'][data.manga_index];
         imgs = document.getElementsByClassName("chap-page");
-        let c = await invoke('get_manga_pages', { source: manga.plugin, id: chapter.id });
-        let html = await invoke('fetch', {url: c.url});
-        chapters = eval(c.getChapterPages + `getChapterPages(${JSON.stringify(html)})`);
+        chapters = await invoke('get_manga_pages', { source: manga.plugin, id: chapter.id });
+        // let html = await invoke('fetch', {url: c.url});
+        // chapters = eval(c.getChapterPages + `getChapterPages(${JSON.stringify(html)})`);
         // chapters = await getChapterPages(manga.extention, chapter.id);
         if (chapter.completed && page != Infinity) {
             curr_page = 0;

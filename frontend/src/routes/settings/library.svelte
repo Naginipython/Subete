@@ -14,15 +14,15 @@
 
     store.subscribe(async json => {
         if (!json["settings"].hasOwnProperty("library_widths")) {
-            library_widths = { manga: '200', ln: '200' };
+            library_widths = { manga: '100', ln: '100' };
         } else {
             if (!json['settings']['library_widths'].hasOwnProperty("manga")) {
-                library_widths.manga = "200";
+                library_widths.manga = "100";
             } else {
                 library_widths.manga = json["settings"]["library_widths"].manga;
             }
             if (!json['settings']['library_widths'].hasOwnProperty("ln")) {
-                library_widths.ln = "200";
+                library_widths.ln = "100";
             } else {
                 library_widths.ln = json["settings"]["library_widths"].ln;
             }

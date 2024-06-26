@@ -1,8 +1,9 @@
 <script>
     import store from "$lib/store.js";
+    import { onMount } from "svelte";
 
     let library = [];
-    let width = "200";
+    let width = document.documentElement.style.getPropertyValue('--lib-manga-width');
 
     store.subscribe(json => {
         library = json["manga_library"];
@@ -15,10 +16,12 @@
     });
 
     window.addEventListener('resize', setWidth);
+    onMount(setWidth);
 
     function setWidth() {
         // var style = parseFloat(getComputedStyle(document.body).getPropertyValue('--lib-manga-height'));
         // let imgWidth = 0.5*parseFloat(style) + 50 + 10;
+        
         let imgWidth = parseFloat(width) + 10;
         let itemCount = Math.floor(window.innerWidth / imgWidth);
         var newWidth = itemCount * imgWidth;
