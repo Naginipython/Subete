@@ -14,6 +14,7 @@ build.sh
 /frontend/build/
 /frontend/build/*
 build/
+plugins/
 
 ## RUST
 debug/
