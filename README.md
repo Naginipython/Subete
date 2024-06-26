@@ -12,9 +12,9 @@ https://github.com/Naginipython/Subete/assets/42967504/260dfcf2-4acc-40cb-b75d-c
 ## Goals
 - [ ] Error messages for browse, reader, manga. library?
 - [ ] Updates. Cute progress bar for updates
-- [ ] General loading icons for pages, browse.
+- [x] General loading icons for pages, browse.
 - [ ] Make manga & ln snackbar a toggle. Also make browse include a manga/ln/anime quickselect, with the ability to shut off certain types.
-- [ ] App initialize loading icon
+- [x] App initialize loading icon
 - [ ] Icons for nav bar
 - [ ] nav bar more items when able
 - [ ] Hide Navbar when none selected (aka, manga/settings screen
