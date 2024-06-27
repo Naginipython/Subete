@@ -1,9 +1,10 @@
-use crate::FILE_PATH;
+use crate::{fetch, js_value_to_serde_json, post_fetch, Media, FILE_PATH};
 use std::{fs::File, io::Write, path::PathBuf, sync::Mutex};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use lazy_static::lazy_static;
 
+use super::LibraryItem;
 
 lazy_static! {
   pub static ref PLUGINS_PATH: PathBuf = {
@@ -62,16 +63,6 @@ pub struct Plugins {
     pub get_pages: String,
     pub pages_extra: Value,
 }
-#[derive(Debug, Deserialize, Serialize, Clone, Default)]
-pub enum Media {
-    #[serde(rename = "manga")]
-    #[default]
-    Manga, 
-    #[serde(rename = "ln")]
-    Ln, 
-    #[serde(rename = "anime")]
-    Anime
-}
 
 #[tauri::command]
 pub fn get_ln_plugin_names() -> Value {
@@ -88,26 +79,53 @@ fn replace_url(url: &str, placeholder: &str, replace: &str) -> String {
 #[tauri::command]
 pub async fn ln_search(query: String, sources: Vec<String>) -> Value {
   println!("Searching Ln(s)...");
-  let mut result: Vec<Value> = Vec::new();
+  let mut result: Value = json!({});
   let plugins = get_plugins();
   for p in plugins {
       if sources.contains(&p.id) {
-          let temp = json!({"url": replace_url(&p.search_url, "{title}", &query), "search": (p.search).to_string(), "extra": p.search_extra});
-          result.push(temp);
+          // Fetching page data
+          let url = replace_url(&p.search_url, "{title}", &query);
+          let html = fetch(url).await;
+
+          // Getting from plugins
+          let search = (p.search).to_string();
+          let search1 = format!("{}search(`{}`);", &search, &html);
+          
+          let context = quickjs_rs::Context::new().unwrap();
+          let value = context.eval(&search1).unwrap_or_else(|_e| {
+              let search2 = format!("{}search(JSON.stringify({}));", &search, &html);
+              context.eval(&search2).unwrap()
+          });
+          result = js_value_to_serde_json(value);
       }
   }
   json!(result)
 }
 
 #[tauri::command]
-pub async fn get_ln_chapters(source: String, id: String) -> Value {
+pub async fn get_ln_chapters(ln: LibraryItem) -> Value {
     println!("Getting ln chapters...");
     let mut result: Value = json!({});
     let plugins = get_plugins();
-    let plugin = plugins.iter().find(|p| p.id == source);
+    println!("{:?}", plugins);
+    let plugin = plugins.iter().find(|p| p.id == ln.plugin);
     if let Some(p) = plugin {
-        let temp = json!({"url": replace_url(&p.chapters_url, "{id}", &id), "getChapters": (p.get_chapters).to_string(), "extra": p.chapters_extra});
-        result = temp;
+        // let temp = json!({"url": replace_url(&p.chapters_url, "{id}", &id), "getChapters": (p.get_chapters).to_string(), "extra": p.chapters_extra});
+        // result = temp;
+        let url = replace_url(&p.chapters_url, "{id}", &ln.id);
+        let html = if p.chapters_extra.get("request").is_some() {
+            post_fetch(url).await
+        } else {
+            fetch(url).await
+        };
+        
+        let mut chap_code = (&p.get_chapters).clone();
+        chap_code.push_str(&format!("getChapters(JSON.parse({:?}), `{html}`);", serde_json::to_string(&ln).unwrap()));
+        println!("{chap_code}");
+        
+        let context = quickjs_rs::Context::new().unwrap();
+        let value = context.eval(&chap_code).unwrap();
+        result = js_value_to_serde_json(value);
     }
     result
 }
@@ -119,8 +137,17 @@ pub async fn get_ln_pages(source: String, id: String) -> Value {
     let plugins = get_plugins();
     let plugin = plugins.iter().find(|p| p.id == source);
     if let Some(p) = plugin {
-        let temp = json!({"url": replace_url(&p.pages_url, "{id}", &id), "getChapterPages": (p.get_pages).to_string(), "extra": p.chapters_extra});
-        result = temp;
+        // let temp = json!({"url": replace_url(&p.pages_url, "{id}", &id), "getChapterPages": (p.get_pages).to_string()});
+        // result = temp;
+        let url = replace_url(&p.pages_url, "{id}", &id);
+        let html = fetch(url).await;
+        
+        let mut chap_code = (&p.get_pages).clone();
+        chap_code.push_str(&format!("getChapterPages(`{html}`);"));
+        
+        let context = quickjs_rs::Context::new().unwrap();
+        let value = context.eval(&chap_code).unwrap();
+        result = js_value_to_serde_json(value);
     }
     result
 }

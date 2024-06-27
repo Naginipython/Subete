@@ -64,7 +64,6 @@
         let result = [];
         switch (media_screen) {
             case "manga":
-                console.log("Search Manga");
                 result = await invoke('manga_search', { query: `${name}`, sources: s });
                 store.update(json => {
                     json.manga_search_results = result;
@@ -72,14 +71,13 @@
                 });
                 break;
             case "ln":
-                console.log("Search Ln");
-                let l = await invoke('ln_search', { query: `${name}`, sources: s });
-                for (const s of l) {
-                    let html = await invoke('fetch', {url: s.url});
-                    let data = eval(s.search + `search(${JSON.stringify(html)})`);
-                    results.push({plugin: data[0].plugin, data: data});
-                    result = result.concat(data);
-                }
+                result = await invoke('ln_search', { query: `${name}`, sources: s });
+                // for (const s of l) {
+                //     let html = await invoke('fetch', {url: s.url});
+                //     let data = eval(s.search + `search(${JSON.stringify(html)})`);
+                //     results.push({plugin: data[0].plugin, data: data});
+                //     result = result.concat(data);
+                // }
                 store.update(json => {
                     json.ln_search_results = result;
                     return json;

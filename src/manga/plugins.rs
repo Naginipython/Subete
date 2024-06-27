@@ -1,4 +1,4 @@
-use crate::{fetch, js_value_to_serde_json, post_fetch, FILE_PATH};
+use crate::{fetch, js_value_to_serde_json, post_fetch, Media, FILE_PATH};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::{fs::File, io::Write, path::PathBuf, sync::Mutex};
@@ -12,10 +12,10 @@ lazy_static! {
         path.push("manga_plugins.json");
         path
     };
-    static ref MANGA_PLUGINS: Mutex<Vec<Plugins>> = match File::open(&*PLUGINS_PATH) {
+    static ref PLUGINS: Mutex<Vec<Plugins>> = match File::open(&*PLUGINS_PATH) {
         Ok(file) => Mutex::new(serde_json::from_reader(file).unwrap_or_default()),
         Err(_e) => {
-            let plugins = init_manga_plugins();
+            let plugins = init_plugins();
             Mutex::new(plugins)
         }
     };
@@ -29,20 +29,20 @@ fn save(lib: &Vec<Plugins>) {
 fn get_plugins() -> Vec<Plugins> {
     match File::open(&*PLUGINS_PATH) {
         Ok(file) => serde_json::from_reader(file).unwrap_or_default(),
-        Err(_e) => init_manga_plugins(),
+        Err(_e) => init_plugins(),
     }
 }
 #[tauri::command]
 pub fn add_manga_plugin(new_plugin: Plugins) {
-    println!("Adding Manga plugin...");
-    let mut plugins = MANGA_PLUGINS.lock().unwrap();
+    println!("Adding manga plugin...");
+    let mut plugins = PLUGINS.lock().unwrap();
     let names: Vec<String> = plugins.iter().map(|p| p.id.clone()).collect();
     if !names.contains(&new_plugin.id) {
         plugins.push(new_plugin);
         save(&plugins);
     }
 }
-pub fn init_manga_plugins() -> Vec<Plugins> {
+fn init_plugins() -> Vec<Plugins> {
     File::create(&*PLUGINS_PATH).unwrap();
     let plugins = vec![Plugins {
         id: String::from("MangaDex"),
@@ -76,24 +76,11 @@ pub struct Plugins {
     pub get_pages: String,
     pub pages_extra: Value,
 }
-#[derive(Debug, Deserialize, Serialize, Clone, Default)]
-pub enum Media {
-    #[serde(rename = "manga")]
-    #[default]
-    Manga, 
-    #[serde(rename = "ln")]
-    Ln, 
-    #[serde(rename = "anime")]
-    Anime
-}
-// impl Default for Media {
-//     fn default() -> Self { Media::Manga }
-// }
 
 #[tauri::command]
 pub fn get_manga_plugin_names() -> Value {
     println!("Getting Manga Plugin Names...");
-    let plugins = MANGA_PLUGINS.lock().unwrap();
+    let plugins = PLUGINS.lock().unwrap();
     let names: Vec<String> = plugins.iter().map(|p| p.id.clone()).collect();
     json!(names)
 }
@@ -181,7 +168,7 @@ pub async fn get_manga_pages(source: String, id: String) -> Value {
 #[tauri::command]
 pub fn delete_manga_plugins() {
     println!("Deleting manga plugins...");
-    let mut plugins = MANGA_PLUGINS.lock().unwrap();
-    *plugins = init_manga_plugins();
+    let mut plugins = PLUGINS.lock().unwrap();
+    *plugins = init_plugins();
     std::fs::remove_file(&*PLUGINS_PATH).unwrap();
 }

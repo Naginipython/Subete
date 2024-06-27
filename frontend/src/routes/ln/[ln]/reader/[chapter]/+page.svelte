@@ -26,9 +26,9 @@
         paragraphs = [];
         chapter = ln['chapters'][data.ln_index];
         imgs = document.getElementsByTagName("img");
-        let c = await invoke('get_ln_pages', { source: ln.plugin, id: chapter.id });
-        let html = await invoke('fetch', {url: c.url});
-        paragraphs = eval(c.getChapterPages + `getChapterPages(${JSON.stringify(html)})`);
+        paragraphs = await invoke('get_ln_pages', { source: ln.plugin, id: chapter.id });
+        // let html = await invoke('fetch', {url: c.url});
+        // paragraphs = eval(c.getChapterPages + `getChapterPages(${JSON.stringify(html)})`);
         // chapters = await getChapterPages(ln.extention, chapter.id);
         // if (chapter.completed && page != Infinity) {
         //     curr_page = 0;

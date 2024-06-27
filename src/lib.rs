@@ -72,14 +72,25 @@ async fn post_fetch(url: String) -> String {
   let user_agent = "Mozilla/5.0 (Linux; Android 13; SM-S901U) AppleWebkit/537.36 (KHTML, like Gecko Chrome/112.0.0.0 Mobile Safari/537.36";
   let client = reqwest::Client::new();
   let response = client.post(url)
-      .header(reqwest::header::USER_AGENT, user_agent)
-      .send()
-      .await.unwrap();
+    .header(reqwest::header::USER_AGENT, user_agent)
+    .send()
+    .await.unwrap();
   let mut data = response.text().await.unwrap();
   data = data.replace("\n", " ").replace('`', "").replace("${", "S").replace("\\\"", "'");
   let re = regex::Regex::new(r"\s+").unwrap();
   data = re.replace_all(&data, " ").to_string();
   data
+}
+
+#[derive(Debug, serde::Deserialize, serde::Serialize, Clone, Default)]
+pub enum Media {
+    #[serde(rename = "manga")]
+    #[default]
+    Manga, 
+    #[serde(rename = "ln")]
+    Ln, 
+    #[serde(rename = "anime")]
+    Anime
 }
 
 pub fn js_value_to_serde_json(value: JsValue) -> JsonValue {

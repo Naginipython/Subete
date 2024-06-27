@@ -6,7 +6,6 @@
     import { faCircleDown, faBookmark as faOutlineBookmark, faSquare } from '@fortawesome/free-regular-svg-icons';
     import Fa from 'svelte-fa'
     import store from "$lib/store.js"
-    // import { getChapters } from "$lib/manga_sources/main.js";
     import { find_manga } from "$lib/manga_common.js";
     import { Moon } from 'svelte-loading-spinners';
 
@@ -27,7 +26,6 @@
         if (manga['chapters'].length == 0) {
             loading = true;
             let updated_manga = await invoke('get_manga_chapters', { manga });
-            console.log(updated_manga);
             // let html = await invoke('fetch', {url: c.url});
             // manga['chapters'] = eval(c.getChapters + `getChapters(${manga}, ${JSON.stringify(html)})`);
             updated_manga['chapters'].sort((a,b) => b.number-a.number);

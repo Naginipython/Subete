@@ -42,7 +42,7 @@
     <button class="delete-btn" on:click={async () => await invoke('delete_manga_plugins')}>Delete Manga Plugins</button>
 </div>
 <div class="settings-box">
-    <button class="delete-btn" on:click={async () => await invoke('delete_ln_plugins')}>Delete LN Library</button>
+    <button class="delete-btn" on:click={async () => await invoke('delete_ln_plugins')}>Delete LN Plugins</button>
 </div>
 <div class="settings-box">
     <button class="delete-btn" on:click={async () => delete_set()}>Delete Settings</button>

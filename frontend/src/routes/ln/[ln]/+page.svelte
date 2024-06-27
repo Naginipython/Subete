@@ -1,5 +1,6 @@
 <script>
     import { invoke } from "@tauri-apps/api/core";
+    import { onMount } from "svelte";
     import { goto } from "$app/navigation";
     import { faEllipsisVertical, faBookmark, faAnglesDown, faCircleCheck, faSquareCheck, faCheck, faArrowTurnDown, faXmark } from '@fortawesome/free-solid-svg-icons'
     import { faCircleDown, faBookmark as faOutlineBookmark, faSquare } from '@fortawesome/free-regular-svg-icons';
@@ -20,29 +21,32 @@
             return json;
         });
     }
+
+    onMount(async () => {
+        if (ln['chapters'].length == 0) {
+            loading = true;
+            let updated_ln = await invoke('get_ln_chapters', { ln });
+            // let html = '';
+            // if (c.extra.hasOwnProperty("request")) {
+            //     if (c.extra.request == "post") {
+            //         html = await invoke('post_fetch', {url: c.url});
+            //     }
+            // } else {
+            //     html = await invoke('fetch', {url: c.url});
+            // }
+            // ln['chapters'] = eval(c.getChapters + `getChapters(${JSON.stringify(html)})`);
+            updated_ln['chapters'].sort((a,b) => b.number-a.number);
+            ln.author = updated_ln.author;
+            ln.artist = updated_ln.artist;
+            ln.description = updated_ln.description;
+            ln.chapters = updated_ln.chapters;
+            loading = false;
+        }
+    })
     
-    let tries = 30;
     store.subscribe(async (json) => {
         // gets ln search details
         ln = find_ln(data.id);
-
-        // gets chapters, if needed
-        if (ln['chapters'].length == 0 && tries > 0) {
-            loading = true;
-            let c = await invoke('get_ln_chapters', { source: ln.plugin, id: ln.id });
-            let html = '';
-            if (c.extra.hasOwnProperty("request")) {
-                if (c.extra.request == "post") {
-                    html = await invoke('post_fetch', {url: c.url});
-                }
-            } else {
-                html = await invoke('fetch', {url: c.url});
-            }
-            ln['chapters'] = eval(c.getChapters + `getChapters(${JSON.stringify(html)})`);
-            ln['chapters'].sort((a,b) => b.number-a.number);
-            tries--;
-            loading = false;
-        }
     });
 
     // CHAPTER OPTION BUTTONS
