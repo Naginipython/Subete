@@ -1,7 +1,8 @@
-use crate::{fetch, js_value_to_serde_json, post_fetch, Media, FILE_PATH};
+use crate::{fetch, js_value_to_serde_json, append_values, post_fetch, Media, FILE_PATH};
+use quickjs_rs::JsValue;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
-use std::{fs::File, io::Write, path::PathBuf, sync::Mutex};
+use std::{collections::HashMap, fs::File, io::Write, path::PathBuf, sync::Mutex};
 use lazy_static::lazy_static;
 
 use super::LibraryItem;
@@ -92,7 +93,7 @@ fn replace_url(url: &str, placeholder: &str, replace: &str) -> String {
 #[tauri::command]
 pub async fn manga_search(query: String, sources: Vec<String>) -> Value {
     println!("Searching Manga(s)...");
-    let mut result: Value = json!({});
+    let mut result: Value = json!([]);
     let plugins = get_plugins();
     for p in plugins {
         if sources.contains(&p.id) {
@@ -105,11 +106,19 @@ pub async fn manga_search(query: String, sources: Vec<String>) -> Value {
             let search1 = format!("{}search(`{}`);", &search, &html);
             
             let context = quickjs_rs::Context::new().unwrap();
-            let value = context.eval(&search1).unwrap_or_else(|_e| {
+            let value = context.eval(&search1).unwrap_or_else(|error| {
+                println!("{error}");
                 let search2 = format!("{}search(JSON.stringify({}));", &search, &html);
-                context.eval(&search2).unwrap()
+                match context.eval(&search2) {
+                    Ok(v) => v,
+                    Err(e) => {
+                      let h = HashMap::from([(String::from("error"), JsValue::String(format!("{:?} experienced an issue: {e}", p.id)))]);
+                      JsValue::Object(h)
+                    }
+                }
             });
-            result = js_value_to_serde_json(value);
+            let r = js_value_to_serde_json(value);
+            append_values(&mut result, r)
         }
     }
     result

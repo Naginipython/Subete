@@ -3,7 +3,7 @@ use lazy_static::lazy_static;
 use settings::*;
 use tauri_plugin_http::reqwest;
 use quickjs_rs::JsValue;
-use serde_json::{Value as JsonValue, Map as JsonMap, Number as JsonNumber};
+use serde_json::{Value, Map as JsonMap, Number as JsonNumber};
 
 mod manga;
 mod ln;
@@ -95,23 +95,28 @@ pub enum Media {
     Anime
 }
 
-pub fn js_value_to_serde_json(value: JsValue) -> JsonValue {
+pub fn js_value_to_serde_json(value: JsValue) -> Value {
   match value {
-      JsValue::Null => JsonValue::Null,
-      JsValue::Bool(b) => JsonValue::Bool(b),
-      JsValue::Int(i) => JsonValue::Number(JsonNumber::from(i)),
-      JsValue::Float(f) => JsonValue::Number(JsonNumber::from_f64(f).unwrap()),
-      JsValue::String(s) => JsonValue::String(s),
+      JsValue::Null => Value::Null,
+      JsValue::Bool(b) => Value::Bool(b),
+      JsValue::Int(i) => Value::Number(JsonNumber::from(i)),
+      JsValue::Float(f) => Value::Number(JsonNumber::from_f64(f).unwrap()),
+      JsValue::String(s) => Value::String(s),
       JsValue::Array(arr) => {
-          let json_array: Vec<JsonValue> = arr.into_iter().map(js_value_to_serde_json).collect();
-          JsonValue::Array(json_array)
+          let json_array: Vec<Value> = arr.into_iter().map(js_value_to_serde_json).collect();
+          Value::Array(json_array)
       },
       JsValue::Object(obj) => {
-          let json_map: JsonMap<String, JsonValue> = obj.into_iter()
+          let json_map: JsonMap<String, Value> = obj.into_iter()
               .map(|(k, v)| (k, js_value_to_serde_json(v)))
               .collect();
-          JsonValue::Object(json_map)
+            Value::Object(json_map)
       },
       _ => unimplemented!("Unsupported JsValue type for conversion"),
+  }
+}
+pub fn append_values(v1: &mut Value, v2: Value) {
+  if let (Value::Array(ref mut arr1), Value::Array(arr2)) = (v1, v2) {
+      arr1.extend(arr2);
   }
 }

@@ -11,6 +11,7 @@
     let sources = [];
     let checked_sources;
     let media_screen = "manga";
+    let error = "";
     
     $: if (checked_sources) update_settings();
     let first_run = true;
@@ -59,12 +60,18 @@
     async function search() {
         is_searching = true;
         results = [];
+        error = "";
         let s = Object.entries(checked_sources).filter(([key, value]) => value).map(([key, value]) => key);
         s = s.filter(x => sources.includes(x));
         let result = [];
         switch (media_screen) {
             case "manga":
-                result = await invoke('manga_search', { query: `${name}`, sources: s });
+                let r = await invoke('manga_search', { query: `${name}`, sources: s });
+                if (!r.hasOwnProperty("error")) {
+                    result = r;
+                } else {
+                    error = r.error;
+                }
                 store.update(json => {
                     json.manga_search_results = result;
                     return json;
@@ -136,6 +143,9 @@
             <button id="search" on:click="{search}"><Fa icon={faMagnifyingGlass} /></button><br>
         </div>
     </form>
+    {#if error != ""}
+        <p style="color: red; width: inherit; text-align: center; padding: 0; margin: 0">{error}</p>
+    {/if}
     {#if results.length == 0 && !is_searching}
         <div class="quickselect">
             <p>Source Quickselect</p>

@@ -1,5 +1,6 @@
-use crate::{fetch, js_value_to_serde_json, post_fetch, Media, FILE_PATH};
-use std::{fs::File, io::Write, path::PathBuf, sync::Mutex};
+use crate::{append_values, fetch, js_value_to_serde_json, post_fetch, Media, FILE_PATH};
+use std::{collections::HashMap, fs::File, io::Write, path::PathBuf, sync::Mutex};
+use quickjs_rs::JsValue;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use lazy_static::lazy_static;
@@ -93,10 +94,18 @@ pub async fn ln_search(query: String, sources: Vec<String>) -> Value {
           
           let context = quickjs_rs::Context::new().unwrap();
           let value = context.eval(&search1).unwrap_or_else(|_e| {
+              // secondary test
               let search2 = format!("{}search(JSON.stringify({}));", &search, &html);
-              context.eval(&search2).unwrap()
+              match context.eval(&search2) {
+                Ok(v) => v,
+                Err(e) => {
+                  let h = HashMap::from([(String::from("error"), JsValue::String(format!("{:?} experienced an issue: {e}", p.id)))]);
+                  JsValue::Object(h)
+                }
+              }
           });
-          result = js_value_to_serde_json(value);
+          let r = js_value_to_serde_json(value);
+          append_values(&mut result, r)
       }
   }
   json!(result)
@@ -121,7 +130,6 @@ pub async fn get_ln_chapters(ln: LibraryItem) -> Value {
         
         let mut chap_code = (&p.get_chapters).clone();
         chap_code.push_str(&format!("getChapters(JSON.parse({:?}), `{html}`);", serde_json::to_string(&ln).unwrap()));
-        println!("{chap_code}");
         
         let context = quickjs_rs::Context::new().unwrap();
         let value = context.eval(&chap_code).unwrap();
