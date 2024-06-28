@@ -84,12 +84,15 @@
         favorited: false,
         data: {}
     };
+    let from = "/";
 
     // ----- REDIRECT MANAGER -----
     $: if($navigating) page_check();
     function page_check() {
         nav = $navigating.to.url.pathname;
-        let from = $navigating.from.url.pathname
+        if (nav != $navigating.from.url.pathname) {
+            from = $navigating.from.url.pathname
+        }
         console.log(nav);
 
         // default is on, other navs can change this
@@ -241,8 +244,8 @@
     <!-- left side -->
     {#if in_manga || in_ln}
         <button class="snackbar-item" on:click={async () => goto(back)}><Fa icon={faArrowLeft} /></button>
-    {:else if nav.includes('add_sources')}
-        <button class="snackbar-item" on:click={() => goto('/browse/')}><Fa icon={faArrowLeft} /></button>
+    {:else if nav.includes('add_sources') || nav.includes('settings')}
+        <button class="snackbar-item" on:click={() => goto(from)}><Fa icon={faArrowLeft} /></button>
     {:else}
         <!-- TODO: make work -->
         <button id="manga" class="snackbar-item {type=="manga"? 'selected':''}" on:click={() => change_media("manga")}>Manga</button>

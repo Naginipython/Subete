@@ -109,7 +109,6 @@ pub async fn manga_search(query: String, sources: Vec<String>) -> Value {
                 let search2 = format!("{}search(JSON.stringify({}));", &search, &html);
                 context.eval(&search2).unwrap()
             });
-            println!("{:?}", value);
             result = js_value_to_serde_json(value);
         }
     }
@@ -163,6 +162,14 @@ pub async fn get_manga_pages(source: String, id: String) -> Value {
         result = js_value_to_serde_json(value);
     }
     result
+}
+
+#[tauri::command]
+pub fn delete_manga_plugin(plugin: String) {
+    println!("Deleting manga plugin: {plugin}");
+    let mut plugins = PLUGINS.lock().unwrap();
+    plugins.retain(|p| p.id != plugin);
+    save(&plugins);
 }
 
 #[tauri::command]

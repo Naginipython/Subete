@@ -21,9 +21,9 @@ lazy_static! {
   };
 }
 
-fn save(lib: &Vec<Plugins>) {
+fn save(p: &Vec<Plugins>) {
   let mut file = File::create(&*PLUGINS_PATH).unwrap();
-  let json = serde_json::to_string(lib).unwrap();
+  let json = serde_json::to_string(p).unwrap();
   file.write_all(json.as_bytes()).unwrap();
 }
 fn get_plugins() -> Vec<Plugins> {
@@ -150,6 +150,14 @@ pub async fn get_ln_pages(source: String, id: String) -> Value {
         result = js_value_to_serde_json(value);
     }
     result
+}
+
+#[tauri::command]
+pub fn delete_ln_plugin(plugin: String) {
+    println!("Deleting ln plugin: {plugin}");
+    let mut plugins = PLUGINS.lock().unwrap();
+    plugins.retain(|p| p.id != plugin);
+    save(&plugins);
 }
 
 #[tauri::command]
