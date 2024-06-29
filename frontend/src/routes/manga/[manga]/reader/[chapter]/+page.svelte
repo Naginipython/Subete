@@ -81,9 +81,6 @@
             case 'a':
                 prev();
                 break;
-            case "Escape":
-                update_lib();
-                break;
         }
     }
     function toggle_menu() {
@@ -94,48 +91,44 @@
         }
     }
     function next() {
-        if (!is_loading) {
-            if (curr_page < imgs.length-1) {
-                curr_page++;
-                chapter.page = curr_page+1;
-                adjustImage();
-            } else if (curr_page == imgs.length-1) {
-                curr_page++;
-                adjustImage();
-            } else {
-                let next = parseInt(data.manga_index)-1;
-                if (next >= 0) {
-                    goto(`/manga/${data.id}/reader/${next}`).then(() => {
-                        chapter.completed = true;
-                        invoke('update_manga_lib', { item: manga }).then(() => {
-                            start_reader(0);
-                        });
+        if (curr_page < imgs.length-1) {
+            curr_page++;
+            chapter.page = curr_page+1;
+            adjustImage();
+        } else if (curr_page == imgs.length-1) {
+            curr_page++;
+            adjustImage();
+        } else {
+            let next = parseInt(data.manga_index)-1;
+            if (next >= 0) {
+                goto(`/manga/${data.id}/reader/${next}`).then(() => {
+                    chapter.completed = true;
+                    invoke('update_manga_lib', { item: manga }).then(() => {
+                        start_reader(0);
                     });
-                } else {
-                    update_lib();
-                }
+                });
+            } else {
+                update_lib();
             }
         }
     }
     function prev() {
-        if (!is_loading) {
-            if (curr_page > 0) {
-                curr_page--;
-                chapter.page = curr_page+1;
-                adjustImage();
-            } else if (curr_page == 0) {
-                curr_page--;
-            } else {
-                let prev = parseInt(data.manga_index)+1;
-                if (prev < manga['chapters'].length) {
-                    goto(`/manga/${data.id}/reader/${prev}`).then(() => {
-                        invoke('update_manga_lib', { item: manga }).then(() => {
-                            start_reader(Infinity);
-                        });
+        if (curr_page > 0) {
+            curr_page--;
+            chapter.page = curr_page+1;
+            adjustImage();
+        } else if (curr_page == 0) {
+            curr_page--;
+        } else {
+            let prev = parseInt(data.manga_index)+1;
+            if (prev < manga['chapters'].length) {
+                goto(`/manga/${data.id}/reader/${prev}`).then(() => {
+                    invoke('update_manga_lib', { item: manga }).then(() => {
+                        start_reader(Infinity);
                     });
-                } else {
-                    update_lib()
-                }
+                });
+            } else {
+                update_lib()
             }
         }
     }
@@ -195,7 +188,7 @@
 <div class="center-img-div">
     
     <!-- TODO: better prev chap -->
-    <p id="prev-chapter" class={curr_page == -1 && !is_loading? 'visible' : 'invisible'}>previous chapter?</p>
+    <p id="prev-chapter" class={curr_page == -1? 'visible' : 'invisible'}>previous chapter?</p>
     <div style="width:fit-content; display: {is_loading? 'block' : 'none'}">
         <Moon color="var(--selection-color)" size="30" />
     </div>
