@@ -97,12 +97,14 @@
     <Moon color="var(--selection-color)" size="30" />
 </div>
 
+<h3 class="chap-num">{manga['chapters'].length} chapters</h3>
+
 {#each manga['chapters'] as c, i}
 <div class="chapter" style="{manga['chapters'][i].completed? 'color: grey' : ''}">
     <!-- Main Chapter button -->
     <button class="chapter-link" on:click={() => goto(`/manga/${data.id}/reader/${i}`)}>
         <p>
-            {#if c.title == ""} Chapter {c.number}
+            {#if c.title == "" || c.title.toLowerCase() == "chapter "+c.number} Chapter {c.number}
             {:else} Chapter {c.number} - {c.title}
             {/if}
         </p>
@@ -200,13 +202,17 @@
         overflow: scroll;
         overflow-x: hidden;
     }
+    .chap-num {
+        padding: 10px;
+        margin: 0;
+    }
     .chapter {
         width: 100vw;
         padding: 5px 0;
         overflow: auto;
         display: inline-flex;
         background-color: var(--primary-color);
-        filter: brightness(0.95)
+        /* filter: brightness(0.95); */
     }
     .chapter:hover {
         background-color: var(--selection-color)
@@ -220,13 +226,18 @@
         text-overflow: ellipsis;
         overflow: hidden;
     }
+    @media only screen and (max-width: 550px) {
+        .chapter-link p {
+            font-size: medium;
+        }
+    }
     .chapter-link {
         text-align: left;
         cursor: pointer;
         display: inline-flex;
         justify-content: left;
         flex-direction: column;
-        padding-left: 10px;
+        padding-left: 15px;
         border: 0;
         background-color: transparent;
         color: inherit;
@@ -239,6 +250,7 @@
         /* width: idk; TODO */
     }
     .chapter-lower {
+        padding-top: 5px;
         display: inline-flex;
     }
     .chapter-lower p {
@@ -260,11 +272,11 @@
         display: inline-flex;
         align-items: center;
         background-color: transparent;
-        /* background-color: green; */
         border: 0;
         color: var(--text-color);
         font-size: large;
         height: inherit;
         margin: 0 2px;
+        width: 25px;
     }
 </style>

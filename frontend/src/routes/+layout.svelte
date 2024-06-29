@@ -215,7 +215,7 @@
         document.getElementById("nav-centered").style.display = "none";
     }
     function snack_nav_on() {
-        document.documentElement.style.setProperty('--nav-bar-height', '50px');
+        document.documentElement.style.setProperty('--nav-bar-height', '55px');
         document.getElementById("body").style.height = null;
         document.getElementById("snackbar").style.display = "block";
         document.getElementById("nav-centered").style.display = "block";
@@ -248,9 +248,9 @@
         <button class="snackbar-item" on:click={() => goto(from)}><Fa icon={faArrowLeft} /></button>
     {:else}
         <!-- TODO: make work -->
-        <button id="manga" class="snackbar-item {type=="manga"? 'selected':''}" on:click={() => change_media("manga")}>Manga</button>
-        <button id="anime" class="snackbar-item {type=="anime"? 'selected':''}">Anime</button>
-        <button id="ln" class="snackbar-item {type=="ln"? 'selected':''}" on:click={() => change_media("ln")}>LN</button>
+        <button id="manga" class="media {type=="manga"? 'selected':''}" on:click={() => change_media("manga")}>Manga</button>
+        <button id="anime" class="media {type=="anime"? 'selected':''}">Anime</button>
+        <button id="ln" class="media {type=="ln"? 'selected':''}" on:click={() => change_media("ln")}>LN</button>
     {/if}
     
     <!-- right side -->
@@ -307,6 +307,22 @@
 </div>
 
 <style>
+    :root {
+        --snackbar-height: 45px;
+        --nav-bar-height: 55px;
+        --body-height: calc(100vh - var(--snackbar-height) - var(--nav-bar-height));
+
+        --primary-color: #1a1a1a;
+        --secondary-color: #330000;
+        --selection-color: #800000;
+        --text-color: white;
+
+        --lib-manga-width: 100px;
+        --lib-manga-height: calc(var(--lib-manga-width) *1.5);
+
+        --lib-ln-width: 100px;
+        --lib-ln-height: calc(var(--lib-ln-width) *1.5);
+    }
     #splashscreen {
         position: fixed;
         width: 100vw;
@@ -321,36 +337,36 @@
         height: 20vh;
         width: auto;
     }
-    :root {
-        --snackbar-height: 35px;
-        --nav-bar-height: 50px;
-        --body-height: calc(100vh - var(--snackbar-height) - var(--nav-bar-height));
-
-        --primary-color: #1a1a1a;
-        --secondary-color: #330000;
-        --selection-color: #800000;
-        --text-color: white;
-
-        --lib-manga-width: 100px;
-        --lib-manga-height: calc(var(--lib-manga-width) *1.5);
-
-        --lib-ln-width: 100px;
-        --lib-ln-height: calc(var(--lib-ln-width) *1.5);
-    }
     #snackbar {
         height: var(--snackbar-height);
         background-color: var(--secondary-color);
     }
-    .snackbar-item {
+    .media {
         display: inline-flex;
         align-items: center;
         background-color: transparent;
-        /* background-color: green; */
         border: 0;
         color: var(--text-color);
         font-size: medium;
         padding: 0 8px;
         height: inherit;
+        justify-content: center;
+        width: 60px;
+    }
+    .media:hover {
+        background-color: var(--selection-color);
+    }
+    .snackbar-item {
+        display: inline-flex;
+        align-items: center;
+        background-color: transparent;
+        border: 0;
+        color: var(--text-color);
+        font-size: medium;
+        padding: 0 8px;
+        height: inherit;
+        justify-content: center;
+        width: var(--snackbar-height);
     }
     button.snackbar-item:hover {
         background-color: var(--selection-color);

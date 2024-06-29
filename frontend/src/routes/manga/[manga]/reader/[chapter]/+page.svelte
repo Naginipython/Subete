@@ -81,6 +81,9 @@
             case 'a':
                 prev();
                 break;
+            case "Escape":
+                update_lib();
+                break;
         }
     }
     function toggle_menu() {
@@ -91,44 +94,48 @@
         }
     }
     function next() {
-        if (curr_page < imgs.length-1) {
-            curr_page++;
-            chapter.page = curr_page+1;
-            adjustImage();
-        } else if (curr_page == imgs.length-1) {
-            curr_page++;
-            adjustImage();
-        } else {
-            let next = parseInt(data.manga_index)-1;
-            if (next >= 0) {
-                goto(`/manga/${data.id}/reader/${next}`).then(() => {
-                    chapter.completed = true;
-                    invoke('update_manga_lib', { item: manga }).then(() => {
-                        start_reader(0);
-                    });
-                });
+        if (!is_loading) {
+            if (curr_page < imgs.length-1) {
+                curr_page++;
+                chapter.page = curr_page+1;
+                adjustImage();
+            } else if (curr_page == imgs.length-1) {
+                curr_page++;
+                adjustImage();
             } else {
-                update_lib();
+                let next = parseInt(data.manga_index)-1;
+                if (next >= 0) {
+                    goto(`/manga/${data.id}/reader/${next}`).then(() => {
+                        chapter.completed = true;
+                        invoke('update_manga_lib', { item: manga }).then(() => {
+                            start_reader(0);
+                        });
+                    });
+                } else {
+                    update_lib();
+                }
             }
         }
     }
     function prev() {
-        if (curr_page > 0) {
-            curr_page--;
-            chapter.page = curr_page+1;
-            adjustImage();
-        } else if (curr_page == 0) {
-            curr_page--;
-        } else {
-            let prev = parseInt(data.manga_index)+1;
-            if (prev < manga['chapters'].length) {
-                goto(`/manga/${data.id}/reader/${prev}`).then(() => {
-                    invoke('update_manga_lib', { item: manga }).then(() => {
-                        start_reader(Infinity);
-                    });
-                });
+        if (!is_loading) {
+            if (curr_page > 0) {
+                curr_page--;
+                chapter.page = curr_page+1;
+                adjustImage();
+            } else if (curr_page == 0) {
+                curr_page--;
             } else {
-                update_lib()
+                let prev = parseInt(data.manga_index)+1;
+                if (prev < manga['chapters'].length) {
+                    goto(`/manga/${data.id}/reader/${prev}`).then(() => {
+                        invoke('update_manga_lib', { item: manga }).then(() => {
+                            start_reader(Infinity);
+                        });
+                    });
+                } else {
+                    update_lib()
+                }
             }
         }
     }
@@ -188,7 +195,7 @@
 <div class="center-img-div">
     
     <!-- TODO: better prev chap -->
-    <p id="prev-chapter" class={curr_page == -1? 'visible' : 'invisible'}>previous chapter?</p>
+    <p id="prev-chapter" class={curr_page == -1 && !is_loading? 'visible' : 'invisible'}>previous chapter?</p>
     <div style="width:fit-content; display: {is_loading? 'block' : 'none'}">
         <Moon color="var(--selection-color)" size="30" />
     </div>
@@ -227,7 +234,7 @@
     }
     #chap-snackbar {
         /* opacity: 0.5; */
-        height: calc(var(--snackbar-height)*1.4);
+        height: var(--snackbar-height);
         /* background-color: var(--secondary-color); */
         position: absolute;
         width: 100vw;
@@ -236,7 +243,7 @@
         width: 100vw;
         position: absolute;
         opacity: 0.5;
-        height: calc(var(--snackbar-height)*1.4);
+        height: var(--snackbar-height);
         background-color: var(--secondary-color);
     }
     .chap-snack-item {
@@ -244,7 +251,6 @@
         align-items: center;
         justify-content: center;
         background-color: transparent;
-        /* background-color: green; */
         border: 0;
         color: var(--text-color);
         font-size: medium;
@@ -253,7 +259,6 @@
     }
     button.chap-snack-item:hover {
         background-color: var(--selection-color);
-        border-radius: 50%;
     }
     #chap-snack-text {
         position: relative;

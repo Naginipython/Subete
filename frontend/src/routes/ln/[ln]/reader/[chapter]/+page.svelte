@@ -198,7 +198,7 @@
     }
     #chap-snackbar {
         /* opacity: 0.5; */
-        height: calc(var(--snackbar-height)*1.4);
+        height: var(--snackbar-height);
         /* background-color: var(--secondary-color); */
         position: absolute;
         width: 100vw;
@@ -207,7 +207,7 @@
         width: 100vw;
         position: absolute;
         opacity: 0.5;
-        height: calc(var(--snackbar-height)*1.4);
+        height: var(--snackbar-height);
         background-color: var(--secondary-color);
     }
     .chap-snack-item {
