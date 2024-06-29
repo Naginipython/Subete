@@ -224,7 +224,6 @@
     }
     button.chap-snack-item:hover {
         background-color: var(--selection-color);
-        border-radius: 50%;
     }
     #chap-snack-text {
         position: relative;
