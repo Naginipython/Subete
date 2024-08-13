@@ -145,7 +145,14 @@ pub async fn get_manga_chapters(manga: LibraryItem) -> Value {
         chap_code.push_str(&format!("getChapters(JSON.parse({:?}), `{html}`);", serde_json::to_string(&manga).unwrap()));
         
         let context = quickjs_rs::Context::new().unwrap();
-        let value = context.eval(&chap_code).unwrap();
+        let value = match context.eval(&chap_code) {
+            Ok(v) => v,
+            Err(e) => {
+                println!("{e}");
+                let h = HashMap::from([(String::from("error"), JsValue::String(format!("{:?} experienced an issue: {e}", p.id)))]);
+                JsValue::Object(h)
+            }
+        };
         result = js_value_to_serde_json(value);
     }
     result

@@ -13,6 +13,7 @@
 
     let manga = {};
     let loading = false;
+    let error = "";
 
     // Adds to history when data is available
     $: if (Object.keys(manga).length != 0) {
@@ -28,11 +29,15 @@
             let updated_manga = await invoke('get_manga_chapters', { manga });
             // let html = await invoke('fetch', {url: c.url});
             // manga['chapters'] = eval(c.getChapters + `getChapters(${manga}, ${JSON.stringify(html)})`);
-            updated_manga['chapters'].sort((a,b) => b.number-a.number);
-            manga.author = updated_manga.author;
-            manga.artist = updated_manga.artist;
-            manga.description = updated_manga.description;
-            manga.chapters = updated_manga.chapters;
+            if (!updated_manga.hasOwnProperty("error")) {
+                updated_manga['chapters'].sort((a,b) => b.number-a.number);
+                manga.author = updated_manga.author;
+                manga.artist = updated_manga.artist;
+                manga.description = updated_manga.description;
+                manga.chapters = updated_manga.chapters;
+            } else {
+                error = updated_manga.error;
+            }
             loading = false;
         }
     });
@@ -92,12 +97,16 @@
     </div>
 </div>
 
+<h3 class="chap-num">{manga['chapters'].length} chapters</h3>
+
 <!-- Loading icon -->
 <div style="margin: auto; width: fit-content; display: {loading? 'block' : 'none'}">
     <Moon color="var(--selection-color)" size="30" />
 </div>
 
-<h3 class="chap-num">{manga['chapters'].length} chapters</h3>
+{#if error != ""}
+    <p style="color: red; width: inherit; text-align: center; padding: 0; margin: 0">{error}</p>
+{/if}
 
 {#each manga['chapters'] as c, i}
 <div class="chapter" style="{manga['chapters'][i].completed? 'color: grey' : ''}">
