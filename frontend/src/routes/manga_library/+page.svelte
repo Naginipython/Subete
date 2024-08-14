@@ -30,7 +30,7 @@
 {#each library as l, i}
     <a class="lib-manga" href="/manga/{l.id}">
         <div class="lib-manga-wrap">
-            <img src={l.img} alt={l.title}/>
+            <img src={l.img} alt={l.title} on:error={console.log("img failed")}/>
         </div>
         <p>{l.title}</p>
     </a>

@@ -65,18 +65,21 @@ const store = writable({
         }*/
     ],
     "manga_updates": [
-        {
-            // manga_id: string
-            // chapter: {
-            //     id: string,
-            //     num: int,
-            //     title: string,
-            //     page: int,
-            //     completed: boolean
-            // }
-            // receieved: int // Date.now()
-        }
+        /*{
+            id: string,
+            title: String,
+            img: string, //url or link?
+            chapter: {
+                id: string,
+                num: int,
+                title: string,
+                page: int,
+                completed: boolean
+            }
+            receieved: int // Date.now()
+        }*/
     ],
+    "manga_update_progress": null, // {curr: String, index: number, total: number}
     "ln_search_results": [],
     "ln_library": [],
     "ln_history": [],

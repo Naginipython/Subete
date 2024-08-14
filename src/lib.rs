@@ -39,6 +39,7 @@ pub fn run() {
         fetch, post_fetch,
         // manga/library.rs
         manga::get_manga_lib, manga::add_to_manga_lib, manga::remove_from_manga_lib, manga::update_manga_lib, manga::delete_manga_lib,
+        manga::save_manga_updates_list, manga::get_manga_updates_list,
         // manga/plugins.rs
         manga::manga_search, manga::get_manga_chapters, manga::get_manga_plugin_names, manga::get_manga_pages, manga::add_manga_plugin, 
         manga::delete_manga_plugins, manga::delete_manga_plugin,

@@ -43,4 +43,53 @@ export async function toggle_favorite(manga) {
 
 export async function update_lib() {
     // re-fetch every manga chapter, comapre to what we have, add to manga_updates
+    const updated = () => store.update(_json => { _json.manga_updates_progress = json.manga_update_progress; return _json; });
+    json.manga_update_progress = {
+        curr: "",
+        index: 0,
+        total: json.manga_library.length
+    };
+    updated();
+
+    for (let i = 0; i < json.manga_library.length; i++) {
+        // Progress bar
+        json.manga_update_progress.curr = json.manga_library[i].title;
+        json.manga_update_progress.index = json.manga_update_progress.index+1;
+        updated();
+
+        // Update
+        let new_data = await invoke('get_manga_chapters', { manga: json.manga_library[i] });
+        let chap = new_data.chapters;
+
+        // Gets new chapters
+        let new_chapters = chap.filter(c => {
+            return !json.manga_library[i].chapters.some(o => o.id == c.id);
+        }).reverse();
+        json.manga_library[i] = new_data;
+
+        // Adds to updates list
+        for (let j = 0; j < new_chapters.length; j++) {
+            let item = {
+                id: json.manga_library[i].id,
+                title: json.manga_library[i].title,
+                img: json.manga_library[i].img,
+                chapter: new_chapters[j],
+                received: Date.now()
+            }
+            store.update(_json => {
+                _json.manga_updates.unshift(item);
+                _json.manga_library = json.manga_library;
+                return _json;
+            });
+        }
+        await invoke('update_manga_lib', { item: json.manga_library[i] })
+    }
+    await invoke('save_manga_updates_list', { items: json.manga_updates });
+    json.manga_update_progress = null;
+    updated();
+}
+
+export function find_chapter_index_by_id(id, chap_id) {
+    let manga = find_manga(id);
+    return manga.chapters.findIndex(c => c.id == chap_id);
 }

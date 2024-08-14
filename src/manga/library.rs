@@ -10,6 +10,11 @@ lazy_static! {
         path.push("manga_library.json");
         path
     };
+    pub static ref UPDATE_PATH: PathBuf = {
+        let mut path = (*FILE_PATH).clone();
+        path.push("manga_updates.json");
+        path
+    };
     pub static ref MANGA_LIB: Mutex<Vec<LibraryItem>> = match File::open(&*LIB_PATH) {
         Ok(file) => Mutex::new(serde_json::from_reader(file).unwrap_or_default()),
         Err(_e) => {
@@ -100,4 +105,33 @@ pub fn find_manga(id: String) -> Option<LibraryItem> {
     let lib = MANGA_LIB.lock().unwrap();
     let found_item = lib.iter().find(|item| item.id == id);
     found_item.cloned()
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct UpdateItem {
+    pub id: String,
+    pub title: String,
+    pub img: String,
+    pub chapter: ChapterItem,
+}
+
+#[tauri::command]
+pub fn save_manga_updates_list(items: Vec<UpdateItem>) {
+    println!("Saving manga updates list...");
+    let mut file = File::create(&*UPDATE_PATH).unwrap();
+    let json = serde_json::to_string(&items).unwrap();
+    file.write_all(json.as_bytes()).unwrap();
+}
+#[tauri::command]
+pub fn get_manga_updates_list() -> Value {
+    // todo: fix unwraps
+    println!("Getting manga library...");
+    let updates: Vec<UpdateItem> = match File::open(&*UPDATE_PATH) {
+        Ok(file) => serde_json::from_reader(file).unwrap_or_default(),
+        Err(_e) => {
+            File::create(&*LIB_PATH).unwrap();
+            Vec::new()
+        }
+    };
+    serde_json::to_value(updates).unwrap()
 }

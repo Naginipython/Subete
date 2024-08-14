@@ -26,18 +26,20 @@
 
     let manga_library = [];
     let ln_library = [];
-    let type = "manga";
+    let media_screen = "manga";
     let loading = true;
     onMount(async () => {
         // GET LIB
         manga_library = await invoke('get_manga_lib');
         ln_library = await invoke('get_ln_lib');
+        let manga_updates = await invoke('get_manga_updates_list');
         let settings = await invoke('get_settings');
         store.update(json => {
             json.manga_library = manga_library;
             json.ln_library = ln_library;
+            json.manga_updates = manga_updates
             json.settings = settings;
-            json.media_screen = type;
+            json.media_screen = media_screen;
             return json;
         });
         // GET AND SET SETTINGS, if available
@@ -198,13 +200,13 @@
 
     // MEDIA TYPE CHANGE
     function change_media(media) {
-        type = media;
+        media_screen = media;
         store.update(json => {
-            json.media_screen = type;
+            json.media_screen = media_screen;
             return json;
         });
         if (nav.includes('library') || nav == '') {
-            goto(`/${type}_library`);
+            goto(`/${media_screen}_library`);
         }
     }
 
@@ -248,9 +250,9 @@
         <button class="snackbar-item" on:click={() => goto(from)}><Fa icon={faArrowLeft} /></button>
     {:else}
         <!-- TODO: make work -->
-        <button id="manga" class="media {type=="manga"? 'selected':''}" on:click={() => change_media("manga")}>Manga</button>
-        <button id="anime" class="media {type=="anime"? 'selected':''}">Anime</button>
-        <button id="ln" class="media {type=="ln"? 'selected':''}" on:click={() => change_media("ln")}>LN</button>
+        <button id="manga" class="media {media_screen=="manga"? 'selected':''}" on:click={() => change_media("manga")}>Manga</button>
+        <button id="anime" class="media {media_screen=="anime"? 'selected':''}">Anime</button>
+        <button id="ln" class="media {media_screen=="ln"? 'selected':''}" on:click={() => change_media("ln")}>LN</button>
     {/if}
     
     <!-- right side -->
@@ -278,7 +280,7 @@
         {:else if nav.includes('browse')}
             <button class="snackbar-item" on:click={() => goto('/browse/add_sources')}><Fa icon={faBook} /></button>
         {:else if nav.includes('update')}
-            <!-- <button class="snackbar-item" on:click={async () => update_lib()}><Fa icon={faRotateRight} /></button> -->
+            <button class="snackbar-item" on:click={async () => update_lib()}><Fa icon={faRotateRight} /></button>
         {:else}
             <!-- https://fontawesome.com/search -->
             <!-- TODO: make work -->
@@ -297,7 +299,7 @@
     <nav class="nav-bar">
         <!-- TODO: merge with more when possible (for History, stats?, settings) -->
         <a id="/library" class="{path.includes('library')? 'selected' : ''}" 
-            href="/{type}_library">
+            href="/{media_screen}_library">
             Library
         </a>
         <a id="/updates" class="{path=='/updates'? 'selected' : ''}" href="/updates">Updates</a>

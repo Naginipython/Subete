@@ -39,6 +39,8 @@
                 error = updated_manga.error;
             }
             loading = false;
+        } else {
+            manga['chapters'] = manga['chapters'].sort((a,b) => b.number-a.number);
         }
     });
     
