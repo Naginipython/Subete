@@ -10,12 +10,14 @@ https://github.com/Naginipython/Subete/assets/42967504/260dfcf2-4acc-40cb-b75d-c
 
 
 ## Goals
+- [ ] Make look professional
+- [ ] History
 - [x] Error messages for browse
+- [x] Error messages for manga chapters.
+- [ ] Error messages for ln chapters.
 - [ ] Error messages for readers
-- [ ] Error messages for manga/ln.
-- [ ] Updates. Cute progress bar for updates
+- [x] Updates. Cute progress bar for updates
 - [x] General loading icons for pages, browse.
-- [ ] Make manga & ln snackbar a toggle. Also make browse include a manga/ln/anime quickselect, with the ability to shut off certain types.
 - [x] App initialize loading icon
 - [ ] Icons for nav bar
 - [ ] nav bar more items when able
@@ -24,6 +26,12 @@ https://github.com/Naginipython/Subete/assets/42967504/260dfcf2-4acc-40cb-b75d-c
 - [ ] Update result notifications
 - [ ] Fullscreen on Android for Reader (maybe not possible)
 - [ ] Extension General Feed (Front page, if available)
+- [ ] Settings:
+  - [ ] Disable Manga/Ln/Anime
+  - [ ] SPECIAL mode
+  - [ ] Mode: tab above for M/L/A, OR Tabs for each lib
+    - [ ] Browse & Update separation needed
+  - [ ] Tab ordering
 - [ ] Library Features:
   - [ ] Search
   - [ ] Search plugin
@@ -44,7 +52,7 @@ https://github.com/Naginipython/Subete/assets/42967504/260dfcf2-4acc-40cb-b75d-c
   - [ ] Send to Web
   - [ ] Title hold sends to clipboard
   - [ ] Fix Description
-  - [ ] fav button to start/resume
+  - [ ] fav button to start/resume (Topmost non-completed item)
 - [ ] Manga Reader features:
   - [ ] Swipe turn
   - [ ] Bookmark
