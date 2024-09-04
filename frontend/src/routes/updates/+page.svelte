@@ -2,6 +2,7 @@
     import store from "$lib/store.js";
     import { goto } from "$app/navigation";
     import { find_chapter_index_by_id } from "$lib/manga_common.js";
+    import "$lib/css/listItems.css";
 
     let media_screen = "manga";
     let update = [];
@@ -56,15 +57,15 @@
 
 {#each update as u, i}
     <!-- style="{manga['chapters'][i].completed? 'color: grey' : ''}" -->
-    <div class="update-chapter">
-        <button class="update-manga-wrap" on:click={async () => goto(`/manga/${u.id}`)}>
-            <img class="update-img" src={u.img} alt="title">
+    <div class="chapter-item">
+        <button class="chapter-manga" on:click={async () => goto(`/manga/${u.id}`)}>
+            <img class="chapter-manga-img" src={u.img} alt="title">
         </button>
-        <button class="update-link" on:click={async () => {await goToChapter(u)}}>
+        <button class="chapter-link" on:click={async () => {await goToChapter(u)}}>
             <p>
                 {u.title}
             </p>
-            <div class="update-lower">
+            <div class="chapter-link-lower">
                 {#if u.chapter.title == ""} Chapter {u.chapter.number}
                 {:else} Chapter {u.chapter.number} - {u.chapter.title}
                 {/if}
@@ -101,68 +102,4 @@
         margin: 0;
         padding: 0;
     }
-    .update-chapter {
-        width: 100vw;
-        padding: 5px 0;
-        overflow: auto;
-        display: inline-flex;
-        background-color: var(--primary-color);
-        filter: brightness(0.95);
-        align-items: center;
-    }
-    .update-chapter:hover {
-        background-color: var(--selection-color)
-    }
-    .update-manga-wrap {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 50px;
-        height: 50px;
-        border-radius: 5px;
-        overflow: hidden;
-        border: 0;
-        background-color: transparent;
-    }
-    .update-img {
-        /* height: 50px; */
-        /* width: auto; */
-        height: 120%;
-        width: auto;
-    }
-    .update-link p {
-        justify-content: left;
-        width: inherit;
-        padding: 0;
-        margin: 0;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        overflow: hidden;
-    }
-    .update-link {
-        text-align: left;
-        cursor: pointer;
-        display: inline-flex;
-        justify-content: left;
-        flex-direction: column;
-        padding-left: 10px;
-        border: 0;
-        background-color: transparent;
-        color: inherit;
-        width: 100%;
-        height:fit-content;
-        
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        /* width: idk; TODO */
-    }
-    .update-lower {
-        display: inline-flex;
-    }
-    /* .update-lower p {
-        margin: 0; 
-        padding: 0; 
-        font-size: x-small;
-    } */
 </style>

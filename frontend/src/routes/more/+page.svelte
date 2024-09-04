@@ -34,7 +34,7 @@
 <hr>
 
 <div class="box more-options">
-    <button class="more-links" on:click={() => goto('/')}>
+    <button class="more-links" on:click={() => goto('/history')}>
         <div class="link-icon"><Fa icon={faClockRotateLeft} /></div>
         <p>History (WIP)</p>
     </button>

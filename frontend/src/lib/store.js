@@ -14,7 +14,7 @@ const store = writable({
             chapters: [
                 {
                     id: string,
-                    num: int,
+                    number: int,
                     title: string,
                     page: int,
                     completed: boolean
@@ -34,7 +34,7 @@ const store = writable({
             chapters: [
                 {
                     id: string,
-                    num: int,
+                    number: int,
                     title: string,
                     page: int,
                     completed: boolean
@@ -46,22 +46,13 @@ const store = writable({
     ],
     "manga_history": [
         /*{
-            id: int
-            title: string,
-            img: string, //url or link?
-            plugin: string, //file inside lib/manga_sources without "./" and ".js". e.g. "mangadex"
-            authors: string,
-            artists: string
-            description: string,
-            chapters: [
-                {
-                    id: string,
-                    num: int,
-                    title: string,
-                    page: int,
-                    completed: boolean
-                }
-            ]
+            id: String,
+            title: String,
+            img: String,
+            plugin: String,
+            recent_chapter_id: String,
+            recent_chapter_num: int,
+            timestamp: double
         }*/
     ],
     "manga_updates": [
@@ -71,7 +62,7 @@ const store = writable({
             img: string, //url or link?
             chapter: {
                 id: string,
-                num: int,
+                number: int,
                 title: string,
                 page: int,
                 completed: boolean

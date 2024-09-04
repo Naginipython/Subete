@@ -8,6 +8,7 @@
     import store from "$lib/store.js"
     import { find_ln } from "$lib/ln_common.js";
     import { Moon } from 'svelte-loading-spinners';
+    import "$lib/css/listItems.css";
 
     export let data;
 
@@ -105,7 +106,7 @@
 </div>
 
 {#each ln['chapters'] as c, i}
-<div class="chapter" style="{ln['chapters'][i].completed? 'color: grey' : ''}">
+<div class="chapter-item" style="{ln['chapters'][i].completed? 'color: grey' : ''}">
     <!-- Main Chapter button -->
     <button class="chapter-link" on:click={() => goto(`/ln/${data.id}/reader/${i}`)}>
         <p>
@@ -203,52 +204,6 @@
     #desc {
         overflow: scroll;
         overflow-x: hidden;
-    }
-    .chapter {
-        width: 100vw;
-        padding: 5px 0;
-        overflow: auto;
-        display: inline-flex;
-        background-color: var(--primary-color);
-        filter: brightness(0.95)
-    }
-    .chapter:hover {
-        background-color: var(--selection-color)
-    }
-    .chapter-link p {
-        justify-content: left;
-        width: inherit;
-        padding: 0;
-        margin: 0;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        overflow: hidden;
-    }
-    .chapter-link {
-        text-align: left;
-        cursor: pointer;
-        display: inline-flex;
-        justify-content: left;
-        flex-direction: column;
-        padding-left: 10px;
-        border: 0;
-        background-color: transparent;
-        color: inherit;
-        width: 100%;
-        float: left;
-        
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        /* width: idk; TODO */
-    }
-    .chapter-lower {
-        display: inline-flex;
-    }
-    .chapter-lower p {
-        margin: 0; 
-        padding: 0; 
-        font-size: x-small;
     }
     .progress {
         color: grey;
