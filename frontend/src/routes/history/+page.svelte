@@ -16,7 +16,7 @@
         <button class="chapter-link">
             <p>{m.title}</p>
             <div class="chapter-link-lower">
-                temp
+                chp. {m.recent_chapter_num} - 12:00 AM
             </div>
         </button>
     </div>

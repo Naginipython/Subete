@@ -24,19 +24,20 @@
     } from "$lib/ln_common.js";
     import logo from "$lib/logo.png"
 
-    let manga_library = [];
-    let ln_library = [];
+    // Gets data from backend, sets settings
     let media_screen = "manga";
     let loading = true;
     onMount(async () => {
         // GET LIB
-        manga_library = await invoke('get_manga_lib');
-        ln_library = await invoke('get_ln_lib');
+        let manga_library = await invoke('get_manga_lib');
+        let ln_library = await invoke('get_ln_lib');
+        let manga_history = await invoke('get_manga_history');
         let manga_updates = await invoke('get_manga_updates_list');
         let settings = await invoke('get_settings');
         store.update(json => {
             json.manga_library = manga_library;
             json.ln_library = ln_library;
+            json.manga_history = manga_history;
             json.manga_updates = manga_updates
             json.settings = settings;
             json.media_screen = media_screen;
@@ -72,7 +73,7 @@
     });
 
     let nav = '';
-    let selected_valid_links = ["library", "updates", "browse", "more"];
+    let selected_valid_links = ["library", "/updates", "/browse", "/more"];
     $: path = $page.url.pathname;
     let scroll_memory = {};
     let back = "/";
@@ -101,7 +102,7 @@
         snack_nav_on();
 
         // Hides nav bar when not selected
-        if (!selected_valid_links.some(link => nav.includes(link))) {
+        if (!selected_valid_links.some(link => nav == link) && !nav.includes("library")) {
             only_snackbar_on();
         }
 
@@ -211,18 +212,22 @@
     }
 
     // BODY, NAV, and SNACKBAR SIZES
+    let is_nav_off = false;
     function snack_nav_off() {
+        is_nav_off = true;
         document.getElementById("snackbar").style.display = "none";
         document.getElementById("body").style.height = "100vh";
         document.getElementById("nav-centered").style.display = "none";
     }
     function snack_nav_on() {
+        is_nav_off = false;
         document.documentElement.style.setProperty('--nav-bar-height', '55px');
         document.getElementById("body").style.height = null;
         document.getElementById("snackbar").style.display = "block";
         document.getElementById("nav-centered").style.display = "block";
     }
     function only_snackbar_on() {
+        is_nav_off = true;
         document.documentElement.style.setProperty('--nav-bar-height', '0px');
         document.getElementById("nav-centered").style.display = "none";
         document.getElementById("body").style.height = "calc(100vh - var(--snackbar-height));";
@@ -246,7 +251,7 @@
     <!-- left side -->
     {#if in_manga || in_ln}
         <button class="snackbar-item" on:click={async () => goto(back)}><Fa icon={faArrowLeft} /></button>
-    {:else if nav.includes('add_sources') || nav.includes('settings')}
+    {:else if is_nav_off}
         <button class="snackbar-item" on:click={() => goto(from)}><Fa icon={faArrowLeft} /></button>
     {:else}
         <!-- TODO: make work -->

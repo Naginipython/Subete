@@ -64,23 +64,24 @@
     
     // Updates library backend
     async function update_lib() {
-        if (curr_page >= imgs.length-1) chapter.completed = true;
+        if (curr_page >= imgs.length-1 && imgs.length > 0) chapter.completed = true;
         await invoke('update_manga_lib', { item: manga });
-        // TODO: add to history
-        console.log(chapter);
+        let new_hist = {
+            id: manga.id,
+            title: manga.title,
+            img: manga.img,
+            plugin: manga.plugin,
+            recent_chapter_id: chapter.id,
+            recent_chapter_num: chapter.number,
+            timestamp: Date.now()
+        }
+        await invoke('save_manga_history', {item: new_hist});
         store.update(json => {
-            json.manga_history.unshift({
-                id: manga.id,
-                title: manga.title,
-                img: manga.img,
-                plugin: manga.plugin,
-                recent_chapter_id: chapter.id,
-                recent_chapter_num: chapter.number,
-                timestamp: Date.now()
-            });
-            console.log(json.manga_history);
+            json.manga_history = json.manga_history.filter(i => !(i.id == new_hist.id && i.plugin == new_hist.plugin));
+            json.manga_history.unshift(new_hist);
             return json;
         });
+        // TODO: back button sends to update or manga entry
         goto(`/manga/${data.id}`)
     }
 
@@ -209,7 +210,7 @@
     
     <!-- TODO: better prev chap -->
     <p id="prev-chapter" class={curr_page == -1 && !is_loading? 'visible' : 'invisible'}>previous chapter?</p>
-    <div style="width:fit-content; display: {is_loading? 'block' : 'none'}">
+    <div style="pointer-events: none; width:fit-content; display: {is_loading? 'block' : 'none'}">
         <Moon color="var(--selection-color)" size="30" />
     </div>
     {#each chapters as c, i}

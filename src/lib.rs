@@ -1,5 +1,6 @@
-use std::path::PathBuf;
+use std::{fs::File, io::Write, path::PathBuf};
 use lazy_static::lazy_static;
+use serde::Serialize;
 use settings::*;
 use tauri_plugin_http::reqwest;
 use quickjs_rs::JsValue;
@@ -39,10 +40,13 @@ pub fn run() {
         fetch, post_fetch,
         // manga/library.rs
         manga::get_manga_lib, manga::add_to_manga_lib, manga::remove_from_manga_lib, manga::update_manga_lib, manga::delete_manga_lib,
-        manga::save_manga_updates_list, manga::get_manga_updates_list,
         // manga/plugins.rs
         manga::manga_search, manga::get_manga_chapters, manga::get_manga_plugin_names, manga::get_manga_pages, manga::add_manga_plugin, 
         manga::delete_manga_plugins, manga::delete_manga_plugin,
+        // manga/update.rs
+        manga::save_manga_updates_list, manga::get_manga_updates_list,
+        // manga/history.rs
+        manga::save_manga_history, manga::get_manga_history,
         // ln/library.rs
         ln::get_ln_lib, ln::add_to_ln_lib, ln::remove_from_ln_lib, ln::update_ln_lib, ln::delete_ln_lib,
         // ln/plugins.rs
@@ -53,6 +57,12 @@ pub fn run() {
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
+}
+
+fn save<U: Serialize>(path: &PathBuf, data: &Vec<U>) {
+  let mut file = File::create(path).unwrap();
+  let json = serde_json::to_string(data).unwrap();
+  file.write_all(json.as_bytes()).unwrap();
 }
 
 #[tauri::command]
