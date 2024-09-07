@@ -19,6 +19,7 @@ pub struct UpdateItem {
     pub id: String,
     pub title: String,
     pub img: String,
+    pub plugin: String,
     pub chapter: ChapterItem,
 }
 

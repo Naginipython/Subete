@@ -2,6 +2,7 @@
     import { invoke } from "@tauri-apps/api/core";
     import { onMount } from "svelte";
     import { goto } from "$app/navigation";
+    import { navigating } from '$app/stores';
     import { faEllipsisVertical, faBookmark, faAnglesDown, faCircleCheck, faSquareCheck, faCheck, faArrowTurnDown, faXmark } from '@fortawesome/free-solid-svg-icons'
     import { faCircleDown, faBookmark as faOutlineBookmark, faSquare } from '@fortawesome/free-regular-svg-icons';
     import Fa from 'svelte-fa'
@@ -17,8 +18,8 @@
     let error = "";
 
     onMount(async () => {
+        loading = true;
         if (manga['chapters'].length == 0) {
-            loading = true;
             let updated_manga = await invoke('get_manga_chapters', { manga });
             // let html = await invoke('fetch', {url: c.url});
             // manga['chapters'] = eval(c.getChapters + `getChapters(${manga}, ${JSON.stringify(html)})`);
@@ -31,15 +32,15 @@
             } else {
                 error = updated_manga.error;
             }
-            loading = false;
         } else {
             manga['chapters'] = manga['chapters'].sort((a,b) => b.number-a.number);
         }
+        loading = false;
     });
     
     store.subscribe(async (json) => {
         // gets manga search details
-        manga = find_manga(data.id);
+        manga = find_manga(data.plugin, data.id);
     });
 
     // CHAPTER OPTION BUTTONS
@@ -106,7 +107,7 @@
 {#each manga['chapters'] as c, i}
 <div class="chapter-item" style="{manga['chapters'][i].completed? 'color: grey' : ''}">
     <!-- Main Chapter button -->
-    <button class="chapter-link" on:click={() => goto(`/manga/${data.id}/reader/${i}`)}>
+    <button class="chapter-link" on:click={() => goto(`/manga/${data.plugin}/${data.id}/reader/${i}`)}>
         <p>
             {#if c.title == "" || c.title.toLowerCase() == "chapter "+c.number} Chapter {c.number}
             {:else} Chapter {c.number} - {c.title}

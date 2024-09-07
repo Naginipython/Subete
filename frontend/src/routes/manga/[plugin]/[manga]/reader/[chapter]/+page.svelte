@@ -9,7 +9,7 @@
     import store from "$lib/store.js";
     export let data;
 
-    let manga = find_manga(data.id);
+    let manga = find_manga(data.plugin, data.id);
     let chapter = manga['chapters'][data.manga_index];
     let curr_page = 0;
     let display_page = 0;
@@ -82,7 +82,7 @@
             return json;
         });
         // TODO: back button sends to update or manga entry
-        goto(`/manga/${data.id}`)
+        goto(`/manga/${data.plugin}/${data.id}`)
     }
 
     // ----- INPUT -----
@@ -118,7 +118,7 @@
             } else {
                 let next = parseInt(data.manga_index)-1;
                 if (next >= 0) {
-                    goto(`/manga/${data.id}/reader/${next}`).then(() => {
+                    goto(`/manga/${data.plugin}/${data.id}/reader/${next}`).then(() => {
                         chapter.completed = true;
                         // todo: update history?
                         invoke('update_manga_lib', { item: manga }).then(() => {
@@ -141,7 +141,7 @@
             } else {
                 let prev = parseInt(data.manga_index)+1;
                 if (prev < manga['chapters'].length) {
-                    goto(`/manga/${data.id}/reader/${prev}`).then(() => {
+                    goto(`/manga/${data.plugin}/${data.id}/reader/${prev}`).then(() => {
                         // todo: update history?
                         invoke('update_manga_lib', { item: manga }).then(() => {
                             start_reader(Infinity);

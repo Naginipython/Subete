@@ -6,20 +6,46 @@ store.subscribe(_json => {
     json = _json;
 })
 
-export function find_manga(id) {
-    let manga;
-    let manga_test = json.manga_library.find(m => m.id == id);
-    if (manga_test == undefined) {
-        let search_test = json.manga_search_results.find(m => m.id == id);
-        if (search_test == undefined) {
-            manga = json.manga_history.find(m => m.id == id);
-        } else {
-            manga = search_test;
+export function find_manga(plugin, id) {
+    let manga = {};
+    manga = json.manga_temp.find(m => m.id==id && (m.plugin==plugin || plugin==null));
+    if (manga == undefined) {
+        manga = json.manga_library.find(m => m.id == id && (m.plugin==plugin || plugin==null));
+        if (manga==undefined) {
+            manga = json.manga_search_results.find(m => m.id == id && (m.plugin==plugin || plugin==null));
+            if (manga==undefined) {
+                // hist to manga
+                let hist = json.manga_history.find(m => m.id==id && (m.plugin==plugin || plugin==null));
+                manga = {
+                    id: hist.id,
+                    title: hist.title,
+                    img: hist.img,
+                    plugin: hist.plugin,
+                    authors: "",
+                    artists: "",
+                    description: "",
+                    chapters: []
+                };
+            }
         }
-    } else {
-        manga = manga_test;
+        // add to temp for quicker access
+        if (!json.manga_temp.some(m => m.id==id && m.plugin==plugin)) {
+            json.manga_temp.unshift(manga);
+        }
     }
-    return manga;
+
+    // let manga_test = json.manga_library.find(m => m.id == id);
+    // if (manga_test == undefined) {
+    //     let search_test = json.manga_search_results.find(m => m.id == id);
+    //     if (search_test == undefined) {
+    //         manga = json.manga_history.find(m => m.id == id);
+    //     } else {
+    //         manga = search_test;
+    //     }
+    // } else {
+    //     manga = manga_test;
+    // }
+    return manga==undefined? {} : manga;
 }
 export function in_lib(id) {
     return json.manga_library.some(m => m.id == id);
@@ -35,7 +61,7 @@ export async function toggle_favorite(manga) {
     } else {
         await invoke('remove_from_manga_lib', { id: manga.id });
         store.update(_json => {
-            _json.manga_library = _json.manga_library.filter(m => m.id != manga.id);
+            _json.manga_library = _json.manga_library.filter(m => !(m.id==manga.id && m.plugin==manga.plugin));
             return _json;
         });
     }
@@ -73,6 +99,7 @@ export async function update_lib() {
                 id: json.manga_library[i].id,
                 title: json.manga_library[i].title,
                 img: json.manga_library[i].img,
+                plugin: json.manga_library[i].plugin,
                 chapter: new_chapters[j],
                 received: Date.now()
             }
@@ -90,6 +117,6 @@ export async function update_lib() {
 }
 
 export function find_chapter_index_by_id(id, chap_id) {
-    let manga = find_manga(id);
+    let manga = find_manga(null, id);
     return manga.chapters.findIndex(c => c.id == chap_id);
 }

@@ -143,7 +143,7 @@
             if (from.includes('library') || from=='/updates' || from=='/browse') {
                 back = from;
             }
-            manga_data.data = find_manga($navigating.to.params.manga);
+            manga_data.data = find_manga($navigating.to.params.plugin, $navigating.to.params.manga);
             manga_data.favorited = in_manga_lib(manga_data.data.id)
         } else {
             in_manga = false;

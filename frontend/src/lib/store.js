@@ -44,6 +44,9 @@ const store = writable({
             // language?
         }*/
     ],
+    "manga_temp": [
+        //TODO: Will hold every manga_lib entry pressed, from lib and search. To be wiped upon app close. Solves fav issue, and cleans up manga_common
+    ],
     "manga_history": [
         /*{
             id: String,
@@ -59,7 +62,8 @@ const store = writable({
         /*{
             id: string,
             title: String,
-            img: string, //url or link?
+            img: String, //url or link?
+            plugin: String,
             chapter: {
                 id: string,
                 number: int,
@@ -67,7 +71,7 @@ const store = writable({
                 page: int,
                 completed: boolean
             }
-            receieved: int // Date.now()
+            timestamp: double // Date.now()
         }*/
     ],
     "manga_update_progress": null, // {curr: String, index: number, total: number}

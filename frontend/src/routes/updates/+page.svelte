@@ -41,7 +41,7 @@
 
     async function goToChapter(u) {
         let index = find_chapter_index_by_id(u.id, u.chapter.id);
-        goto(`/manga/${u.id}/reader/${index}`);
+        goto(`/manga/${u.plugin}/${u.id}/reader/${index}`);
     }
 </script>
 <div id="update-header">
@@ -58,7 +58,7 @@
 {#each update as u, i}
     <!-- style="{manga['chapters'][i].completed? 'color: grey' : ''}" -->
     <div class="chapter-item">
-        <button class="chapter-manga" on:click={async () => goto(`/manga/${u.id}`)}>
+        <button class="chapter-manga" on:click={async () => goto(`/manga/${u.plugin}/${u.id}`)}>
             <img class="chapter-manga-img" src={u.img} alt="title">
         </button>
         <button class="chapter-link" on:click={async () => {await goToChapter(u)}}>
