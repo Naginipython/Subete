@@ -21,7 +21,6 @@
         let itemCount = Math.floor(window.innerWidth / imgWidth);
         var newWidth = itemCount * imgWidth;
         document.documentElement.style.setProperty('--calculated-width', `${newWidth}px`);
-        console.log(document.documentElement.style);
     }
 </script>
 
