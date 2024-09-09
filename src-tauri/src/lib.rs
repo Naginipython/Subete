@@ -108,6 +108,7 @@ pub enum Media {
 }
   
 pub fn js_value_to_serde_json(value: JsValue) -> Value {
+    println!("{:?}", value);
     match value {
         JsValue::Null => Value::Null,
         JsValue::Bool(b) => Value::Bool(b),
@@ -124,6 +125,7 @@ pub fn js_value_to_serde_json(value: JsValue) -> Value {
                 .collect();
               Value::Object(json_map)
         },
+        JsValue::Undefined => Value::Null,
         _ => unimplemented!("Unsupported JsValue type for conversion"),
     }
 }
