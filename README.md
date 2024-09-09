@@ -32,6 +32,7 @@ https://github.com/Naginipython/Subete/assets/42967504/260dfcf2-4acc-40cb-b75d-c
   - [ ] Mode: tab above for M/L/A, OR Tabs for each lib
     - [ ] Browse & Update separation needed
   - [ ] Tab ordering
+  - [ ] Repo link for extentions (like Tachiyomi)
 - [ ] Library Features:
   - [ ] Search
   - [ ] Search plugin
