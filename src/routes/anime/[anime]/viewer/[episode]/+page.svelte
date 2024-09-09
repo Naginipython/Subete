@@ -1,19 +1,19 @@
 <script>
-    export let data;
-    let videoUrl = "https://s3taku.com/abpl1245?id=NDUzODQ=&title=Akame+ga+Kill%21+Episode+6";
-    let video2 = "https://sveltejs.github.io/assets/caminandes-llamigos.mp4";
+  export let data;
+  let videoUrl = "https://s3taku.com/abpl1245?id=NDUzODQ=&title=Akame+ga+Kill%21+Episode+6";
+  let video2 = "https://sveltejs.github.io/assets/caminandes-llamigos.mp4";
 
-    let videoElement;
-    let time = 0;
+  let videoElement;
+  let time = 0;
 	let duration;
 	let paused = true;
 
-    const playVideo = () => videoElement.play();
-    const pauseVideo = () => videoElement.pause();
-    const muteVideo = () => videoElement.muted = !videoElement.muted;
-    function handleMousedown(e) {
-		if (paused) e.target.play();
-		else e.target.pause();
+  const playVideo = () => videoElement.play();
+  const pauseVideo = () => videoElement.pause();
+  const muteVideo = () => videoElement.muted = !videoElement.muted;
+  function handleMousedown(e) {
+	  if (paused) e.target.play();
+	  else e.target.pause();
 	}
 </script>
 

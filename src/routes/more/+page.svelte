@@ -26,7 +26,7 @@
             <label class="switch">
                 <input type="checkbox" bind:checked={special}>
                 <span class="slider"></span>
-            </label>~
+            </label>
         </div>
     </div>
 </div>
@@ -36,7 +36,7 @@
 <div class="box more-options">
     <button class="more-links" on:click={() => goto('/history')}>
         <div class="link-icon"><Fa icon={faClockRotateLeft} /></div>
-        <p>History (WIP)</p>
+        <p>History</p>
     </button>
 </div>
 <div class="box more-options">
