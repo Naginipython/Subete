@@ -5,6 +5,7 @@ plugins/old
 android.sh
 # Script for easily remembering 'NO_STRIP=true cargo tauri build'
 build.sh
+android.sh
 # Feels uneeded
 # /frontend/build/
 # /frontend/build/*
