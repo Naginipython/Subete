@@ -21,6 +21,7 @@
         let itemCount = Math.floor(window.innerWidth / imgWidth);
         var newWidth = itemCount * imgWidth;
         document.documentElement.style.setProperty('--calculated-width', `${newWidth}px`);
+        console.log(document.documentElement.style);
     }
 </script>
 
@@ -38,6 +39,9 @@
 </div>
 
 <style>
+    :root {
+        --calculated-width: 100px;
+    }
     #lib-manga-section {
         display: flex;
         flex-wrap: wrap;

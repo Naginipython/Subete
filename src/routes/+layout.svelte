@@ -237,7 +237,6 @@
     // Keeps the bottom nav at the bottom of the screen (keyboards move it)
 	$: outerHeight = 0
     $: if (outerHeight) {
-        console.log(outerHeight);
         document.documentElement.style.setProperty('--body-height', `calc(${outerHeight}px - var(--snackbar-height) - var(--nav-bar-height))`);
     }
 </script>

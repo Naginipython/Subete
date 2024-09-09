@@ -159,6 +159,7 @@
         --manga-img-width: 25vw;
     }
     #header {
+        --manga-img-width: 25vw;
         overflow: hidden;
         border-bottom: 1px solid black;
         display: inline-flex;
