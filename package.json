@@ -18,8 +18,10 @@
     "@tauri-apps/api": ">=2.0.0-rc.0",
     "@tauri-apps/plugin-http": "^2.0.0-rc",
     "@tauri-apps/plugin-shell": ">=2.0.0-rc.0",
+    "svelte-agnostic-draggable": "^0.2.0",
     "svelte-fa": "^4.0.2",
-    "svelte-loading-spinners": "^0.3.6"
+    "svelte-loading-spinners": "^0.3.6",
+    "svelte-touch-to-mouse": "^1.0.0"
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "^3.0.1",

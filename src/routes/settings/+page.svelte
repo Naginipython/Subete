@@ -3,6 +3,7 @@
     import store from "$lib/store.js";
     import Theme from "./theme.svelte";
     import Library from "./library.svelte";
+    import Nav from "./nav.svelte";
     async function delete_manga_lib() {
         invoke('delete_manga_lib');
         store.update(json => {json.manga_library = []; return json;});
@@ -27,6 +28,9 @@
 
 <h4 class="set-header">Library</h4>
 <Library />
+
+<h4 class="set-header">Nav Bar</h4>
+<Nav />
 
 <hr>
 
