@@ -78,9 +78,9 @@ https://github.com/Naginipython/Subete/assets/42967504/260dfcf2-4acc-40cb-b75d-c
 ## Installation
 
 To-Build Pt.1:\
-Install node & rust (rustup) (Note: on Manjaro Linux, I also needed webkit2gtk)\
-In a command line, install tauri-cli: `cargo install tauri-cli@^2.0.0-beta` (note: may need quotation)\
-Move to the `/frontend` folder, and run `npm i` or `npm install`\
+Install all needed by [Tauri](https://beta.tauri.app/start/prerequisites/)\
+In a command line, install tauri-cli: `cargo install tauri-cli@^2.0.0-rc` (note: may need quotation)\
+In the root folder, run `npm i` or `npm install`
 
 To-Build Pt.2: Linux\
 In the root folder, run: `cargo tauri dev` for testing, `cargo tauri build` to build release (will be in `target/release/bundle/`).\
