@@ -18,7 +18,7 @@ lazy_static! {
         // if os == "windows" {
         //   data_folder.join("\\subete");
         if os == "android" {
-            data_folder = PathBuf::from("/data/data/com.subete.dev/files/");
+            data_folder = PathBuf::from("/data/data/com.subete.app/files/");
         } else {
             data_folder.push("subete");
         }
