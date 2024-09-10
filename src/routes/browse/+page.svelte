@@ -66,6 +66,7 @@
         let result = [];
         switch (media_screen) {
             case "manga":
+                // TODO: call this multiple times, instead of looping in. This way, can get some results earlier
                 let r = await invoke('manga_search', { query: `${name}`, sources: s });
                 if (!r.hasOwnProperty("error")) {
                     result = r;
