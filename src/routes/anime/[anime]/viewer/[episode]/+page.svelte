@@ -1,71 +1,28 @@
 <script>
-  export let data;
-  let videoUrl = "https://s3taku.com/abpl1245?id=NDUzODQ=&title=Akame+ga+Kill%21+Episode+6";
-  let video2 = "https://sveltejs.github.io/assets/caminandes-llamigos.mp4";
+  import { onMount } from 'svelte';
+  import Hls from 'hls.js';
 
   let videoElement;
-  let time = 0;
-	let duration;
-	let paused = true;
+  export let data;
 
-  const playVideo = () => videoElement.play();
-  const pauseVideo = () => videoElement.pause();
-  const muteVideo = () => videoElement.muted = !videoElement.muted;
-  function handleMousedown(e) {
-	  if (paused) e.target.play();
-	  else e.target.pause();
-	}
+  // URL to the .m3u8 file
+  let streamUrl = 'https://www048.anzeat.pro/streamhls/c2039a66c65a3592163a68424f5cf8ea/ep.6.1709540076.m3u8';
+
+  onMount(() => {
+    if (Hls.isSupported()) {
+      const hls = new Hls();
+      hls.loadSource(streamUrl);
+      hls.attachMedia(videoElement);
+      // hls.on(Hls.Events.MANIFEST_PARSED, () => {
+      //   videoElement.play();
+      // });
+    } else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
+      // Native support (e.g., in Safari)
+      videoElement.src = streamUrl;
+      videoElement.play();
+    }
+  });
 </script>
 
-{data.id}
-{data.anime_index}
-
-<div class="video-container">
-    <!-- <video
-        src={video2}
-		on:mousedown={handleMousedown}
-		bind:currentTime={time}
-		bind:duration
-		bind:paused
-    >
-        <track kind="captions" />
-    </video> -->
-    <!-- <div class="controls"> -->
-      <!-- <button on:click={playVideo}>Play</button> -->
-      <!-- <button on:click={pauseVideo}>Pause</button> -->
-      <!-- <button on:click={muteVideo}>Mute/Unmute</button> -->
-    <!-- </div> -->
-     <iframe src={videoUrl} />
-</div>
-
-<style>
-  .video-container {
-    position: relative;
-    max-width: 100%;
-    margin: auto;
-    background-color: #000;
-  }
-  iframe, video {
-    width: 100%;
-    height: auto;
-  }
-  /* .controls { */
-    /* position: absolute; */
-    /* bottom: 10px; */
-    /* left: 50%; */
-    /* transform: translateX(-50%); */
-    /* display: flex; */
-    /* justify-content: center; */
-    /* gap: 10px; */
-    /* background: rgba(0, 0, 0, 0.5); */
-    /* padding: 5px; */
-    /* border-radius: 5px; */
-  /* } */
-  /* button { */
-    /* background: #fff; */
-    /* border: none; */
-    /* padding: 5px 10px; */
-    /* cursor: pointer; */
-    /* border-radius: 5px; */
-  /* } */
-</style>
+<!-- svelte-ignore a11y-media-has-caption -->
+<video bind:this={videoElement} controls width="600" />
