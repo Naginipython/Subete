@@ -1,6 +1,7 @@
 export const prerender = false;
 export function load({ params }) {
     return {
-        id: params.anime
+        id: params.anime,
+        plugin: params.plugin
     }
 }

@@ -76,8 +76,47 @@ const store = writable({
     ],
     "manga_update_progress": null, // {curr: String, index: number, total: number}
     
-    "anime_search_results": [],
-    "anime_library": [],
+    "anime_search_results": [
+        /*{
+            id: int
+            title: string,
+            img: string, //url or link?
+            plugin: string, //file inside lib/manga_sources without "./" and ".js". e.g. "mangadex"
+            studio: string,
+            status: string
+            description: string,
+            episodes: [
+                {
+                    id: string,
+                    number: int,
+                    title: string,
+                    watch_time: long,
+                    completed: boolean
+                }
+            ]
+        }*/
+    ],
+    "anime_library": [
+        /*{
+            id: string
+            title: string,
+            img: string,
+            plugin: string,
+            studio: string,
+            status: string
+            description: string,
+            episodes: [
+                {
+                    id: string,
+                    number: int,
+                    title: string,
+                    watch_time: long,
+                    completed: boolean
+                }
+            ]
+        }*/
+    ],
+    "anime_temp": [],
     "anime_history": [],
     "anime_updates": [],
 
