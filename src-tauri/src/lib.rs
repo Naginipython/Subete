@@ -1,32 +1,31 @@
-use std::{fs::File, io::Write, path::PathBuf};
-use lazy_static::lazy_static;
-use serde::Serialize;
+use std::{path::PathBuf, sync::LazyLock};
 use settings::*;
 use tauri_plugin_http::reqwest;
 use quickjs_rs::JsValue;
 use serde_json::{Value, Map as JsonMap, Number as JsonNumber};
 
+pub use common::*;
+
 mod anime;
 mod manga;
 mod ln;
+mod common;
 mod settings;
 
-lazy_static! {
-    pub static ref FILE_PATH: PathBuf = {
-        let mut data_folder: PathBuf = dirs::data_local_dir().unwrap_or_else(|| PathBuf::from("./"));
-        // let mut str = data_folder.to_str().unwrap_or_default().to_string();
-        let os = std::env::consts::OS;
-        // if os == "windows" {
-        //   data_folder.join("\\subete");
-        if os == "android" {
-            data_folder = PathBuf::from("/data/data/com.subete.app/files/");
-        } else {
-            data_folder.push("subete");
-        }
-        std::fs::create_dir_all(&data_folder).unwrap_or_default();
-        data_folder
-    };
-}
+static FILE_PATH: LazyLock<PathBuf> = LazyLock::new(|| {
+    let mut data_folder: PathBuf = dirs::data_local_dir().unwrap_or_else(|| PathBuf::from("./"));
+    // let mut str = data_folder.to_str().unwrap_or_default().to_string();
+    let os = std::env::consts::OS;
+    // if os == "windows" {
+    //   data_folder.join("\\subete");
+    if os == "android" {
+        data_folder = PathBuf::from("/data/data/com.subete.app/files/");
+    } else {
+        data_folder.push("subete");
+    }
+    std::fs::create_dir_all(&data_folder).unwrap_or_default();
+    data_folder
+});
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -49,6 +48,8 @@ pub fn run() {
             manga::save_manga_updates_list, manga::get_manga_updates_list,
             // manga/history.rs
             manga::save_manga_history, manga::get_manga_history,
+            // anime/library.rs
+            anime::get_anime_lib, anime::add_to_anime_lib, anime::remove_from_anime_lib, anime::update_anime_lib, anime::delete_anime_lib,
             // anime/plugins.rs
             anime::anime_search, anime::add_anime_plugin, anime::get_anime_plugin_names,
             // ln/library.rs
@@ -61,12 +62,6 @@ pub fn run() {
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
-}
-
-fn save<U: Serialize>(path: &PathBuf, data: &Vec<U>) {
-    let mut file = File::create(path).unwrap();
-    let json = serde_json::to_string(data).unwrap();
-    file.write_all(json.as_bytes()).unwrap();
 }
   
 #[tauri::command]

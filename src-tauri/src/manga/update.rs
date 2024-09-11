@@ -1,18 +1,14 @@
 use crate::{save, FILE_PATH};
-use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use std::{fs::File, path::PathBuf};
-
+use std::{fs::File, path::PathBuf, sync::LazyLock};
 use super::ChapterItem;
 
-lazy_static! {
-    pub static ref UPDATE_PATH: PathBuf = {
-        let mut path = (*FILE_PATH).clone();
-        path.push("manga_updates.json");
-        path
-    };
-}
+static UPDATE_PATH: LazyLock<PathBuf> = LazyLock::new(|| {
+    let mut path = (*FILE_PATH).clone();
+    path.push("manga_updates.json");
+    path
+});
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct UpdateItem {

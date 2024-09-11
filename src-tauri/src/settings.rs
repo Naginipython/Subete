@@ -1,25 +1,22 @@
 use super::FILE_PATH;
-use lazy_static::lazy_static;
 use serde_json::{json, Value};
-use std::{fs::File, io::Write, path::PathBuf, sync::Mutex};
+use std::{fs::File, io::Write, path::PathBuf, sync::{LazyLock, Mutex}};
 
-lazy_static! {
-    pub static ref SETTINGS_PATH: PathBuf = {
-        let mut path = (*FILE_PATH).clone();
-        path.push("settings.json");
-        path
-    };
-    pub static ref SETTINGS: Mutex<Value> = match File::open(&*SETTINGS_PATH) {
-        Ok(file) => Mutex::new(serde_json::from_reader(file).unwrap_or_default()),
-        Err(_e) => {
-            save(&json!({}));
-            Mutex::new(json!({}))
-        }
-    };
-}
+static PATH: LazyLock<PathBuf> = LazyLock::new(|| {
+    let mut path = (*FILE_PATH).clone();
+    path.push("settings.json");
+    path
+});
+static SETTINGS: LazyLock<Mutex<Value>> = LazyLock::new(|| match File::open(&*PATH) {
+    Ok(file) => Mutex::new(serde_json::from_reader(file).unwrap_or_default()),
+    Err(_e) => {
+        File::create(&*PATH).unwrap();
+        Mutex::new(json!({}))
+    }
+});
 
 fn save(settings: &Value) {
-    let mut file = File::create(&*SETTINGS_PATH).unwrap();
+    let mut file = File::create(&*PATH).unwrap();
     let json = serde_json::to_string(settings).unwrap();
     file.write_all(json.as_bytes()).unwrap();
 }
@@ -56,5 +53,5 @@ pub fn delete_settings() {
     println!("Deleting settings...");
     let mut settings = SETTINGS.lock().unwrap();
     *settings = json!({});
-    std::fs::remove_file(&*SETTINGS_PATH).unwrap();
+    std::fs::remove_file(&*PATH).unwrap();
 }

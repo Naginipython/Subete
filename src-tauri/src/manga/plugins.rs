@@ -2,25 +2,22 @@ use crate::{fetch, js_value_to_serde_json, append_values, post_fetch, Media, FIL
 use quickjs_rs::JsValue;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
-use std::{collections::HashMap, fs::File, io::Write, path::PathBuf, sync::Mutex};
-use lazy_static::lazy_static;
+use std::{collections::HashMap, fs::File, io::Write, path::PathBuf, sync::{LazyLock, Mutex}};
 
 use super::LibraryItem;
 
-lazy_static! {
-    pub static ref PLUGINS_PATH: PathBuf = {
-        let mut path = (*FILE_PATH).clone();
-        path.push("manga_plugins.json");
-        path
-    };
-    static ref PLUGINS: Mutex<Vec<Plugins>> = match File::open(&*PLUGINS_PATH) {
-        Ok(file) => Mutex::new(serde_json::from_reader(file).unwrap_or_default()),
-        Err(_e) => {
-            let plugins = init_plugins();
-            Mutex::new(plugins)
-        }
-    };
-}
+static PLUGINS_PATH: LazyLock<PathBuf> = LazyLock::new(|| {
+    let mut path = (*FILE_PATH).clone();
+    path.push("manga_plugins.json");
+    path
+});
+static PLUGINS: LazyLock<Mutex<Vec<Plugins>>> = LazyLock::new(|| match File::open(&*PLUGINS_PATH) {
+    Ok(file) => Mutex::new(serde_json::from_reader(file).unwrap_or_default()),
+    Err(_e) => {
+        File::create(&*PLUGINS_PATH).unwrap();
+        Mutex::new(Vec::new())
+    }
+});
 
 fn save(lib: &Vec<Plugins>) {
     let mut file = File::create(&*PLUGINS_PATH).unwrap();

@@ -3261,7 +3261,6 @@ name = "subete"
 version = "0.1.0"
 dependencies = [
  "dirs",
- "lazy_static",
  "quickjs-rs",
  "regex",
  "serde",

@@ -1,23 +1,20 @@
-use crate::{save, FILE_PATH};
-use lazy_static::lazy_static;
+use crate::{add_to_lib, delete_entire_lib, get_lib, remove_from_lib, update_lib, HasId, FILE_PATH};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use std::{fs::File, path::PathBuf, sync::Mutex};
+use std::{fs::File, path::PathBuf, sync::{LazyLock, Mutex}};
 
-lazy_static! {
-    pub static ref LIB_PATH: PathBuf = {
-        let mut path = (*FILE_PATH).clone();
-        path.push("manga_library.json");
-        path
-    };
-    pub static ref MANGA_LIB: Mutex<Vec<LibraryItem>> = match File::open(&*LIB_PATH) {
-        Ok(file) => Mutex::new(serde_json::from_reader(file).unwrap_or_default()),
-        Err(_e) => {
-            File::create(&*LIB_PATH).unwrap();
-            Mutex::new(Vec::new())
-        }
-    };
-}
+static LIB_PATH: LazyLock<PathBuf> = LazyLock::new(|| {
+    let mut path = (*FILE_PATH).clone();
+    path.push("manga_library.json");
+    path
+});
+static LIB: LazyLock<Mutex<Vec<LibraryItem>>> = LazyLock::new(|| match File::open(&*LIB_PATH) {
+    Ok(file) => Mutex::new(serde_json::from_reader(file).unwrap_or_default()),
+    Err(_e) => {
+        File::create(&*LIB_PATH).unwrap();
+        Mutex::new(Vec::new())
+    }
+});
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct LibraryItem {
@@ -38,69 +35,45 @@ pub struct ChapterItem {
     pub page: u32,
     pub completed: bool,
 }
-
-// fn save(lib: &Vec<LibraryItem>) {
-//     let mut file = File::create(&*LIB_PATH).unwrap();
-//     let json = serde_json::to_string(lib).unwrap();
-//     file.write_all(json.as_bytes()).unwrap();
-// }
+impl PartialEq for LibraryItem {
+    fn eq(&self, other: &Self) -> bool {
+        self.id == other.id && self.plugin == other.plugin
+    }
+}
+impl HasId for LibraryItem {
+    fn id(&self) -> &str {
+        &self.id
+    }
+}
 
 #[tauri::command]
 pub fn get_manga_lib() -> Value {
-    // todo: fix unwraps
-    println!("Getting manga library...");
-    let lib = MANGA_LIB.lock().unwrap();
-    serde_json::to_value(&*lib).unwrap()
+    get_lib("manga", &LIB)
 }
 
 #[tauri::command]
 pub fn add_to_manga_lib(new_item: LibraryItem) {
-    // todo: fix unwraps
-    println!("Adding to manga library...");
-    let mut lib = MANGA_LIB.lock().unwrap();
-    if !lib.iter().any(|l| l.id.eq(&new_item.id)) {
-        lib.push(new_item);
-        save(&*LIB_PATH, &lib);
-        // save(&lib);
-    }
+    add_to_lib("manga", &LIB, &LIB_PATH, new_item)
 }
 
 #[tauri::command]
 pub fn update_manga_lib(item: LibraryItem) {
-    let mut lib = MANGA_LIB.lock().unwrap();
-    for entry in lib.iter_mut() {
-        if entry.id == item.id {
-            *entry = item;
-            save(&*LIB_PATH, &lib);
-            // save(&lib);
-            return;
-        }
-    }
-    // If it somehow isn't on the list, add it
-    lib.push(item);
+    update_lib("manga", &LIB, &LIB_PATH, item)
 }
 
 #[tauri::command]
 pub fn remove_from_manga_lib(id: String) {
-    // todo: fix unwraps
-    println!("Removing from manga library...");
-    let mut lib = MANGA_LIB.lock().unwrap();
-    lib.retain(|l| l.id != id);
-    save(&*LIB_PATH, &lib);
-    // save(&lib);
+    remove_from_lib("manga", &LIB, &LIB_PATH, id)
 }
 
 #[tauri::command]
 pub fn delete_manga_lib() {
-    println!("Deleting manga lib...");
-    let mut lib = MANGA_LIB.lock().unwrap();
-    *lib = vec![];
-    std::fs::remove_file(&*LIB_PATH).unwrap();
+    delete_entire_lib("manga", &LIB, &LIB_PATH);
 }
 
 #[allow(dead_code)]
 pub fn find_manga(id: String) -> Option<LibraryItem> {
-    let lib = MANGA_LIB.lock().unwrap();
+    let lib = LIB.lock().unwrap();
     let found_item = lib.iter().find(|item| item.id == id);
     found_item.cloned()
 }
