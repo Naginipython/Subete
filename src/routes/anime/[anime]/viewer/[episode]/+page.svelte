@@ -3,6 +3,7 @@
   import Hls from 'hls.js';
 
   let videoElement;
+  // svelte-ignore unused-export-let TODO
   export let data;
 
   // URL to the .m3u8 file

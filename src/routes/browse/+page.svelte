@@ -43,8 +43,8 @@
                 sources = await invoke('get_ln_plugin_names');
                 break;
             case "anime":
-                // sources = await invoke('get_ln_plugin_names');
-                sources = [];
+                results = json["anime_search_results"];
+                sources = await invoke('get_anime_plugin_names');
                 break;
         }
         let s = Object.entries(checked_sources).map(([key, value]) => key);
@@ -65,7 +65,7 @@
         s = s.filter(x => sources.includes(x));
         let result = [];
         switch (media_screen) {
-            case "manga":
+            case "manga": {
                 // TODO: call this multiple times, instead of looping in. This way, can get some results earlier
                 let r = await invoke('manga_search', { query: `${name}`, sources: s });
                 if (!r.hasOwnProperty("error")) {
@@ -78,21 +78,33 @@
                     return json;
                 });
                 break;
-            case "ln":
-                result = await invoke('ln_search', { query: `${name}`, sources: s });
-                // for (const s of l) {
-                //     let html = await invoke('fetch', {url: s.url});
-                //     let data = eval(s.search + `search(${JSON.stringify(html)})`);
-                //     results.push({plugin: data[0].plugin, data: data});
-                //     result = result.concat(data);
-                // }
+            }
+            case "ln": {
+                let r = await invoke('ln_search', { query: `${name}`, sources: s });
+                if (!r.hasOwnProperty("error")) {
+                    result = r;
+                } else {
+                    error = r.error;
+                }
                 store.update(json => {
                     json.ln_search_results = result;
                     return json;
                 });
                 break;
-            case "anime":
+            }
+            case "anime": {
+                let r = await invoke('anime_search', { query: `${name}`, sources: s });
+                if (!r.hasOwnProperty("error")) {
+                    result = r;
+                } else {
+                    error = r.error;
+                }
+                store.update(json => {
+                    json.anime_search_results = result;
+                    return json;
+                });
                 break;
+            }
         }
         is_searching = false;
         // reformatResults();
@@ -126,7 +138,7 @@
                     json.ln_search_results = results;
                     break;
                 case "anime":
-                    sources = [];
+                    json.anime_search_results = results;
                     break;
             }
             return json;

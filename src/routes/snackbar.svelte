@@ -112,7 +112,7 @@
     {:else}
         <!-- TODO: make work -->
         <button id="manga" class="media {media_screen=="manga"? 'selected':''}" on:click={() => change_media("manga")}>Manga</button>
-        <button id="anime" class="media {media_screen=="anime"? 'selected':''}">Anime</button>
+        <button id="anime" class="media {media_screen=="anime"? 'selected':''}" on:click={() => change_media("anime")}>Anime</button>
         <button id="ln" class="media {media_screen=="ln"? 'selected':''}" on:click={() => change_media("ln")}>LN</button>
     {/if}
     

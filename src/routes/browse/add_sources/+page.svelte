@@ -9,6 +9,7 @@
   let anime_plugins = [];
   onMount(async () => {
     manga_plugins = await invoke("get_manga_plugin_names");
+    anime_plugins = await invoke("get_anime_plugin_names");
     ln_plugins = await invoke("get_ln_plugin_names");
   });
 
@@ -43,12 +44,12 @@
         test_json.hasOwnProperty("search_url") &&
         test_json.hasOwnProperty("search") &&
         test_json.hasOwnProperty("search_extra") &&
-        test_json.hasOwnProperty("chapters_url") &&
-        test_json.hasOwnProperty("get_chapters") &&
-        test_json.hasOwnProperty("chapters_extra") &&
-        test_json.hasOwnProperty("pages_url") &&
-        test_json.hasOwnProperty("get_pages") &&
-        test_json.hasOwnProperty("pages_extra")
+        (test_json.hasOwnProperty("chapters_url") || test_json.hasOwnProperty("episodes_url")) &&
+        (test_json.hasOwnProperty("get_chapters") || test_json.hasOwnProperty("get_episodes")) &&
+        (test_json.hasOwnProperty("chapters_extra") || test_json.hasOwnProperty("episodes_extra")) &&
+        (test_json.hasOwnProperty("pages_url") || test_json.hasOwnProperty("videos_url")) &&
+        (test_json.hasOwnProperty("get_pages") || test_json.hasOwnProperty("get_videos")) &&
+        (test_json.hasOwnProperty("pages_extra") || test_json.hasOwnProperty("videos_extra"))
       ) {
         json = test_json;
         media_type = test_json.media_type;
@@ -79,6 +80,11 @@
         json.success = `Ln plugin uploaded: ${json.id}`;
         await invoke('add_ln_plugin', { newPlugin: json });
         ln_plugins = await invoke("get_ln_plugin_names");
+        break;
+      case "anime":
+        json.success = `Anime plugin uploaded: ${json.id}`;
+        await invoke('add_anime_plugin', { newPlugin: json });
+        anime_plugins = await invoke("get_anime_plugin_names");
         break;
       default:
         json.error = "ERROR: media_type is invalid";

@@ -75,10 +75,17 @@ const store = writable({
         }*/
     ],
     "manga_update_progress": null, // {curr: String, index: number, total: number}
+    
+    "anime_search_results": [],
+    "anime_library": [],
+    "anime_history": [],
+    "anime_updates": [],
+
     "ln_search_results": [],
     "ln_library": [],
     "ln_history": [],
     "ln_updates": [],
+
     "settings": {
         "quickselect": {}, // typically: "[plugin_name]": Boolean, 
         "library_widths": {}, // "manga", "ln", and "anime", equal to a string of the width #

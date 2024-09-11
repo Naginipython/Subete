@@ -6,6 +6,7 @@ use tauri_plugin_http::reqwest;
 use quickjs_rs::JsValue;
 use serde_json::{Value, Map as JsonMap, Number as JsonNumber};
 
+mod anime;
 mod manga;
 mod ln;
 mod settings;
@@ -48,6 +49,8 @@ pub fn run() {
             manga::save_manga_updates_list, manga::get_manga_updates_list,
             // manga/history.rs
             manga::save_manga_history, manga::get_manga_history,
+            // anime/plugins.rs
+            anime::anime_search, anime::add_anime_plugin, anime::get_anime_plugin_names,
             // ln/library.rs
             ln::get_ln_lib, ln::add_to_ln_lib, ln::remove_from_ln_lib, ln::update_ln_lib, ln::delete_ln_lib,
             // ln/plugins.rs
