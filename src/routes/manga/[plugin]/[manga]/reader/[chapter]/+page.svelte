@@ -21,6 +21,7 @@
     set_colors();
     start_reader(chapter.page-1);
     
+    console.log("here");
     // Prepares Reader & pages
     async function start_reader(page) {
         is_loading = true;

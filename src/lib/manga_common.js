@@ -1,4 +1,3 @@
-// Commonly used functions
 import { invoke } from "@tauri-apps/api/core";
 import store from "./store.js";
 let json;
@@ -33,18 +32,6 @@ export function find_manga(plugin, id) {
             json.manga_temp.unshift(manga);
         }
     }
-
-    // let manga_test = json.manga_library.find(m => m.id == id);
-    // if (manga_test == undefined) {
-    //     let search_test = json.manga_search_results.find(m => m.id == id);
-    //     if (search_test == undefined) {
-    //         manga = json.manga_history.find(m => m.id == id);
-    //     } else {
-    //         manga = search_test;
-    //     }
-    // } else {
-    //     manga = manga_test;
-    // }
     return manga==undefined? {} : manga;
 }
 export function in_lib(id) {
