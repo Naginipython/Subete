@@ -1,4 +1,4 @@
-use crate::{add_to_lib, delete_entire_lib, get_lib, remove_from_lib, update_lib, HasId, FILE_PATH};
+use crate::{add_to_lib, delete_entire_lib, get_lib, remove_from_lib, update_lib, HasId, IsItem, FILE_PATH};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::{fs::File, path::PathBuf, sync::{LazyLock, Mutex}};
@@ -43,6 +43,14 @@ impl PartialEq for LibraryItem {
 impl HasId for LibraryItem {
     fn id(&self) -> &str {
         &self.id
+    }
+}
+impl IsItem for LibraryItem {
+    fn plugin(&self) -> &str {
+        &self.plugin
+    }
+    fn list_fn(&self) -> &str {
+        "getChapters"
     }
 }
 

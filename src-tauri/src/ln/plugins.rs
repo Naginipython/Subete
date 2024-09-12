@@ -1,7 +1,7 @@
-use crate::{fetch, post_fetch, save, search, IsPlugin, Media, FILE_PATH};
 use std::{fs::File, path::PathBuf, sync::{LazyLock, Mutex}};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
+use crate::{get_item, get_list, save, search, IsPlugin, Media, FILE_PATH};
 
 use super::LibraryItem;
 
@@ -33,20 +33,17 @@ pub struct Plugins {
     pub pages_extra: Value,
 }
 impl IsPlugin for Plugins {
-    fn id(&self) -> String {
-        self.id.clone()
-    }
-    fn search_url(&self) -> &str {
-        &self.search_url
-    }
-    fn search(&self) -> &str {
-        &self.search
-    }
+  fn id(&self) -> String { self.id.clone() }
+  fn search_url(&self) -> &str { &self.search_url }
+  fn search(&self) -> &str { &self.search }
+  fn list_url(&self) -> &str { &self.chapters_url }
+  fn get_list(&self) -> &str { &self.get_chapters }
+  fn list_extra(&self) -> &Value { &self.chapters_extra }
+  fn item_url(&self) -> &str { &self.pages_url }
+  fn get_item(&self) -> &str { &self.get_pages }
+  fn item_fn(&self) -> &str { "getChapterPages" }
 }
 
-fn replace_url(url: &str, placeholder: &str, replace: &str) -> String {
-  url.replace(placeholder, replace)
-}
 fn get_plugins() -> Vec<Plugins> {
   match File::open(&*PLUGINS_PATH) {
       Ok(file) => serde_json::from_reader(file).unwrap_or_default(),
@@ -87,65 +84,26 @@ pub async fn ln_search(query: String, sources: Vec<String>) -> Value {
 
 #[tauri::command]
 pub async fn get_ln_chapters(ln: LibraryItem) -> Value {
-    println!("Getting ln chapters...");
-    let result: Value = json!({});
-    let plugins = get_plugins();
-    println!("{:?}", plugins);
-    let plugin = plugins.iter().find(|p| p.id == ln.plugin);
-    if let Some(p) = plugin {
-        // let temp = json!({"url": replace_url(&p.chapters_url, "{id}", &id), "getChapters": (p.get_chapters).to_string(), "extra": p.chapters_extra});
-        // result = temp;
-        let url = replace_url(&p.chapters_url, "{id}", &ln.id);
-        let html = if p.chapters_extra.get("request").is_some() {
-            post_fetch(url).await
-        } else {
-            fetch(url).await
-        };
-        
-        let mut chap_code = (&p.get_chapters).clone();
-        chap_code.push_str(&format!("getChapters(JSON.parse({:?}), `{html}`);", serde_json::to_string(&ln).unwrap()));
-        
-        // let context = quickjs_rs::Context::new().unwrap();
-        // let value = context.eval(&chap_code).unwrap();
-        // result = js_value_to_serde_json(value);
-    }
-    result
+  get_list("ln", get_plugins(), ln).await
 }
 
 #[tauri::command]
 pub async fn get_ln_pages(source: String, id: String) -> Value {
-  println!("Getting ln pages...");
-    let result: Value = json!({});
-    let plugins = get_plugins();
-    let plugin = plugins.iter().find(|p| p.id == source);
-    if let Some(p) = plugin {
-        // let temp = json!({"url": replace_url(&p.pages_url, "{id}", &id), "getChapterPages": (p.get_pages).to_string()});
-        // result = temp;
-        let url = replace_url(&p.pages_url, "{id}", &id);
-        let html = fetch(url).await;
-        
-        let mut chap_code = (&p.get_pages).clone();
-        chap_code.push_str(&format!("getChapterPages(`{html}`);"));
-        
-        // let context = quickjs_rs::Context::new().unwrap();
-        // let value = context.eval(&chap_code).unwrap();
-        // result = js_value_to_serde_json(value);
-    }
-    result
+  get_item("ln", get_plugins(), source, id).await
 }
 
 #[tauri::command]
 pub fn delete_ln_plugin(plugin: String) {
-    println!("Deleting ln plugin: {plugin}");
-    let mut plugins = PLUGINS.lock().unwrap();
-    plugins.retain(|p| p.id != plugin);
-    save(&*PLUGINS_PATH, &plugins);
+  println!("Deleting ln plugin: {plugin}");
+  let mut plugins = PLUGINS.lock().unwrap();
+  plugins.retain(|p| p.id != plugin);
+  save(&*PLUGINS_PATH, &plugins);
 }
 
 #[tauri::command]
 pub fn delete_ln_plugins() {
-    println!("Deleting ln plugins...");
-    let mut plugins = PLUGINS.lock().unwrap();
-    *plugins = init_plugins();
-    std::fs::remove_file(&*PLUGINS_PATH).unwrap();
+  println!("Deleting ln plugins...");
+  let mut plugins = PLUGINS.lock().unwrap();
+  *plugins = init_plugins();
+  std::fs::remove_file(&*PLUGINS_PATH).unwrap();
 }

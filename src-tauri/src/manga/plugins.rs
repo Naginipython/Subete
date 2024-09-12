@@ -1,8 +1,7 @@
-use crate::{fetch, post_fetch, save, search, IsPlugin, Media, FILE_PATH};
-use quickjs_runtime::{builder::QuickJsRuntimeBuilder, jsutils::Script, values::JsValueConvertable};
+use std::{fs::File, path::PathBuf, sync::{LazyLock, Mutex}};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
-use std::{fs::File, path::PathBuf, sync::{LazyLock, Mutex}};
+use crate::{get_item, get_list, save, search, IsPlugin, Media, FILE_PATH};
 
 use super::LibraryItem;
 
@@ -34,20 +33,17 @@ pub struct Plugins {
     pub pages_extra: Value,
 }
 impl IsPlugin for Plugins {
-    fn id(&self) -> String {
-        self.id.clone()
-    }
-    fn search_url(&self) -> &str {
-        &self.search_url
-    }
-    fn search(&self) -> &str {
-        &self.search
-    }
+    fn id(&self) -> String { self.id.clone() }
+    fn search_url(&self) -> &str { &self.search_url }
+    fn search(&self) -> &str { &self.search }
+    fn list_url(&self) -> &str { &self.chapters_url }
+    fn get_list(&self) -> &str { &self.get_chapters }
+    fn list_extra(&self) -> &Value { &self.chapters_extra }
+    fn item_url(&self) -> &str { &self.pages_url }
+    fn get_item(&self) -> &str { &self.get_pages }
+    fn item_fn(&self) -> &str { "getChapterPages" }
 }
 
-fn replace_url(url: &str, placeholder: &str, replace: &str) -> String {
-    url.replace(placeholder, replace)
-}
 fn get_plugins() -> Vec<Plugins> {
     match File::open(&*PLUGINS_PATH) {
         Ok(file) => serde_json::from_reader(file).unwrap_or_default(),
@@ -100,70 +96,12 @@ pub async fn manga_search(query: String, sources: Vec<String>) -> Value {
 
 #[tauri::command]
 pub async fn get_manga_chapters(manga: LibraryItem) -> Value {
-    println!("Getting manga chapters...");
-    let mut result: Value = json!({});
-    let plugins = get_plugins();
-    let plugin = plugins.iter().find(|p| p.id == manga.plugin);
-    if let Some(p) = plugin {
-        // let temp = json!({"url": replace_url(&p.chapters_url, "{id}", &manga.id), "getChapters": (p.get_chapters).to_string()});
-        // result = temp;
-        // Fetching page data
-        let url = replace_url(&p.chapters_url, "{id}", &manga.id);
-        let html = if p.chapters_extra.get("request").is_some() {
-            post_fetch(url).await
-        } else {
-            fetch(url).await
-        };
-        
-        let chap_code = (&p.get_chapters).clone();
-        // chap_code.push_str(&format!("getChapters(JSON.parse({:?}), `{html}`);", serde_json::to_string(&manga).unwrap()));
-        
-        // let context = quickjs_rs::Context::new().unwrap();
-        // let value = match context.eval(&chap_code) {
-        //     Ok(v) => v,
-        //     Err(e) => {
-        //         println!("{e}");
-        //         let h = HashMap::from([(String::from("error"), JsValue::String(format!("{:?} experienced an issue: {e}", p.id)))]);
-        //         JsValue::Object(h)
-        //     }
-        // };
-        // result = js_value_to_serde_json(value);
-        let runtime = QuickJsRuntimeBuilder::new().build();
-        let script = Script::new("chapters.js", &chap_code);
-        runtime.eval_sync(None, script).ok().expect("script failed");
-        result = runtime
-            .invoke_function_sync(None, &[], "getChapters", vec![serde_json::to_string(&manga).unwrap().to_js_value_facade(), html.to_js_value_facade()])
-            .unwrap().to_serde_value().await.unwrap();
-    }
-    result
+    get_list("manga", get_plugins(), manga).await
 }
 
 #[tauri::command]
 pub async fn get_manga_pages(source: String, id: String) -> Value {
-    println!("Getting manga pages...");
-    let mut result: Value = json!({});
-    let plugins = get_plugins();
-    let plugin = plugins.iter().find(|p| p.id == source);
-    if let Some(p) = plugin {
-        // let temp = json!({"url": replace_url(&p.pages_url, "{id}", &id), "getChapterPages": (p.get_pages).to_string()});
-        // result = temp;
-        let url = replace_url(&p.pages_url, "{id}", &id);
-        let html = fetch(url).await;
-        
-        let chap_code = (&p.get_pages).clone();
-        // chap_code.push_str(&format!("getChapterPages(`{html}`);"));
-        
-        // let context = quickjs_rs::Context::new().unwrap();
-        // let value = context.eval(&chap_code).unwrap();
-        // result = js_value_to_serde_json(value);
-        let runtime = QuickJsRuntimeBuilder::new().build();
-        let script = Script::new("pages.js", &chap_code);
-        runtime.eval_sync(None, script).ok().expect("script failed");
-        result = runtime
-            .invoke_function_sync(None, &[], "getChapterPages", vec![html.to_js_value_facade()])
-            .unwrap().to_serde_value().await.unwrap();
-    }
-    result
+    get_item("manga", get_plugins(), source, id).await
 }
 
 #[tauri::command]

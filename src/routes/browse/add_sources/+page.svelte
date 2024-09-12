@@ -19,9 +19,13 @@
         await invoke('delete_manga_plugin', { plugin })
         manga_plugins = await invoke("get_manga_plugin_names");
         break;
-      case 'ln':
+        case 'ln':
         await invoke('delete_ln_plugin', { plugin })
         ln_plugins = await invoke("get_ln_plugin_names");
+        break;
+      case 'anime':
+        await invoke('delete_anime_plugin', { plugin })
+        anime_plugins = await invoke("get_anime_plugin_names");
         break;
     }
   }

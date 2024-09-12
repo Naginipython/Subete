@@ -9,6 +9,7 @@
     import store from "$lib/store.js";
     export let data;
 
+    // TODO: add query params for this, but if there are none do find manga
     let manga = find_manga(data.plugin, data.id);
     let chapter = manga['chapters'][data.manga_index];
     let curr_page = 0;
@@ -21,7 +22,6 @@
     set_colors();
     start_reader(chapter.page-1);
     
-    console.log("here");
     // Prepares Reader & pages
     async function start_reader(page) {
         is_loading = true;

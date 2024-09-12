@@ -26,7 +26,7 @@
     // TODO: add query params for this, but if there are none do find manga
     anime = find_anime(data.plugin, data.id);
     episode = anime['episodes'][data.anime_index];
-    // streamUrl = await invoke('get_anime_video', { source: anime.plugin, id: episode.id });
+    streamUrl = await invoke('get_anime_video', { source: anime.plugin, id: episode.id });
 
     // Sets up link with video
     if (Hls.isSupported()) {
