@@ -24,3 +24,5 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vscode
 package-lock.json
+Cargo.lock
+src-tauri/Cargo.lock
