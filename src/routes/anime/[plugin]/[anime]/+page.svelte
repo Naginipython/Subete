@@ -24,7 +24,7 @@
             if (!updated_anime.hasOwnProperty("error")) {
                 updated_anime['episodes'].sort((a,b) => b.number-a.number);
                 anime.studio = updated_anime.studio;
-                anime.status = updated_anime.artist;
+                anime.status = updated_anime.status;
                 anime.description = updated_anime.description;
                 anime.episodes = updated_anime.episodes;
             } else {

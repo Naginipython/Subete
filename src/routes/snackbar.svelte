@@ -168,7 +168,7 @@
             <button class="snackbar-item"><Fa icon={faEllipsisVertical} /></button>
         {:else if in_anime}
             <button class="snackbar-item" on:click={async () => toggle_anime_fav()}>
-                {#if ln_data.favorited}
+                {#if anime_data.favorited}
                 <Fa icon={faHeart} />
                 {:else}
                 <Fa icon={faOutlineHeart} />

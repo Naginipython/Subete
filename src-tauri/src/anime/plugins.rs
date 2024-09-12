@@ -92,7 +92,7 @@ pub async fn anime_search(query: String, sources: Vec<String>) -> Value {
 
 #[tauri::command]
 pub async fn get_anime_episodes(anime: LibraryItem) -> Value {
-    println!("Getting manga chapters...");
+    println!("Getting anime episodes...");
     let mut result: Value = json!({});
     let plugins = get_plugins();
     let plugin = plugins.iter().find(|p| p.id == anime.plugin);
@@ -107,7 +107,7 @@ pub async fn get_anime_episodes(anime: LibraryItem) -> Value {
         
         // setup code
         let code = (&p.get_episodes).clone();
-        let ep_code = format!("{code} getEpisodes(JSON.parse({:?}), `{html}`);", serde_json::to_string(&anime).unwrap());
+        // let ep_code = format!("{code} getEpisodes(JSON.parse({:?}), `{html}`);", serde_json::to_string(&anime).unwrap());
 
         let runtime = QuickJsRuntimeBuilder::new().build();
         let script = Script::new("get_episodes.js", &code);
@@ -115,7 +115,6 @@ pub async fn get_anime_episodes(anime: LibraryItem) -> Value {
         result = runtime
             .invoke_function_sync(None, &[], "getEpisodes", vec![serde_json::to_string(&anime).unwrap().to_js_value_facade(), html.to_js_value_facade()])
             .unwrap().to_serde_value().await.unwrap();
-        println!("{:?}", result);
 
         // extra
         if let Some(e) = result["extra"].as_object() {
@@ -126,7 +125,7 @@ pub async fn get_anime_episodes(anime: LibraryItem) -> Value {
                 // let ep_code = format!("{code} next(JSON.parse({:?}), `{html}`);", serde_json::to_string(&anime).unwrap());
 
                 result = runtime
-                    .invoke_function_sync(None, &[], "next", vec![serde_json::to_string(&anime).unwrap().to_js_value_facade(), html.to_js_value_facade()])
+                    .invoke_function_sync(None, &[], "next", vec![serde_json::to_string(&result).unwrap().to_js_value_facade(), html.to_js_value_facade()])
                     .unwrap().to_serde_value().await.unwrap();
             //     if let None = episode_result.extra { break; }
             }

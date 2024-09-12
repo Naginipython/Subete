@@ -13,15 +13,17 @@
     onMount(async () => {
         // GET LIB
         let manga_library = await invoke('get_manga_lib');
-        let ln_library = await invoke('get_ln_lib');
         let manga_history = await invoke('get_manga_history');
         let manga_updates = await invoke('get_manga_updates_list');
+        let anime_library = await invoke('get_anime_lib');
+        let ln_library = await invoke('get_ln_lib');
         let settings = await invoke('get_settings');
         store.update(json => {
             json.manga_library = manga_library;
-            json.ln_library = ln_library;
             json.manga_history = manga_history;
             json.manga_updates = manga_updates
+            json.ln_library = ln_library;
+            json.anime_library = anime_library;
             json.settings = settings;
             json.media_screen = media_screen;
             return json;
@@ -48,9 +50,9 @@
             if (settings["library_widths"].hasOwnProperty("ln")) {
                 document.documentElement.style.setProperty('--lib-ln-width', `${settings['library_widths'].ln}px`); 
             }
-            // if (settings["library_widths"].hasOwnProperty("anime")) {
-                
-            // }
+            if (settings["library_widths"].hasOwnProperty("anime")) {
+                document.documentElement.style.setProperty('--lib-anime-width', `${settings['library_widths'].ln}px`); 
+            }
         }
         loading = false;
     });
@@ -129,6 +131,11 @@
             event.preventDefault();
             change_media("ln");
             goto('/ln_library');
+        }
+        if (event.ctrlKey && event.key === 'a') {
+            event.preventDefault();
+            change_media("anime");
+            goto('/anime_library');
         }
     }
 

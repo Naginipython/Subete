@@ -39,6 +39,7 @@ export function in_lib(id) {
 }
 
 export async function toggle_favorite(anime) {
+    console.log(anime);
     if (!in_lib(anime.id)) {
         await invoke('add_to_anime_lib', { newItem: anime });
         store.update(_json => {
