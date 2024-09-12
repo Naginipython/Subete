@@ -1,5 +1,5 @@
 /* CSS FOR ITEMS IN UPDATE/HISTORY */
-.chapter-item {
+.chapter-item, .episode-item {
     width: 100vw;
     padding: 5px 0;
     overflow: auto;
@@ -8,7 +8,7 @@
     filter: brightness(0.95);
     align-items: center;
 }
-.chapter-item:hover {
+.chapter-item:hover, .episode-item:hover {
     background-color: var(--selection-color)
 }
 .chapter-manga {
@@ -28,7 +28,7 @@
     height: 120%;
     width: auto;
 }
-.chapter-link {
+.chapter-link, .episode-link {
     text-align: left;
     cursor: pointer;
     display: inline-flex;
@@ -46,7 +46,7 @@
     overflow: hidden;
     /* width: idk; TODO */
 }
-.chapter-link p {
+.chapter-link p, .episode-link p {
     justify-content: left;
     width: inherit;
     padding: 0;

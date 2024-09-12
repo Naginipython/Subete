@@ -238,4 +238,9 @@
         margin: 0 2px;
         width: 25px;
     }
+
+    .chapter-lower {
+        padding-top: 5px;
+        display: inline-flex;
+    }
 </style>

@@ -111,7 +111,7 @@
             {:else} Episode {c.number} - {c.title}
             {/if}
         </p>
-        <div class="episode-lower">
+        <div class="chapter-lower">
             <p>date - group</p>
             <!-- {#if anime['episodes'][i].page-1 != 0 && !anime['chapters'][i].completed}
                 <p class="progress">&emsp;(page: {manga['chapters'][i].page})</p>

@@ -16,6 +16,12 @@
         update_lib as manga_update
     } from "$lib/manga_common.js";
     import { 
+        find_anime,
+        in_lib as in_anime_lib, 
+        toggle_favorite as toggle_anime_favorite, 
+        update_lib as anime_update
+    } from "$lib/anime_common.js";
+    import { 
         find_ln, 
         in_lib as in_ln_lib, 
         toggle_favorite as toggle_ln_favorite 
@@ -32,6 +38,11 @@
         favorited: false,
         data: {}
     };
+    let in_anime = false;
+    let anime_data = {
+        favorited: false,
+        data: {}
+    };
     let in_ln= false;
     let ln_data = {
         favorited: false,
@@ -41,10 +52,10 @@
     // Snackbar navigation manager
     $: if($navigating) page_check();
     function page_check() {
+        console.log(nav);
 
         // --- MANGA ---
         // Changes the top nav for manga
-        console.log(nav);
         if (nav.includes("manga/") && !nav.includes("reader")) {
             in_manga = true;
             if (from.includes('library') || from=='/updates' || from=='/browse') {
@@ -54,6 +65,19 @@
             manga_data.favorited = in_manga_lib(manga_data.data.id)
         } else {
             in_manga = false;
+        }
+
+        // --- ANIME ---
+        // Changes the top nav for anime
+        if (nav.includes("anime/") && !nav.includes("reader")) {
+            in_anime = true;
+            if (from.includes('library') || from=='/updates' || from=='/browse') {
+                back = from;
+            }
+            anime_data.data = find_anime($navigating.to.params.plugin, $navigating.to.params.anime);
+            anime_data.favorited = in_anime_lib(anime_data.data.id)
+        } else {
+            in_anime = false;
         }
 
         // --- LN ---
@@ -78,6 +102,10 @@
     async function toggle_ln_fav() {
         ln_data.favorited = !ln_data.favorited;
         await toggle_ln_favorite(ln_data.data);
+    }
+    async function toggle_anime_fav() {
+        anime_data.favorited = !anime_data.favorited;
+        await toggle_anime_favorite(anime_data.data);
     }
     async function update_lib() {
         switch (media_screen) {
@@ -105,7 +133,7 @@
 
 <div id="snackbar">
     <!-- left side -->
-    {#if in_manga || in_ln}
+    {#if in_manga || in_ln || in_anime}
         <button class="snackbar-item" on:click={async () => goto(back)}><Fa icon={faArrowLeft} /></button>
     {:else if is_nav_off}
         <button class="snackbar-item" on:click={() => goto(from)}><Fa icon={faArrowLeft} /></button>
@@ -130,6 +158,16 @@
             <button class="snackbar-item"><Fa icon={faEllipsisVertical} /></button>
         {:else if in_ln}
             <button class="snackbar-item" on:click={async () => toggle_ln_fav()}>
+                {#if ln_data.favorited}
+                <Fa icon={faHeart} />
+                {:else}
+                <Fa icon={faOutlineHeart} />
+                {/if}
+            </button>
+            <button class="snackbar-item"><Fa icon={faFilter} /></button>
+            <button class="snackbar-item"><Fa icon={faEllipsisVertical} /></button>
+        {:else if in_anime}
+            <button class="snackbar-item" on:click={async () => toggle_anime_fav()}>
                 {#if ln_data.favorited}
                 <Fa icon={faHeart} />
                 {:else}
