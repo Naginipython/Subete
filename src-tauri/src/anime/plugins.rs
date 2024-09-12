@@ -86,7 +86,7 @@ pub fn get_anime_plugin_names() -> Value {
 
 #[tauri::command]
 pub async fn anime_search(query: String, sources: Vec<String>) -> Value {
-    search("anime", get_plugins, query, sources).await
+    search("anime", get_plugins(), query, sources).await
 }
 
 #[tauri::command]

@@ -71,16 +71,14 @@ fn replace_url(url: &str, placeholder: &str, replace: &str) -> String {
     url.replace(placeholder, replace)
 }
 
-pub async fn search<T: Serialize + IsPlugin, F>(
-    media: &str, 
-    get_plugins: F, 
+pub async fn search<T: Serialize + IsPlugin>(
+    media: &str,
+    plugins: Vec<T>,
     query: String, 
     sources: Vec<String>
-) -> Value
-where F: Fn() -> Vec<T> {
+) -> Value {
     println!("Searching {media}(s)...");
     let mut result: Value = json!([]);
-    let plugins = get_plugins();
     for p in plugins {
         if sources.contains(&p.id()) {
             // Fetching page data

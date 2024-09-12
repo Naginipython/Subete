@@ -95,7 +95,7 @@ pub fn get_manga_plugin_names() -> Value {
 
 #[tauri::command]
 pub async fn manga_search(query: String, sources: Vec<String>) -> Value {
-    search("manga", get_plugins, query, sources).await
+    search("manga", get_plugins(), query, sources).await
 }
 
 #[tauri::command]
