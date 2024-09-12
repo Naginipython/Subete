@@ -105,7 +105,7 @@
 {#each anime['episodes'] as c, i}
 <div class="episode-item" style="{anime['episodes'][i].completed? 'color: grey' : ''}">
     <!-- Main Chapter button -->
-    <button class="episode-link" on:click={() => goto(`/anime/${data.plugin}/${data.id}/reader/${i}`)}>
+    <button class="episode-link" on:click={() => goto(`/anime/${data.plugin}/${data.id}/viewer/${i}`)}>
         <p>
             {#if c.title == "" || c.title.toLowerCase() == "episode "+c.number} Episode {c.number}
             {:else} Episode {c.number} - {c.title}

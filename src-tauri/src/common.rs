@@ -1,10 +1,18 @@
 use std::{fs::File, io::Write, path::PathBuf, sync::Mutex};
 
+use quickjs_runtime::{builder::QuickJsRuntimeBuilder, jsutils::Script, values::JsValueConvertable};
 use serde::Serialize;
-use serde_json::Value;
+use serde_json::{json, Value};
+
+use crate::fetch;
 
 pub trait HasId {
     fn id(&self) -> &str;
+}
+pub trait IsPlugin {
+    fn id(&self) -> String;
+    fn search_url(&self) -> &str;
+    fn search(&self) -> &str;
 }
 
 pub fn save<T: Serialize>(path: &PathBuf, data: &Vec<T>) {
@@ -57,4 +65,36 @@ pub fn delete_entire_lib<T: Serialize>(media: &str, lock: &Mutex<Vec<T>>, path: 
     let mut lib = lock.lock().unwrap();
     *lib = vec![];
     std::fs::remove_file(path).unwrap();
+}
+
+fn replace_url(url: &str, placeholder: &str, replace: &str) -> String {
+    url.replace(placeholder, replace)
+}
+
+pub async fn search<T: Serialize + IsPlugin, F>(
+    media: &str, 
+    get_plugins: F, 
+    query: String, 
+    sources: Vec<String>
+) -> Value
+where F: Fn() -> Vec<T> {
+    println!("Searching {media}(s)...");
+    let mut result: Value = json!([]);
+    let plugins = get_plugins();
+    for p in plugins {
+        if sources.contains(&p.id()) {
+            // Fetching page data
+            let url = replace_url(p.search_url(), "{title}", &query);
+            let html = fetch(url).await;
+
+            // Getting from plugins
+            let search = (p.search()).to_string();
+
+            let runtime = QuickJsRuntimeBuilder::new().build();
+            let script = Script::new("search.js", &search);
+            runtime.eval_sync(None, script).ok().expect("script failed");
+            result = runtime.invoke_function_sync(None, &[], "search", vec![html.to_js_value_facade()]).unwrap().to_serde_value().await.unwrap();
+        }
+    }
+    result
 }

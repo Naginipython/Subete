@@ -50,7 +50,8 @@ pub fn run() {
             // anime/library.rs
             anime::get_anime_lib, anime::add_to_anime_lib, anime::remove_from_anime_lib, anime::update_anime_lib, anime::delete_anime_lib,
             // anime/plugins.rs
-            anime::anime_search, anime::add_anime_plugin, anime::get_anime_plugin_names, anime::get_anime_episodes,
+            anime::anime_search, anime::get_anime_episodes, anime::get_anime_plugin_names, anime::get_anime_video, anime::add_anime_plugin,
+            anime::delete_anime_plugins, anime::delete_anime_plugin,
             
             // ln/library.rs
             ln::get_ln_lib, ln::add_to_ln_lib, ln::remove_from_ln_lib, ln::update_ln_lib, ln::delete_ln_lib,

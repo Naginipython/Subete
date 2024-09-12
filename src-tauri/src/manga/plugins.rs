@@ -1,8 +1,8 @@
-use crate::{fetch, post_fetch, Media, FILE_PATH};
+use crate::{fetch, post_fetch, save, search, IsPlugin, Media, FILE_PATH};
 use quickjs_runtime::{builder::QuickJsRuntimeBuilder, jsutils::Script, values::JsValueConvertable};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
-use std::{fs::File, io::Write, path::PathBuf, sync::{LazyLock, Mutex}};
+use std::{fs::File, path::PathBuf, sync::{LazyLock, Mutex}};
 
 use super::LibraryItem;
 
@@ -19,25 +19,39 @@ static PLUGINS: LazyLock<Mutex<Vec<Plugins>>> = LazyLock::new(|| match File::ope
     }
 });
 
-fn save(lib: &Vec<Plugins>) {
-    let mut file = File::create(&*PLUGINS_PATH).unwrap();
-    let json = serde_json::to_string(lib).unwrap();
-    file.write_all(json.as_bytes()).unwrap();
+#[derive(Debug, Deserialize, Serialize, Default, Clone)]
+pub struct Plugins {
+    pub id: String,
+    pub media_type: Media,
+    pub search_url: String,
+    pub search: String,
+    pub search_extra: Value,
+    pub chapters_url: String,
+    pub get_chapters: String,
+    pub chapters_extra: Value,
+    pub pages_url: String,
+    pub get_pages: String,
+    pub pages_extra: Value,
+}
+impl IsPlugin for Plugins {
+    fn id(&self) -> String {
+        self.id.clone()
+    }
+    fn search_url(&self) -> &str {
+        &self.search_url
+    }
+    fn search(&self) -> &str {
+        &self.search
+    }
+}
+
+fn replace_url(url: &str, placeholder: &str, replace: &str) -> String {
+    url.replace(placeholder, replace)
 }
 fn get_plugins() -> Vec<Plugins> {
     match File::open(&*PLUGINS_PATH) {
         Ok(file) => serde_json::from_reader(file).unwrap_or_default(),
         Err(_e) => init_plugins(),
-    }
-}
-#[tauri::command]
-pub fn add_manga_plugin(new_plugin: Plugins) {
-    println!("Adding manga plugin...");
-    let mut plugins = PLUGINS.lock().unwrap();
-    let names: Vec<String> = plugins.iter().map(|p| p.id.clone()).collect();
-    if !names.contains(&new_plugin.id) {
-        plugins.push(new_plugin);
-        save(&plugins);
     }
 }
 fn init_plugins() -> Vec<Plugins> {
@@ -56,23 +70,19 @@ fn init_plugins() -> Vec<Plugins> {
         get_pages: String::from("function getChapterPages(html) { html = JSON.parse(html); let hash = html['chapter']['hash']; let data = html['chapter']['data']; return data.map(x => `https://uploads.mangadex.org/data/${hash}/${x}`); }"),
         pages_extra: json!({})
     }];
-    save(&plugins);
+    save(&*PLUGINS_PATH, &plugins);
     plugins
 }
 
-#[derive(Debug, Deserialize, Serialize, Default, Clone)]
-pub struct Plugins {
-    pub id: String,
-    pub media_type: Media,
-    pub search_url: String,
-    pub search: String,
-    pub search_extra: Value,
-    pub chapters_url: String,
-    pub get_chapters: String,
-    pub chapters_extra: Value,
-    pub pages_url: String,
-    pub get_pages: String,
-    pub pages_extra: Value,
+#[tauri::command]
+pub fn add_manga_plugin(new_plugin: Plugins) {
+    println!("Adding manga plugin...");
+    let mut plugins = PLUGINS.lock().unwrap();
+    let names: Vec<String> = plugins.iter().map(|p| p.id.clone()).collect();
+    if !names.contains(&new_plugin.id) {
+        plugins.push(new_plugin);
+        save(&*PLUGINS_PATH, &plugins);
+    }
 }
 
 #[tauri::command]
@@ -83,47 +93,9 @@ pub fn get_manga_plugin_names() -> Value {
     json!(names)
 }
 
-fn replace_url(url: &str, placeholder: &str, replace: &str) -> String {
-    url.replace(placeholder, replace)
-}
-
 #[tauri::command]
 pub async fn manga_search(query: String, sources: Vec<String>) -> Value {
-    println!("Searching Manga(s)...");
-    let mut result: Value = json!([]);
-    let plugins = get_plugins();
-    for p in plugins {
-        if sources.contains(&p.id) {
-            // Fetching page data
-            let url = replace_url(&p.search_url, "{title}", &query);
-            let html = fetch(url).await;
-
-            // Getting from plugins
-            let search = (p.search).to_string();
-            // let search1 = format!("{}search(`{}`);", &search, &html);
-            
-            // let context = quickjs_rs::Context::new().unwrap();
-            // let value = context.eval(&search1).unwrap_or_else(|error| {
-            //     println!("{error}");
-            //     let search2 = format!("{}search(JSON.stringify({}));", &search, &html);
-            //     match context.eval(&search2) {
-            //         Ok(v) => v,
-            //         Err(e) => {
-            //           let h = HashMap::from([(String::from("error"), JsValue::String(format!("{:?} experienced an issue: {e}", p.id)))]);
-            //           JsValue::Object(h)
-            //         }
-            //     }
-            // });
-            
-            let runtime = QuickJsRuntimeBuilder::new().build();
-            let script = Script::new("search.js", &search);
-            runtime.eval_sync(None, script).ok().expect("script failed");
-            result = runtime
-                .invoke_function_sync(None, &[], "search", vec![html.to_js_value_facade()])
-                .unwrap().to_serde_value().await.unwrap();
-        }
-    }
-    result
+    search("manga", get_plugins, query, sources).await
 }
 
 #[tauri::command]
@@ -199,7 +171,7 @@ pub fn delete_manga_plugin(plugin: String) {
     println!("Deleting manga plugin: {plugin}");
     let mut plugins = PLUGINS.lock().unwrap();
     plugins.retain(|p| p.id != plugin);
-    save(&plugins);
+    save(&*PLUGINS_PATH, &plugins);
 }
 
 #[tauri::command]

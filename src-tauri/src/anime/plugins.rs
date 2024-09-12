@@ -2,7 +2,7 @@ use std::{fs::File, path::PathBuf, sync::{LazyLock, Mutex}};
 use quickjs_runtime::{builder::QuickJsRuntimeBuilder, jsutils::Script, values::JsValueConvertable};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
-use crate::{fetch, post_fetch, save, Media, FILE_PATH};
+use crate::{fetch, post_fetch, save, search, IsPlugin, Media, FILE_PATH};
 
 use super::LibraryItem;
 
@@ -33,6 +33,17 @@ pub struct Plugins {
     pub get_videos: String,
     pub videos_extra: Value,
 }
+impl IsPlugin for Plugins {
+    fn id(&self) -> String {
+        self.id.clone()
+    }
+    fn search_url(&self) -> &str {
+        &self.search_url
+    }
+    fn search(&self) -> &str {
+        &self.search
+    }
+}
 
 fn replace_url(url: &str, placeholder: &str, replace: &str) -> String {
     url.replace(placeholder, replace)
@@ -46,6 +57,12 @@ fn get_plugins() -> Vec<Plugins> {
             plugins
         },
     }
+}
+fn init_plugins() -> Vec<Plugins> {
+    File::create(&*PLUGINS_PATH).unwrap();
+    let plugins = vec![];
+    save(&*PLUGINS_PATH, &plugins);
+    plugins
 }
 
 #[tauri::command]
@@ -69,25 +86,7 @@ pub fn get_anime_plugin_names() -> Value {
 
 #[tauri::command]
 pub async fn anime_search(query: String, sources: Vec<String>) -> Value {
-    println!("Searching Anime(s)...");
-    let mut result: Value = json!([]);
-    let plugins = get_plugins();
-    for p in plugins {
-        if sources.contains(&p.id) {
-            // Fetching page data
-            let url = replace_url(&p.search_url, "{title}", &query);
-            let html = fetch(url).await;
-
-            // Getting from plugins
-            let search = (p.search).to_string();
-
-            let runtime = QuickJsRuntimeBuilder::new().build();
-            let script = Script::new("search.js", &search);
-            runtime.eval_sync(None, script).ok().expect("script failed");
-            result = runtime.invoke_function_sync(None, &[], "search", vec![html.to_js_value_facade()]).unwrap().to_serde_value().await.unwrap();
-        }
-    }
-    result
+    search("anime", get_plugins, query, sources).await
 }
 
 #[tauri::command]
@@ -132,4 +131,48 @@ pub async fn get_anime_episodes(anime: LibraryItem) -> Value {
         }
     }
     result
+}
+
+#[tauri::command]
+pub async fn get_anime_video(source: String, id: String) -> Value {
+    println!("Getting anime video...");
+    let mut result: Value = json!({});
+    let plugins = get_plugins();
+    let plugin = plugins.iter().find(|p| p.id == source);
+    if let Some(p) = plugin {
+        // let temp = json!({"url": replace_url(&p.pages_url, "{id}", &id), "getChapterPages": (p.get_pages).to_string()});
+        // result = temp;
+        let url = replace_url(&p.videos_url, "{id}", &id);
+        let html = fetch(url).await;
+        
+        let chap_code = (&p.get_videos).clone();
+        // chap_code.push_str(&format!("getChapterPages(`{html}`);"));
+        
+        // let context = quickjs_rs::Context::new().unwrap();
+        // let value = context.eval(&chap_code).unwrap();
+        // result = js_value_to_serde_json(value);
+        let runtime = QuickJsRuntimeBuilder::new().build();
+        let script = Script::new("pages.js", &chap_code);
+        runtime.eval_sync(None, script).ok().expect("script failed");
+        result = runtime
+            .invoke_function_sync(None, &[], "getChapterPages", vec![html.to_js_value_facade()])
+            .unwrap().to_serde_value().await.unwrap();
+    }
+    result
+}
+
+#[tauri::command]
+pub fn delete_anime_plugin(plugin: String) {
+    println!("Deleting anime plugin: {plugin}");
+    let mut plugins = PLUGINS.lock().unwrap();
+    plugins.retain(|p| p.id != plugin);
+    save(&*PLUGINS_PATH, &plugins);
+}
+
+#[tauri::command]
+pub fn delete_anime_plugins() {
+    println!("Deleting anime plugins...");
+    let mut plugins = PLUGINS.lock().unwrap();
+    *plugins = init_plugins();
+    std::fs::remove_file(&*PLUGINS_PATH).unwrap();
 }
