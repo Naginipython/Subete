@@ -1,8 +1,6 @@
 use std::{path::PathBuf, sync::LazyLock};
 use settings::*;
 use tauri_plugin_http::reqwest;
-use quickjs_rs::JsValue;
-use serde_json::{Value, Map as JsonMap, Number as JsonNumber};
 
 pub use common::*;
 
@@ -48,15 +46,18 @@ pub fn run() {
             manga::save_manga_updates_list, manga::get_manga_updates_list,
             // manga/history.rs
             manga::save_manga_history, manga::get_manga_history,
+
             // anime/library.rs
             anime::get_anime_lib, anime::add_to_anime_lib, anime::remove_from_anime_lib, anime::update_anime_lib, anime::delete_anime_lib,
             // anime/plugins.rs
-            anime::anime_search, anime::add_anime_plugin, anime::get_anime_plugin_names,
+            anime::anime_search, anime::add_anime_plugin, anime::get_anime_plugin_names, anime::get_anime_episodes,
+            
             // ln/library.rs
             ln::get_ln_lib, ln::add_to_ln_lib, ln::remove_from_ln_lib, ln::update_ln_lib, ln::delete_ln_lib,
             // ln/plugins.rs
             ln::ln_search, ln::get_ln_chapters, ln::get_ln_plugin_names, ln::get_ln_pages, ln::add_ln_plugin, ln::delete_ln_plugins, 
             ln::delete_ln_plugin,
+            
             // settings.rs
             update_settings, get_settings, delete_settings
         ])
@@ -103,32 +104,4 @@ pub enum Media {
     Ln, 
     #[serde(rename = "anime")]
     Anime
-}
-  
-pub fn js_value_to_serde_json(value: JsValue) -> Value {
-    println!("{:?}", value);
-    match value {
-        JsValue::Null => Value::Null,
-        JsValue::Bool(b) => Value::Bool(b),
-        JsValue::Int(i) => Value::Number(JsonNumber::from(i)),
-        JsValue::Float(f) => Value::Number(JsonNumber::from_f64(f).unwrap()),
-        JsValue::String(s) => Value::String(s),
-        JsValue::Array(arr) => {
-            let json_array: Vec<Value> = arr.into_iter().map(js_value_to_serde_json).collect();
-            Value::Array(json_array)
-        },
-        JsValue::Object(obj) => {
-            let json_map: JsonMap<String, Value> = obj.into_iter()
-                .map(|(k, v)| (k, js_value_to_serde_json(v)))
-                .collect();
-              Value::Object(json_map)
-        },
-        JsValue::Undefined => Value::Null,
-        _ => unimplemented!("Unsupported JsValue type for conversion"),
-    }
-}
-pub fn append_values(v1: &mut Value, v2: Value) {
-    if let (Value::Array(ref mut arr1), Value::Array(arr2)) = (v1, v2) {
-        arr1.extend(arr2);
-    }
 }

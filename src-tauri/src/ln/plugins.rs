@@ -1,6 +1,5 @@
-use crate::{append_values, fetch, js_value_to_serde_json, post_fetch, Media, FILE_PATH};
+use crate::{fetch, post_fetch, Media, FILE_PATH};
 use std::{collections::HashMap, fs::File, io::Write, path::PathBuf, sync::{LazyLock, Mutex}};
-use quickjs_rs::JsValue;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 
@@ -89,20 +88,20 @@ pub async fn ln_search(query: String, sources: Vec<String>) -> Value {
           let search = (p.search).to_string();
           let search1 = format!("{}search(`{}`);", &search, &html);
           
-          let context = quickjs_rs::Context::new().unwrap();
-          let value = context.eval(&search1).unwrap_or_else(|_e| {
-              // secondary test
-              let search2 = format!("{}search(JSON.stringify({}));", &search, &html);
-              match context.eval(&search2) {
-                Ok(v) => v,
-                Err(e) => {
-                  let h = HashMap::from([(String::from("error"), JsValue::String(format!("{:?} experienced an issue: {e}", p.id)))]);
-                  JsValue::Object(h)
-                }
-              }
-          });
-          let r = js_value_to_serde_json(value);
-          append_values(&mut result, r)
+          // let context = quickjs_rs::Context::new().unwrap();
+          // let value = context.eval(&search1).unwrap_or_else(|_e| {
+          //     // secondary test
+          //     let search2 = format!("{}search(JSON.stringify({}));", &search, &html);
+          //     match context.eval(&search2) {
+          //       Ok(v) => v,
+          //       Err(e) => {
+          //         let h = HashMap::from([(String::from("error"), JsValue::String(format!("{:?} experienced an issue: {e}", p.id)))]);
+          //         JsValue::Object(h)
+          //       }
+          //     }
+          // });
+          // let r = js_value_to_serde_json(value);
+          // append_values(&mut result, r)
       }
   }
   json!(result)
@@ -128,9 +127,9 @@ pub async fn get_ln_chapters(ln: LibraryItem) -> Value {
         let mut chap_code = (&p.get_chapters).clone();
         chap_code.push_str(&format!("getChapters(JSON.parse({:?}), `{html}`);", serde_json::to_string(&ln).unwrap()));
         
-        let context = quickjs_rs::Context::new().unwrap();
-        let value = context.eval(&chap_code).unwrap();
-        result = js_value_to_serde_json(value);
+        // let context = quickjs_rs::Context::new().unwrap();
+        // let value = context.eval(&chap_code).unwrap();
+        // result = js_value_to_serde_json(value);
     }
     result
 }
@@ -150,9 +149,9 @@ pub async fn get_ln_pages(source: String, id: String) -> Value {
         let mut chap_code = (&p.get_pages).clone();
         chap_code.push_str(&format!("getChapterPages(`{html}`);"));
         
-        let context = quickjs_rs::Context::new().unwrap();
-        let value = context.eval(&chap_code).unwrap();
-        result = js_value_to_serde_json(value);
+        // let context = quickjs_rs::Context::new().unwrap();
+        // let value = context.eval(&chap_code).unwrap();
+        // result = js_value_to_serde_json(value);
     }
     result
 }

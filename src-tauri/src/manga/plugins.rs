@@ -1,8 +1,8 @@
-use crate::{fetch, js_value_to_serde_json, append_values, post_fetch, Media, FILE_PATH};
-use quickjs_rs::JsValue;
+use crate::{fetch, post_fetch, Media, FILE_PATH};
+use quickjs_runtime::{builder::QuickJsRuntimeBuilder, jsutils::Script, values::JsValueConvertable};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
-use std::{collections::HashMap, fs::File, io::Write, path::PathBuf, sync::{LazyLock, Mutex}};
+use std::{fs::File, io::Write, path::PathBuf, sync::{LazyLock, Mutex}};
 
 use super::LibraryItem;
 
@@ -50,7 +50,7 @@ fn init_plugins() -> Vec<Plugins> {
         search: String::from("function search(html) { html = JSON.parse(html); let data = []; for (let d of html['data']) { let temp = {}; temp['id'] = d['id']; if (d['attributes']['title'].hasOwnProperty('en')) { temp['title'] = d['attributes']['title']['en']; } else if (d['attributes']['title'].hasOwnProperty('ja-ro')) { temp['title'] = d['attributes']['title']['ja-ro']; } else { temp['title'] = d['attributes']['title']['ja']; } let filetemp = d['relationships'].filter(o => o.type == 'cover_art')[0]; if (filetemp != undefined) { temp['img'] = `https://uploads.mangadex.org/covers/${temp['id']}/${filetemp['attributes']['fileName']}`; } else { temp['img'] = ''; } temp['plugin'] = 'MangaDex'; temp['description'] = d['attributes']['description']['en']? d['attributes']['description']['en'] : ''; temp['chapters'] = []; let author_names = d['relationships'].filter(x => x.type == 'author').map(y => y['attributes']['name']); let artist_names = d['relationships'].filter(x => x.type == 'artist').map(y => y['attributes']['name']); temp['authors'] = author_names.join(', '); temp['artists'] = artist_names.join(', '); data.push(temp); } return data; }"),
         search_extra: json!({}),
         chapters_url: String::from("https://api.mangadex.org/manga/{id}/feed?limit=500&order[chapter]=asc&translatedLanguage[]=en"),
-        get_chapters: String::from("function getChapters(json, html) { html = JSON.parse(html); json.chapters = html['data'].map(e => { return { number: parseFloat(e['attributes']['chapter'])? parseFloat(e['attributes']['chapter']) : 0.0, id: e['id'], title: e['attributes']['title'] == '' || e['attributes']['title'] == null? `Chapter ${e['attributes']['chapter']}` : e['attributes']['title'], page: 1, completed: false } }); return json; }"),
+        get_chapters: String::from("function getChapters(json, html) { json = JSON.parse(json); html = JSON.parse(html); json.chapters = html['data'].map(e => { return { number: parseFloat(e['attributes']['chapter'])? parseFloat(e['attributes']['chapter']) : 0.0, id: e['id'], title: e['attributes']['title'] == '' || e['attributes']['title'] == null? `Chapter ${e['attributes']['chapter']}` : e['attributes']['title'], page: 1, completed: false } }); return json; }"),
         chapters_extra: json!({}),
         pages_url: String::from("https://api.mangadex.org/at-home/server/{id}"),
         get_pages: String::from("function getChapterPages(html) { html = JSON.parse(html); let hash = html['chapter']['hash']; let data = html['chapter']['data']; return data.map(x => `https://uploads.mangadex.org/data/${hash}/${x}`); }"),
@@ -100,22 +100,27 @@ pub async fn manga_search(query: String, sources: Vec<String>) -> Value {
 
             // Getting from plugins
             let search = (p.search).to_string();
-            let search1 = format!("{}search(`{}`);", &search, &html);
+            // let search1 = format!("{}search(`{}`);", &search, &html);
             
-            let context = quickjs_rs::Context::new().unwrap();
-            let value = context.eval(&search1).unwrap_or_else(|error| {
-                println!("{error}");
-                let search2 = format!("{}search(JSON.stringify({}));", &search, &html);
-                match context.eval(&search2) {
-                    Ok(v) => v,
-                    Err(e) => {
-                      let h = HashMap::from([(String::from("error"), JsValue::String(format!("{:?} experienced an issue: {e}", p.id)))]);
-                      JsValue::Object(h)
-                    }
-                }
-            });
-            let r = js_value_to_serde_json(value);
-            append_values(&mut result, r)
+            // let context = quickjs_rs::Context::new().unwrap();
+            // let value = context.eval(&search1).unwrap_or_else(|error| {
+            //     println!("{error}");
+            //     let search2 = format!("{}search(JSON.stringify({}));", &search, &html);
+            //     match context.eval(&search2) {
+            //         Ok(v) => v,
+            //         Err(e) => {
+            //           let h = HashMap::from([(String::from("error"), JsValue::String(format!("{:?} experienced an issue: {e}", p.id)))]);
+            //           JsValue::Object(h)
+            //         }
+            //     }
+            // });
+            
+            let runtime = QuickJsRuntimeBuilder::new().build();
+            let script = Script::new("search.js", &search);
+            runtime.eval_sync(None, script).ok().expect("script failed");
+            result = runtime
+                .invoke_function_sync(None, &[], "search", vec![html.to_js_value_facade()])
+                .unwrap().to_serde_value().await.unwrap();
         }
     }
     result
@@ -138,19 +143,25 @@ pub async fn get_manga_chapters(manga: LibraryItem) -> Value {
             fetch(url).await
         };
         
-        let mut chap_code = (&p.get_chapters).clone();
-        chap_code.push_str(&format!("getChapters(JSON.parse({:?}), `{html}`);", serde_json::to_string(&manga).unwrap()));
+        let chap_code = (&p.get_chapters).clone();
+        // chap_code.push_str(&format!("getChapters(JSON.parse({:?}), `{html}`);", serde_json::to_string(&manga).unwrap()));
         
-        let context = quickjs_rs::Context::new().unwrap();
-        let value = match context.eval(&chap_code) {
-            Ok(v) => v,
-            Err(e) => {
-                println!("{e}");
-                let h = HashMap::from([(String::from("error"), JsValue::String(format!("{:?} experienced an issue: {e}", p.id)))]);
-                JsValue::Object(h)
-            }
-        };
-        result = js_value_to_serde_json(value);
+        // let context = quickjs_rs::Context::new().unwrap();
+        // let value = match context.eval(&chap_code) {
+        //     Ok(v) => v,
+        //     Err(e) => {
+        //         println!("{e}");
+        //         let h = HashMap::from([(String::from("error"), JsValue::String(format!("{:?} experienced an issue: {e}", p.id)))]);
+        //         JsValue::Object(h)
+        //     }
+        // };
+        // result = js_value_to_serde_json(value);
+        let runtime = QuickJsRuntimeBuilder::new().build();
+        let script = Script::new("chapters.js", &chap_code);
+        runtime.eval_sync(None, script).ok().expect("script failed");
+        result = runtime
+            .invoke_function_sync(None, &[], "getChapters", vec![serde_json::to_string(&manga).unwrap().to_js_value_facade(), html.to_js_value_facade()])
+            .unwrap().to_serde_value().await.unwrap();
     }
     result
 }
@@ -167,12 +178,18 @@ pub async fn get_manga_pages(source: String, id: String) -> Value {
         let url = replace_url(&p.pages_url, "{id}", &id);
         let html = fetch(url).await;
         
-        let mut chap_code = (&p.get_pages).clone();
-        chap_code.push_str(&format!("getChapterPages(`{html}`);"));
+        let chap_code = (&p.get_pages).clone();
+        // chap_code.push_str(&format!("getChapterPages(`{html}`);"));
         
-        let context = quickjs_rs::Context::new().unwrap();
-        let value = context.eval(&chap_code).unwrap();
-        result = js_value_to_serde_json(value);
+        // let context = quickjs_rs::Context::new().unwrap();
+        // let value = context.eval(&chap_code).unwrap();
+        // result = js_value_to_serde_json(value);
+        let runtime = QuickJsRuntimeBuilder::new().build();
+        let script = Script::new("pages.js", &chap_code);
+        runtime.eval_sync(None, script).ok().expect("script failed");
+        result = runtime
+            .invoke_function_sync(None, &[], "getChapterPages", vec![html.to_js_value_facade()])
+            .unwrap().to_serde_value().await.unwrap();
     }
     result
 }

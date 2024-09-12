@@ -1,8 +1,10 @@
-use std::{collections::HashMap, fs::File, path::PathBuf, sync::{LazyLock, Mutex}};
-use quickjs_rs::JsValue;
+use std::{fs::File, path::PathBuf, sync::{LazyLock, Mutex}};
+use quickjs_runtime::{builder::QuickJsRuntimeBuilder, jsutils::Script, values::JsValueConvertable};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
-use crate::{append_values, fetch, js_value_to_serde_json, save, Media, FILE_PATH};
+use crate::{fetch, post_fetch, save, Media, FILE_PATH};
+
+use super::LibraryItem;
 
 static PLUGINS_PATH: LazyLock<PathBuf> = LazyLock::new(|| {
     let mut path = (*FILE_PATH).clone();
@@ -78,57 +80,57 @@ pub async fn anime_search(query: String, sources: Vec<String>) -> Value {
 
             // Getting from plugins
             let search = (p.search).to_string();
-            let search1 = format!("{}search(`{}`);", &search, &html);
-            
-            let context = quickjs_rs::Context::new().unwrap();
-            let value = context.eval(&search1).unwrap_or_else(|error| {
-                println!("{error}");
-                let search2 = format!("{}search(JSON.stringify({}));", &search, &html);
-                match context.eval(&search2) {
-                    Ok(v) => v,
-                    Err(e) => {
-                      let h = HashMap::from([(String::from("error"), JsValue::String(format!("{:?} experienced an issue: {e}", p.id)))]);
-                      JsValue::Object(h)
-                    }
-                }
-            });
-            let r = js_value_to_serde_json(value);
-            append_values(&mut result, r)
+
+            let runtime = QuickJsRuntimeBuilder::new().build();
+            let script = Script::new("search.js", &search);
+            runtime.eval_sync(None, script).ok().expect("script failed");
+            result = runtime.invoke_function_sync(None, &[], "search", vec![html.to_js_value_facade()]).unwrap().to_serde_value().await.unwrap();
         }
     }
     result
 }
 
-// #[tauri::command]
-// pub async fn get_anime_chapters(anime: LibraryItem) -> Value {
-//     println!("Getting manga chapters...");
-//     let mut result: Value = json!({});
-//     let plugins = get_plugins();
-//     let plugin = plugins.iter().find(|p| p.id == manga.plugin);
-//     if let Some(p) = plugin {
-//         // let temp = json!({"url": replace_url(&p.chapters_url, "{id}", &manga.id), "getChapters": (p.get_chapters).to_string()});
-//         // result = temp;
-//         // Fetching page data
-//         let url = replace_url(&p.chapters_url, "{id}", &manga.id);
-//         let html = if p.chapters_extra.get("request").is_some() {
-//             post_fetch(url).await
-//         } else {
-//             fetch(url).await
-//         };
+#[tauri::command]
+pub async fn get_anime_episodes(anime: LibraryItem) -> Value {
+    println!("Getting manga chapters...");
+    let mut result: Value = json!({});
+    let plugins = get_plugins();
+    let plugin = plugins.iter().find(|p| p.id == anime.plugin);
+    if let Some(p) = plugin {
+        // fetch
+        let url = replace_url(&p.episodes_url, "{id}", &anime.id);
+        let html = if p.episodes_extra.get("request").is_some() {
+            post_fetch(url).await
+        } else {
+            fetch(url).await
+        };
         
-//         let mut chap_code = (&p.get_chapters).clone();
-//         chap_code.push_str(&format!("getChapters(JSON.parse({:?}), `{html}`);", serde_json::to_string(&manga).unwrap()));
-        
-//         let context = quickjs_rs::Context::new().unwrap();
-//         let value = match context.eval(&chap_code) {
-//             Ok(v) => v,
-//             Err(e) => {
-//                 println!("{e}");
-//                 let h = HashMap::from([(String::from("error"), JsValue::String(format!("{:?} experienced an issue: {e}", p.id)))]);
-//                 JsValue::Object(h)
-//             }
-//         };
-//         result = js_value_to_serde_json(value);
-//     }
-//     result
-// }
+        // setup code
+        let code = (&p.get_episodes).clone();
+        let ep_code = format!("{code} getEpisodes(JSON.parse({:?}), `{html}`);", serde_json::to_string(&anime).unwrap());
+
+        let runtime = QuickJsRuntimeBuilder::new().build();
+        let script = Script::new("get_episodes.js", &code);
+        runtime.eval_sync(None, script).ok().expect("script failed");
+        result = runtime
+            .invoke_function_sync(None, &[], "getEpisodes", vec![serde_json::to_string(&anime).unwrap().to_js_value_facade(), html.to_js_value_facade()])
+            .unwrap().to_serde_value().await.unwrap();
+        println!("{:?}", result);
+
+        // extra
+        if let Some(e) = result["extra"].as_object() {
+            if let Some(next) = e.get("next") {
+                let link = String::from(next.as_str().unwrap());
+                let html = fetch(link).await;
+                // If there is a next link, call it
+                // let ep_code = format!("{code} next(JSON.parse({:?}), `{html}`);", serde_json::to_string(&anime).unwrap());
+
+                result = runtime
+                    .invoke_function_sync(None, &[], "next", vec![serde_json::to_string(&anime).unwrap().to_js_value_facade(), html.to_js_value_facade()])
+                    .unwrap().to_serde_value().await.unwrap();
+            //     if let None = episode_result.extra { break; }
+            }
+        }
+    }
+    result
+}
