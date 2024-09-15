@@ -80,7 +80,7 @@ https://github.com/Naginipython/Subete/assets/42967504/260dfcf2-4acc-40cb-b75d-c
 
 To-Build Pt.1:\
 Install all needed by [Tauri](https://beta.tauri.app/start/prerequisites/)\
-In a command line, install tauri-cli: `cargo install tauri-cli@^2.0.0-rc` (note: may need quotation)\
+In a command line, install tauri-cli: `cargo install tauri-cli@^2.0.0-rc` (note: may need quotation) you can also use other methods listed on [tauri's website](https://v2.tauri.app/reference/cli/)\
 In the root folder, run `npm i` or `npm install`
 
 To-Build Pt.2: Linux\
@@ -88,7 +88,11 @@ In the root folder, run: `cargo tauri dev` for testing, `cargo tauri build` to b
 Note: Release build may need to be `NO_STRIP=true cargo tauri build`
 
 To-Build Pt.2: Windows\
-In the root folder, run: `cargo tauri dev --target x86_64-pc-windows-msvc` for testing, `cargo tauri build --target x86_64-pc-windows-msvc` to build release (will be in `target/release/bundle/`).\
+In windows, Microsoft's C compiler won't work. You will need to use the `stable-x86_64-pc-windows-gnu` rust toolchain, which uses gcc. Install it with `rustup toolchain install stable-x86_64-pc-windows-gnu`, then you have 3 ways to use this:
+1) In the root folder, run: `cargo tauri dev --target stable-x86_64-pc-windows-gnu` for testing, `cargo tauri build --target stable-x86_64-pc-windows-gnu` to build release (will be in `target/release/bundle/`).
+2) `rustup default stable-x86_64-pc-windows-gnu` to set as your primary toolchain.
+3) There's a way to set a file to set your toolchain for projects, I don't know it rn
+
 Optionally, go into `.cargo` and change `target = ` to `x86_64-pc-windows-msvc` so that you can run the same commands as Linux does\
 
 NOTE: Some pages randomly don't work first run, finding the page in `frontend/src/routes` and pressing save helps reload it\
