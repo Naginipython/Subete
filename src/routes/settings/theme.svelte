@@ -17,66 +17,40 @@
     let init = true;
 
     store.subscribe(async json => {
-        if (!json["settings"].hasOwnProperty("app_colors")) {
-            color_text = {theme: "Nagini's dark", primary: "1a1a1a", secondary: "330000", selection: "800000", text: "ffffff"};
-        } else {
-            if (!json['settings']['app_colors'].hasOwnProperty("theme")) {
-                color_text.theme = "Nagini's dark";
-            } else {
-                color_text.theme = json["settings"]["app_colors"].theme;
-            }
-            if (!json['settings']['app_colors'].hasOwnProperty("primary")) {
-                color_text.primary = "1a1a1a";
-            } else {
-                color_text.primary = json["settings"]["app_colors"].primary;
-            }
-            if (!json['settings']['app_colors'].hasOwnProperty("secondary")) {
-                color_text.secondary = "330000";
-            } else {
-                color_text.secondary = json["settings"]["app_colors"].secondary;
-            }
-            if (!json['settings']['app_colors'].hasOwnProperty("selection")) {
-                color_text.selection = "800000";
-            } else {
-                color_text.selection = json["settings"]["app_colors"].selection;
-            }
-            if (!json['settings']['app_colors'].hasOwnProperty("text")) {
-                color_text.text = "ffffff";
-            } else {
-                color_text.text = json["settings"]["app_colors"].text;
-            }
+        color_text.theme = json["settings"]["app_colors"].theme;
+        color_text.primary = json["settings"]["app_colors"].primary;
+        color_text.secondary = json["settings"]["app_colors"].secondary;
+        color_text.selection = json["settings"]["app_colors"].selection;
+        color_text.text = json["settings"]["app_colors"].text;
+        
+        if (color_text.theme == "Custom") custom = true;
+        switch (color_text.primary) {
+            case "1a1a1a": primary_color_select = "Dark"; break;
+            case "f2f2f2": primary_color_select = "Light"; break;
+            default: primary_color_select = "Other";
         }
-        if (init) {
-            init = false;
-            if (color_text.theme == "Custom") custom = true;
-            switch (color_text.primary) {
-                case "1a1a1a": primary_color_select = "Dark"; break;
-                case "f2f2f2": primary_color_select = "Light"; break;
-                default: primary_color_select = "Other";
-            }
-            switch (color_text.secondary) {
-                case "330000": secondary_color_select = "Shitty Red"; break;
-                case "331f00": secondary_color_select = "Shitty Orange"; break;
-                case "333300": secondary_color_select = "Shitty Yellow"; break;
-                case "003300": secondary_color_select = "Shitty Green"; break;
-                case "000033": secondary_color_select = "Shitty Blue"; break;
-                case "1a0033": secondary_color_select = "Shitty Purple"; break;
-                default: secondary_color_select = "Other";
-            }
-            switch (color_text.selection) {
-                case "800000": selection_color_select = "Shitty Red"; break;
-                case "801f00": selection_color_select = "Shitty Orange"; break;
-                case "808000": selection_color_select = "Shitty Yellow"; break;
-                case "008000": selection_color_select = "Shitty Green"; break;
-                case "000080": selection_color_select = "Shitty Blue"; break;
-                case "1a0080": selection_color_select = "Shitty Purple"; break;
-                default: selection_color_select = "Other";
-            }
-            switch (color_text.text) {
-                case "ffffff": text_color_select = "White"; break;
-                case "000000": text_color_select = "Black"; break;
-                default: text_color_select = "Other";
-            }
+        switch (color_text.secondary) {
+            case "330000": secondary_color_select = "Shitty Red"; break;
+            case "331f00": secondary_color_select = "Shitty Orange"; break;
+            case "333300": secondary_color_select = "Shitty Yellow"; break;
+            case "003300": secondary_color_select = "Shitty Green"; break;
+            case "000033": secondary_color_select = "Shitty Blue"; break;
+            case "1a0033": secondary_color_select = "Shitty Purple"; break;
+            default: secondary_color_select = "Other";
+        }
+        switch (color_text.selection) {
+            case "800000": selection_color_select = "Shitty Red"; break;
+            case "801f00": selection_color_select = "Shitty Orange"; break;
+            case "808000": selection_color_select = "Shitty Yellow"; break;
+            case "008000": selection_color_select = "Shitty Green"; break;
+            case "000080": selection_color_select = "Shitty Blue"; break;
+            case "1a0080": selection_color_select = "Shitty Purple"; break;
+            default: selection_color_select = "Other";
+        }
+        switch (color_text.text) {
+            case "ffffff": text_color_select = "White"; break;
+            case "000000": text_color_select = "Black"; break;
+            default: text_color_select = "Other";
         }
         return json;
     });

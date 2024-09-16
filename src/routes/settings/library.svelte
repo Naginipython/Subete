@@ -4,47 +4,44 @@
 
     let library_widths = {
         manga: '',
+        anime: '',
         ln: '',
     };
     $: manga_item_custom = manga_width == "Custom";
+    $: anime_item_custom = anime_width == "Custom";
     $: ln_item_custom = ln_width == "Custom";
     let manga_width = "2x"; // 100 + 50*width
+    let anime_width = "2x"; // 100 + 50*width
     let ln_width = "2x"; // 100 + 50*width
-    let init = true;
 
     store.subscribe(async json => {
-        if (!json["settings"].hasOwnProperty("library_widths")) {
-            library_widths = { manga: '100', ln: '100' };
-        } else {
-            if (!json['settings']['library_widths'].hasOwnProperty("manga")) {
-                library_widths.manga = "100";
-            } else {
-                library_widths.manga = json["settings"]["library_widths"].manga;
-            }
-            if (!json['settings']['library_widths'].hasOwnProperty("ln")) {
-                library_widths.ln = "100";
-            } else {
-                library_widths.ln = json["settings"]["library_widths"].ln;
-            }
+        library_widths.manga = json["settings"]["library_widths"].manga;
+        library_widths.anime = json["settings"]["library_widths"].anime;
+        library_widths.ln = json["settings"]["library_widths"].ln;
+        
+        switch(library_widths.manga) {
+            case "50": manga_width = "1x"; break;
+            case "100": manga_width = "2x"; break;
+            case "150": manga_width = "3x"; break;
+            case "200": manga_width = "4x"; break;
+            case "250": manga_width = "5x"; break;
+            default: manga_width = "Custom";
         }
-        if (init) {
-            init = false;
-            switch(library_widths.manga) {
-                case "50": manga_width = "1x"; break;
-                case "100": manga_width = "2x"; break;
-                case "150": manga_width = "3x"; break;
-                case "200": manga_width = "4x"; break;
-                case "250": manga_width = "5x"; break;
-                default: manga_width = "Custom";
-            }
-            switch(library_widths.ln) {
-                case "50": ln_width = "1x"; break;
-                case "100": ln_width = "2x"; break;
-                case "150": ln_width = "3x"; break;
-                case "200": ln_width = "4x"; break;
-                case "250": ln_width = "5x"; break;
-                default: ln_width = "Custom";
-            }
+        switch(library_widths.anime) {
+            case "50": anime_width = "1x"; break;
+            case "100": anime_width = "2x"; break;
+            case "150": anime_width = "3x"; break;
+            case "200": anime_width = "4x"; break;
+            case "250": anime_width = "5x"; break;
+            default: anime_width = "Custom";
+        }
+        switch(library_widths.ln) {
+            case "50": ln_width = "1x"; break;
+            case "100": ln_width = "2x"; break;
+            case "150": ln_width = "3x"; break;
+            case "200": ln_width = "4x"; break;
+            case "250": ln_width = "5x"; break;
+            default: ln_width = "Custom";
         }
     });
 
@@ -54,6 +51,18 @@
             library_widths.manga = (50*scale).toString();
         }
         document.documentElement.style.setProperty('--lib-manga-width', `${library_widths.manga}px`);
+        store.update(json => {
+            json["settings"].library_widths = library_widths;
+            return json;
+        });
+        await invoke('update_settings', { newSettings: {"library_widths": library_widths}})
+    }
+    async function change_anime_width() {
+        if (anime_width != "Custom") {
+            let scale = parseInt(anime_width[0]);
+            library_widths.anime = (50*scale).toString();
+        }
+        document.documentElement.style.setProperty('--lib-anime-width', `${library_widths.anime}px`);
         store.update(json => {
             json["settings"].library_widths = library_widths;
             return json;
@@ -87,6 +96,23 @@
     {#if manga_width == "Custom"}
         <form on:submit={change_manga_width}>
             <input id="input-primary-color" bind:value={library_widths.manga} /><span>px</span>
+            <input type="button" value="Apply"/>
+        </form>
+    {/if}
+</div>
+<div class="library-box">
+    <label for="presets">Anime Item Size: </label>
+    <select id="presets" bind:value={anime_width} on:change={async () => change_anime_width()}>
+        <option>1x</option>
+        <option>2x</option>
+        <option>3x</option>
+        <option>4x</option>
+        <option>5x</option>
+        <option>Custom</option>
+    </select>
+    {#if anime_width == "Custom"}
+        <form on:submit={change_anime_width}>
+            <input id="input-primary-color" bind:value={library_widths.anime} /><span>px</span>
             <input type="button" value="Apply"/>
         </form>
     {/if}

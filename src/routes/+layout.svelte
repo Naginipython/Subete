@@ -4,6 +4,7 @@
     import { goto } from "$app/navigation";
     import { onMount } from "svelte";
     import { invoke } from "@tauri-apps/api/core";
+    import { setup } from "$lib/global_common.js";
     import store from "$lib/store.js";
     import logo from "$lib/logo.png"
 
@@ -12,48 +13,7 @@
     let loading = true;
     onMount(async () => {
         // GET LIB
-        let manga_library = await invoke('get_manga_lib');
-        let manga_history = await invoke('get_manga_history');
-        let manga_updates = await invoke('get_manga_updates_list');
-        let anime_library = await invoke('get_anime_lib');
-        let ln_library = await invoke('get_ln_lib');
-        let settings = await invoke('get_settings');
-        store.update(json => {
-            json.manga_library = manga_library;
-            json.manga_history = manga_history;
-            json.manga_updates = manga_updates
-            json.ln_library = ln_library;
-            json.anime_library = anime_library;
-            json.settings = settings;
-            json.media_screen = media_screen;
-            return json;
-        });
-        // GET AND SET SETTINGS, if available
-        if (settings.hasOwnProperty("app_colors")) {
-            if (settings['app_colors'].hasOwnProperty("primary")) {
-                document.documentElement.style.setProperty('--primary-color', `#${settings['app_colors'].primary}`); 
-            }
-            if (settings['app_colors'].hasOwnProperty("secondary")) {
-                document.documentElement.style.setProperty('--secondary-color', `#${settings['app_colors'].secondary}`); 
-            }
-            if (settings['app_colors'].hasOwnProperty("selection")) {
-                document.documentElement.style.setProperty('--selection-color', `#${settings['app_colors'].selection}`); 
-            }
-            if (settings['app_colors'].hasOwnProperty("text")) {
-                document.documentElement.style.setProperty('--text-color', `#${settings['app_colors'].text}`); 
-            }
-        }
-        if (settings.hasOwnProperty("library_widths")) {
-            if (settings["library_widths"].hasOwnProperty("manga")) {
-                document.documentElement.style.setProperty('--lib-manga-width', `${settings['library_widths'].manga}px`); 
-            }
-            if (settings["library_widths"].hasOwnProperty("ln")) {
-                document.documentElement.style.setProperty('--lib-ln-width', `${settings['library_widths'].ln}px`); 
-            }
-            if (settings["library_widths"].hasOwnProperty("anime")) {
-                document.documentElement.style.setProperty('--lib-anime-width', `${settings['library_widths'].ln}px`); 
-            }
-        }
+        await setup(media_screen);
         loading = false;
     });
     store.subscribe(json => {

@@ -1,6 +1,7 @@
 export const prerender = false;
 export function load({ params }) {
     return {
-        id: params.ln
+        id: params.ln,
+        plugin: params.plugin
     }
 }
