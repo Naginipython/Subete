@@ -118,6 +118,22 @@
         if (nav.includes("reader")) {
             snack_nav_off();
         }
+
+        // --- VIEWER ---
+        // Removes snackbar and nav for viewer
+        if (nav.includes("viewer")) {
+            snack_nav_off();
+        }
+    }
+    function change_media(media) {
+        media_screen = media;
+        store.update(json => {
+            json.media_screen = media_screen;
+            return json;
+        });
+        if (nav.includes('library') || nav == '') {
+            goto(`/${media_screen}_library`);
+        }
     }
 
     // ----- PRIMARY APP COMMANDS & KEYS ----- 
@@ -182,7 +198,6 @@
 
 <div id="nav-centered">
     <nav class="nav-bar">
-        <!-- TODO: merge with more when possible (for History, stats?, settings) -->
         <a id="/library" class="{path.includes('library')? 'selected' : ''}" 
             href="/{media_screen}_library">
             Library

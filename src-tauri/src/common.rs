@@ -1,8 +1,10 @@
 use std::{fs::File, io::Write, path::PathBuf, sync::Mutex};
-use quickjs_runtime::{builder::QuickJsRuntimeBuilder, jsutils::Script, values::JsValueConvertable};
 use serde::Serialize;
 use serde_json::{json, Value};
 use crate::helpers;
+
+#[cfg(target_os = "linux")]
+use quickjs_runtime::{builder::QuickJsRuntimeBuilder, jsutils::Script, values::{JsValueConvertable, JsValueFacade}};
 
 // TRAITS
 pub trait HasId {
@@ -92,12 +94,8 @@ pub async fn search<T: Serialize + IsPlugin>(
             let html = helpers::fetch(url).await;
 
             // Getting from plugins
-            let search = (p.search()).to_string();
-
-            let runtime = QuickJsRuntimeBuilder::new().build();
-            let script = Script::new("search.js", &search);
-            runtime.eval_sync(None, script).ok().expect("script failed");
-            result = runtime.invoke_function_sync(None, &[], "search", vec![html.to_js_value_facade()]).unwrap().to_serde_value().await.unwrap();
+            let code = p.search();
+            result = run_js("search", code, "search", vec![html]).await;
         }
     }
     result
@@ -120,13 +118,7 @@ pub async fn get_list<T: Serialize + IsPlugin, U: Serialize + IsItem + HasId>(me
         
         // setup code
         let code = p.get_list();
-        
-        let runtime = QuickJsRuntimeBuilder::new().build();
-        let script = Script::new("get_list.js", &code);
-        runtime.eval_sync(None, script).ok().expect("script failed");
-        result = runtime
-            .invoke_function_sync(None, &[], item.list_fn(), vec![serde_json::to_string(&item).unwrap().to_js_value_facade(), html.to_js_value_facade()])
-            .unwrap().to_serde_value().await.unwrap();
+        result = run_js("get_list.js", code, item.list_fn(), vec![serde_json::to_string(&item).unwrap(), html]).await;
 
         // extra
         if let Some(e) = result["extra"].as_object() {
@@ -134,10 +126,8 @@ pub async fn get_list<T: Serialize + IsPlugin, U: Serialize + IsItem + HasId>(me
             if let Some(next) = e.get("next") {
                 let link = String::from(next.as_str().unwrap());
                 let html = helpers::fetch(link).await;
-
-                result = runtime
-                    .invoke_function_sync(None, &[], "next", vec![serde_json::to_string(&result).unwrap().to_js_value_facade(), html.to_js_value_facade()])
-                    .unwrap().to_serde_value().await.unwrap();
+                
+                result = run_js("get_list.js", code, "next", vec![serde_json::to_string(&result).unwrap(), html]).await;
                 // if let None = episode_result.extra { break; }
             }
         }
@@ -155,14 +145,8 @@ pub async fn get_item<T: Serialize + IsPlugin>(media: &str, plugins: Vec<T>, sou
         let html = helpers::fetch(url).await;
         
         let code = p.get_item();
-
-        let runtime = QuickJsRuntimeBuilder::new().build();
-        let script = Script::new("item.js", &code);
-        runtime.eval_sync(None, script).ok().expect("script failed");
-        result = runtime
-            .invoke_function_sync(None, &[], p.item_fn(), vec![html.to_js_value_facade()])
-            .unwrap().to_serde_value().await.unwrap();
-
+        result = run_js("item.js", code, p.item_fn(), vec![html]).await;
+                
         // extra
         let mut count = 0;
         while let Some(next) = result.get("next") {
@@ -190,10 +174,27 @@ pub async fn get_item<T: Serialize + IsPlugin>(media: &str, plugins: Vec<T>, sou
             } else {
                 helpers::fetch(String::from(next.as_str().unwrap())).await
             };
-            result = runtime
-                .invoke_function_sync(None, &[], &format!("next{next_count}"), vec![serde_json::to_string(&result).unwrap().to_js_value_facade(), html.to_js_value_facade()])
-                .unwrap().to_serde_value().await.unwrap();
+            result = run_js("item.js", code, &format!("next{next_count}"), vec![serde_json::to_string(&result).unwrap(), html]).await;
         }
     }
     result
+}
+
+#[cfg(target_os = "linux")]
+async fn run_js(file: &str, code: &str, method_name: &str, args: Vec<String>) -> Value {
+    let args: Vec<JsValueFacade> = args.iter().map(|f| f.clone().to_js_value_facade()).collect();
+
+    let runtime = QuickJsRuntimeBuilder::new().build();
+    let script = Script::new(file, &code);
+    runtime.eval_sync(None, script).ok().expect("script failed");
+    runtime.invoke_function_sync(None, &[], method_name, args).unwrap().to_serde_value().await.unwrap()
+}
+
+#[cfg(target_os = "windows")]
+async fn run_js() -> Value {
+    // example, TODO
+    // note: reset(), call_function
+    // maybe can eval and call_function?
+    let context = Context::new().unwrap();
+    let value = context.eval_as::<String>(" var x = 100 + 250; x.toString() ").unwrap();
 }
