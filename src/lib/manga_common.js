@@ -11,7 +11,7 @@ export function find_manga(plugin, id) {
     if (manga == undefined) {
         manga = json.manga_library.find(m => m.id == id && (m.plugin==plugin || plugin==null));
         if (manga==undefined) {
-            manga = json.manga_search_results.find(m => m.id == id && (m.plugin==plugin || plugin==null));
+            manga = json.manga_search_results.map(m => m.data).flat().find(m => m.id == id && (m.plugin==plugin || plugin==null));
             if (manga==undefined) {
                 // hist to manga
                 let hist = json.manga_history.find(m => m.id==id && (m.plugin==plugin || plugin==null));

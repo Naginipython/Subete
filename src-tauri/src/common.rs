@@ -102,12 +102,12 @@ pub async fn search<T: Serialize + IsPlugin>(
     media: &str,
     plugins: Vec<T>,
     query: String,
-    sources: Vec<String>,
+    source: String,
 ) -> Value {
     println!("Searching {media}(s)...");
     let mut result: Value = json!([]);
     for p in plugins {
-        if sources.contains(&p.id()) {
+        if source.contains(&p.id()) {
             // Fetching page data
             let url = replace_url(p.search_url(), "{title}", &query);
             let html = helpers::fetch(url).await;

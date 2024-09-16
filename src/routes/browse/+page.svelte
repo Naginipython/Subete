@@ -52,7 +52,6 @@
         new_sources.forEach(i => {
             checked_sources[i] = true;
         });
-        reformatResults();
         return json;
     });
 
@@ -61,72 +60,64 @@
         is_searching = true;
         results = [];
         error = "";
-        let s = Object.entries(checked_sources).filter(([key, value]) => value).map(([key, value]) => key);
-        s = s.filter(x => sources.includes(x));
+        // setup sources to be searched and the output
+        let search_sources = Object.entries(checked_sources).filter(([key, value]) => value).map(([key, value]) => key);
+        search_sources = search_sources.filter(x => sources.includes(x));
         let result = [];
+        for (const s of search_sources) {
+            result.push({plugin: s, data: []});
+        }
+        // based on media_screen, calls different tauri commands & stores differently
         switch (media_screen) {
-            case "manga": {
-                // TODO: call this multiple times, instead of looping in. This way, can get some results earlier
-                let r = await invoke('manga_search', { query: `${name}`, sources: s });
-                if (!r.hasOwnProperty("error")) {
-                    result = r;
-                } else {
-                    error = r.error;
+            case "manga":
+                for (const s of search_sources) {
+                    let r = await invoke('manga_search', { query: `${name}`, source: s });
+                    if (!r.hasOwnProperty("error")) {
+                        result[result.findIndex(i => i.plugin==s)].data = r;
+                    } else {
+                        result[result.findIndex(i => i.plugin==s)].error = r.error;
+                        error = r.error;
+                    }
+                    store.update(json => {
+                        json.manga_search_results = result;
+                        return json;
+                    });
                 }
-                store.update(json => {
-                    json.manga_search_results = result;
-                    return json;
-                });
                 break;
-            }
-            case "ln": {
-                let r = await invoke('ln_search', { query: `${name}`, sources: s });
-                if (!r.hasOwnProperty("error")) {
-                    result = r;
-                } else {
-                    error = r.error;
+            case "ln":
+                for (const s of search_sources) {
+                    let r = await invoke('ln_search', { query: `${name}`, source: s });
+                    if (!r.hasOwnProperty("error")) {
+                        result[result.findIndex(i => i.plugin==s)].data = r;
+                    } else {
+                        result[result.findIndex(i => i.plugin==s)].error = r.error;
+                        error = r.error;
+                    }
+                    store.update(json => {
+                        json.ln_search_results = result;
+                        return json;
+                    });
                 }
-                store.update(json => {
-                    json.ln_search_results = result;
-                    return json;
-                });
                 break;
-            }
-            case "anime": {
-                let r = await invoke('anime_search', { query: `${name}`, sources: s });
-                if (!r.hasOwnProperty("error")) {
-                    result = r;
-                } else {
-                    error = r.error;
+            case "anime":
+                for (const s of search_sources) {
+                    let r = await invoke('anime_search', { query: `${name}`, source: s });
+                    if (!r.hasOwnProperty("error")) {
+                        result[result.findIndex(i => i.plugin==s)].data = r;
+                    } else {
+                        result[result.findIndex(i => i.plugin==s)].error = r.error;
+                        error = r.error;
+                    }
+                    store.update(json => {
+                        json.anime_search_results = result;
+                        return json;
+                    });
                 }
-                store.update(json => {
-                    json.anime_search_results = result;
-                    return json;
-                });
                 break;
-            }
         }
         is_searching = false;
-        // reformatResults();
     }
 
-    function reformatResults() {
-        // Exports the plugin name to the outside.
-        // Turns a array of everything into:
-        // [{plugin: string, data: []}]
-        if (!results.some(a => a.hasOwnProperty('data'))) {
-            results = Object.values(
-                results.reduce((result, item) => {
-                    let plugin = item.plugin;
-                    if (!result[plugin]) {
-                        result[plugin] = {plugin: plugin, data: []};
-                    }
-                    result[plugin]['data'].push(item);
-                    return result;
-                }, {})
-            );
-        }
-    }
     function clear_search() {
         results = [];
         store.update(json => {
@@ -169,16 +160,18 @@
             </div>
             {/each}
         </div>
-    {:else if is_searching}
-        <div class="loading">
-            <Moon color="var(--selection-color)" size="30" />
-        </div>
     {/if}
 
     <!-- displays manga -->
     {#each results as item, i}
         <h3>{item.plugin}</h3>
-        <Display data={item.data} media_screen={media_screen}/>
+        {#if item.data.length==0 && is_searching}
+            <div class="loading">
+                <Moon color="var(--selection-color)" size="30" />
+            </div>
+        {:else}
+            <Display data={item.data} media_screen={media_screen}/>
+        {/if}
     {/each}
 
 </div>

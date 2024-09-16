@@ -77,8 +77,8 @@ pub fn get_ln_plugin_names() -> Value {
 }
 
 #[tauri::command]
-pub async fn ln_search(query: String, sources: Vec<String>) -> Value {
-    search("ln", get_plugins(), query, sources).await
+pub async fn ln_search(query: String, source: String) -> Value {
+    search("ln", get_plugins(), query, source).await
 }
 
 #[tauri::command]
