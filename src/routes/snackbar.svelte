@@ -58,7 +58,7 @@
         // Changes the top nav for manga
         if (nav.includes("manga/") && !nav.includes("reader")) {
             in_manga = true;
-            if (from.includes('library') || from=='/updates' || from=='/browse') {
+            if (from=='/library' || from=='/updates' || from=='/browse') {
                 back = from;
             }
             manga_data.data = find_manga($navigating.to.params.plugin, $navigating.to.params.manga);
@@ -71,7 +71,7 @@
         // Changes the top nav for anime
         if (nav.includes("anime/") && !nav.includes("reader")) {
             in_anime = true;
-            if (from.includes('library') || from=='/updates' || from=='/browse') {
+            if (from=='/library' || from=='/updates' || from=='/browse') {
                 back = from;
             }
             anime_data.data = find_anime($navigating.to.params.plugin, $navigating.to.params.anime);
@@ -84,7 +84,7 @@
         // Changes the top nav for ln
         if (nav.includes("ln/") && !nav.includes("reader")) {
             in_ln = true;
-            if (from.includes('library') || from=='/updates' || from=='/browse') {
+            if (from=='/library' || from=='/updates' || from=='/browse') {
                 back = from;
             }
             ln_data.data = find_ln($navigating.to.params.ln);
@@ -122,9 +122,6 @@
             json.media_screen = media_screen;
             return json;
         });
-        if (nav.includes('library') || nav == '') {
-            goto(`/${media_screen}_library`);
-        }
     }
     store.subscribe(json => {
         media_screen = json.media_screen;

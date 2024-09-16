@@ -61,7 +61,7 @@
     });
 
     let nav = '';
-    let selected_valid_links = ["library", "/updates", "/browse", "/more"];
+    let selected_valid_links = ["/library", "/updates", "/browse", "/more"];
     $: path = $page.url.pathname;
     let scroll_memory = {};
     let from = "/";
@@ -79,7 +79,7 @@
         snack_nav_on();
 
         // Hides nav bar when not selected
-        if (!selected_valid_links.some(link => nav == link) && !nav.includes("library")) {
+        if (!selected_valid_links.some(link => nav == link) && nav != '/library') {
             only_snackbar_on();
         }
 
@@ -131,9 +131,6 @@
             json.media_screen = media_screen;
             return json;
         });
-        if (nav.includes('library') || nav == '') {
-            goto(`/${media_screen}_library`);
-        }
     }
 
     // ----- PRIMARY APP COMMANDS & KEYS ----- 
@@ -141,17 +138,17 @@
         if (event.ctrlKey && event.key === 'm') {
             event.preventDefault();
             change_media("manga");
-            goto('/manga_library');
+            goto('/library');
         }
         if (event.ctrlKey && event.key === 'l') {
             event.preventDefault();
             change_media("ln");
-            goto('/ln_library');
+            goto('/library');
         }
         if (event.ctrlKey && event.key === 'a') {
             event.preventDefault();
             change_media("anime");
-            goto('/anime_library');
+            goto('/library');
         }
     }
 
@@ -198,10 +195,7 @@
 
 <div id="nav-centered">
     <nav class="nav-bar">
-        <a id="/library" class="{path.includes('library')? 'selected' : ''}" 
-            href="/{media_screen}_library">
-            Library
-        </a>
+        <a id="/library" class="{path=='/library'? 'selected' : ''}" href="/library">Library</a>
         <a id="/updates" class="{path=='/updates'? 'selected' : ''}" href="/updates">Updates</a>
         <a id="/browse" class="{path.includes('/browse')? 'selected' : ''}" href="/browse">Browse</a>
         <a id="/more" class="{path=='/more'? 'selected' : ''}" href="/more">More</a>
@@ -224,6 +218,9 @@
 
         --lib-ln-width: 100px;
         --lib-ln-height: calc(var(--lib-ln-width) *1.5);
+
+        --lib-anime-width: 100px;
+        --lib-anime-height: calc(var(--lib-anime-width) *1.5);
     }
     #splashscreen {
         position: fixed;
