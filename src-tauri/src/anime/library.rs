@@ -1,7 +1,6 @@
-use std::{fs::File, path::PathBuf, sync::{LazyLock, Mutex}};
+use std::{fs::File, path::PathBuf, process::Command, sync::{LazyLock, Mutex}};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-
 use crate::{add_to_lib, delete_entire_lib, get_lib, remove_from_lib, update_lib, HasId, IsItem, FILE_PATH};
 
 static LIB_PATH: LazyLock<PathBuf> = LazyLock::new(|| {
@@ -78,4 +77,10 @@ pub fn remove_from_anime_lib(id: String) {
 #[tauri::command]
 pub fn delete_anime_lib() {
     delete_entire_lib("anime", &LIB, &LIB_PATH);
+}
+
+#[tauri::command]
+pub async fn open_in_vlc(url: String) {
+    let mut process = Command::new("vlc").arg(url).spawn().expect("Failed");
+    process.wait().expect("Failed2");
 }

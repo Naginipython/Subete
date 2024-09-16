@@ -25,12 +25,14 @@ regex = "1.10.6"
 aes = "0.7"
 block-modes = "0.8"
 base64 = "0.13"
-quickjs_runtime = { version="0.13.4", optional=true }
+quickjs_runtime = { version = "0.13.4", optional = true, features = ["console"] }
 quickjs-rusty = { version="0.6.3", optional=true }
+tauri-plugin-os = "2.0.0-rc"
 
 [features]
 windows = ["quickjs-rusty"]
 linux = ["quickjs_runtime"]
+quickjs_runtime = ["dep:quickjs_runtime"]
 
 [target.'cfg(unix)'.dependencies]
 quickjs_runtime = "0.13.4"

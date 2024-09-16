@@ -10,13 +10,11 @@ static PLUGINS_PATH: LazyLock<PathBuf> = LazyLock::new(|| {
     path.push("manga_plugins.json");
     path
 });
-static PLUGINS: LazyLock<Mutex<Vec<Plugins>>> = LazyLock::new(|| match File::open(&*PLUGINS_PATH) {
-    Ok(file) => Mutex::new(serde_json::from_reader(file).unwrap_or_default()),
-    Err(_e) => {
-        File::create(&*PLUGINS_PATH).unwrap();
-        Mutex::new(Vec::new())
-    }
-});
+static PLUGINS: LazyLock<Mutex<Vec<Plugins>>> =
+    LazyLock::new(|| match File::open(&*PLUGINS_PATH) {
+        Ok(file) => Mutex::new(serde_json::from_reader(file).unwrap_or_default()),
+        Err(_e) => Mutex::new(init_plugins()),
+    });
 
 #[derive(Debug, Deserialize, Serialize, Default, Clone)]
 pub struct Plugins {

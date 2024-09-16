@@ -1,13 +1,13 @@
-use std::{path::PathBuf, sync::LazyLock};
 use settings::*;
+use std::{path::PathBuf, sync::LazyLock};
 
 pub use common::*;
 
 mod anime;
-mod manga;
-mod ln;
 mod common;
 mod helpers;
+mod ln;
+mod manga;
 mod settings;
 
 static FILE_PATH: LazyLock<PathBuf> = LazyLock::new(|| {
@@ -28,6 +28,7 @@ static FILE_PATH: LazyLock<PathBuf> = LazyLock::new(|| {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_shell::init())
         .setup(|_app| {
@@ -36,43 +37,73 @@ pub fn run() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
-            helpers::fetch, helpers::post_fetch,
+            helpers::fetch,
+            helpers::post_fetch,
             // manga/library.rs
-            manga::get_manga_lib, manga::add_to_manga_lib, manga::remove_from_manga_lib, manga::update_manga_lib, manga::delete_manga_lib,
+            manga::get_manga_lib,
+            manga::add_to_manga_lib,
+            manga::remove_from_manga_lib,
+            manga::update_manga_lib,
+            manga::delete_manga_lib,
             // manga/plugins.rs
-            manga::manga_search, manga::get_manga_chapters, manga::get_manga_plugin_names, manga::get_manga_pages, manga::add_manga_plugin, 
-            manga::delete_manga_plugins, manga::delete_manga_plugin,
+            manga::manga_search,
+            manga::get_manga_chapters,
+            manga::get_manga_plugin_names,
+            manga::get_manga_pages,
+            manga::add_manga_plugin,
+            manga::delete_manga_plugins,
+            manga::delete_manga_plugin,
             // manga/update.rs
-            manga::save_manga_updates_list, manga::get_manga_updates_list,
+            manga::save_manga_updates_list,
+            manga::get_manga_updates_list,
             // manga/history.rs
-            manga::save_manga_history, manga::get_manga_history,
-
+            manga::save_manga_history,
+            manga::get_manga_history,
             // anime/library.rs
-            anime::get_anime_lib, anime::add_to_anime_lib, anime::remove_from_anime_lib, anime::update_anime_lib, anime::delete_anime_lib,
+            anime::get_anime_lib,
+            anime::add_to_anime_lib,
+            anime::remove_from_anime_lib,
+            anime::update_anime_lib,
+            anime::delete_anime_lib,
+            anime::open_in_vlc,
             // anime/plugins.rs
-            anime::anime_search, anime::get_anime_episodes, anime::get_anime_plugin_names, anime::get_anime_video, anime::add_anime_plugin,
-            anime::delete_anime_plugins, anime::delete_anime_plugin,
-            
+            anime::anime_search,
+            anime::get_anime_episodes,
+            anime::get_anime_plugin_names,
+            anime::get_anime_video,
+            anime::add_anime_plugin,
+            anime::delete_anime_plugins,
+            anime::delete_anime_plugin,
             // ln/library.rs
-            ln::get_ln_lib, ln::add_to_ln_lib, ln::remove_from_ln_lib, ln::update_ln_lib, ln::delete_ln_lib,
+            ln::get_ln_lib,
+            ln::add_to_ln_lib,
+            ln::remove_from_ln_lib,
+            ln::update_ln_lib,
+            ln::delete_ln_lib,
             // ln/plugins.rs
-            ln::ln_search, ln::get_ln_chapters, ln::get_ln_plugin_names, ln::get_ln_pages, ln::add_ln_plugin, ln::delete_ln_plugins, 
+            ln::ln_search,
+            ln::get_ln_chapters,
+            ln::get_ln_plugin_names,
+            ln::get_ln_pages,
+            ln::add_ln_plugin,
+            ln::delete_ln_plugins,
             ln::delete_ln_plugin,
-            
             // settings.rs
-            update_settings, get_settings, delete_settings
+            update_settings,
+            get_settings,
+            delete_settings
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
-  
+
 #[derive(Debug, serde::Deserialize, serde::Serialize, Clone, Default)]
 pub enum Media {
     #[serde(rename = "manga")]
     #[default]
-    Manga, 
+    Manga,
     #[serde(rename = "ln")]
-    Ln, 
+    Ln,
     #[serde(rename = "anime")]
-    Anime
+    Anime,
 }
