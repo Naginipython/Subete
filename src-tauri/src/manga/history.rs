@@ -17,7 +17,7 @@ pub struct HistoryItem {
     pub plugin: String,
     pub recent_chapter_id: String,
     pub recent_chapter_num: i32,
-    pub timestamp: i64
+    pub timestamp: i64,
 }
 
 fn get_hist() -> Vec<HistoryItem> {
@@ -32,9 +32,12 @@ fn get_hist() -> Vec<HistoryItem> {
 
 #[tauri::command]
 pub fn save_manga_history(item: HistoryItem) {
-    let temp: Vec<HistoryItem> = get_hist().into_iter().filter(|h| !(h.title == item.title && h.plugin == item.plugin)).collect();
+    let temp: Vec<HistoryItem> = get_hist()
+        .into_iter()
+        .filter(|h| !(h.title == item.title && h.plugin == item.plugin))
+        .collect();
     let mut hist = VecDeque::from(temp);
-    
+
     hist.push_front(item);
     println!("Saving manga history...");
     save(&*HIST_PATH, &Vec::from(hist));

@@ -51,7 +51,7 @@ fn get_plugins() -> Vec<Plugins> {
             let plugins = vec![];
             save(&*PLUGINS_PATH, &plugins);
             plugins
-        },
+        }
     }
 }
 fn init_plugins() -> Vec<Plugins> {
