@@ -1,6 +1,6 @@
-# Omniyomi
+# Subete
 
-A personal project attempting to create a Tachiyomi/Aniyomi-like for desktop from scratch. Currently features manga reading, library, and app setting modification, soon to be implementing Light Novel support
+A personal project attempting to create a ~~Tachiyomi~~ Mihon/Aniyomi-like for desktop from scratch. Currently features manga reading, library, and app setting modification, soon to be implementing Light Novel support
 
 Currently only has a built-in MangaDex plugin, but features a plugin creator in `plugins/` to help creating plugins for this app. Due to limitation on how JavaScript code runs within the Rust code, do not rely on npm packages unless they are hard-coded, and avoid odd symbols because of JSON parsing (e.g. \\\\. \\\' seems fine)
 
@@ -15,19 +15,24 @@ https://github.com/Naginipython/Subete/assets/42967504/260dfcf2-4acc-40cb-b75d-c
 - [x] Error messages for browse
 - [x] Error messages for manga chapters.
 - [ ] Error messages for ln chapters.
+- [x] Error messages for anime episodes
 - [ ] Error messages for readers
+- [ ] Easier Plugin DOM parsing
 - [x] Updates. Cute progress bar for updates
+  - [ ] fix updates back button
+  - [ ] anime & ln
 - [x] General loading icons for pages, browse.
 - [x] App initialize loading icon
 - [ ] Icons for nav bar
 - [ ] nav bar more items when able
-- [x] Hide Navbar when none selected (aka, manga/settings screen
+- [x] Hide Navbar when none selected (aka, manga/settings screen)
 - [ ] Run app in background (& Auto-update)
 - [ ] Update result notifications
 - [ ] Fullscreen on Android for Reader (maybe not possible)
 - [ ] Extension General Feed (Front page, if available)
 - [ ] Settings:
   - [ ] Disable Manga/Ln/Anime
+  - [ ] Show per row OR as many as fit
   - [ ] SPECIAL mode
   - [ ] Mode: tab above for M/L/A, OR Tabs for each lib
     - [ ] Browse & Update separation needed
@@ -53,6 +58,7 @@ https://github.com/Naginipython/Subete/assets/42967504/260dfcf2-4acc-40cb-b75d-c
   - [ ] Send to Web
   - [ ] Title hold sends to clipboard
   - [ ] Fix Description
+  - [ ] Categories
   - [ ] fav button to start/resume (Topmost non-completed item)
 - [ ] Manga Reader features:
   - [ ] Swipe turn
@@ -75,6 +81,9 @@ https://github.com/Naginipython/Subete/assets/42967504/260dfcf2-4acc-40cb-b75d-c
   - [ ] top areas
   - [ ] next/prev chapter
 - [ ] Anime
+  - [ ] Choose linux watcher
+  - [ ] Download
+  - [ ] 
 
 ## Installation
 
