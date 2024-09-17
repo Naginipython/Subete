@@ -86,8 +86,8 @@ pub async fn anime_search(query: String, source: String) -> Value {
 }
 
 #[tauri::command]
-pub async fn get_anime_episodes(anime: LibraryItem) -> Value {
-    get_list("anime", get_plugins(), anime).await
+pub async fn get_anime_episodes(item: LibraryItem) -> Value {
+    get_list("anime", get_plugins(), item).await
 }
 
 #[tauri::command]

@@ -4,7 +4,7 @@
     import { goto } from "$app/navigation";
     import { onMount } from "svelte";
     import { invoke } from "@tauri-apps/api/core";
-    import { setup } from "$lib/global_common.js";
+    import { setup } from "$lib/common.js";
     import store from "$lib/store.js";
     import logo from "$lib/logo.png"
 
@@ -14,6 +14,7 @@
     onMount(async () => {
         // GET LIB
         await setup(media_screen);
+        goto('/library');
         loading = false;
     });
     store.subscribe(json => {

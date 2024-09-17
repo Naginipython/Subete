@@ -2,7 +2,7 @@
   import { invoke } from "@tauri-apps/api/core";
   import { platform } from '@tauri-apps/plugin-os';
   import { onMount } from 'svelte';
-  import { find_anime } from "$lib/anime_common.js";
+  import { find_item } from "$lib/common.js";
   import store from "$lib/store.js";
   import Hls from 'hls.js';
   
@@ -27,7 +27,7 @@
     is_loading = true;
     currPlatform = await platform();
     // TODO: add query params for this, but if there are none do find manga
-    anime = find_anime(data.plugin, data.id);
+    anime = find_item("anime", data.plugin, data.id);
     episode = anime['episodes'][data.anime_index];
     streamUrl = await invoke('get_anime_video', { source: anime.plugin, id: episode.id });
 

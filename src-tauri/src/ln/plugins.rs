@@ -82,8 +82,8 @@ pub async fn ln_search(query: String, source: String) -> Value {
 }
 
 #[tauri::command]
-pub async fn get_ln_chapters(ln: LibraryItem) -> Value {
-    get_list("ln", get_plugins(), ln).await
+pub async fn get_ln_chapters(item: LibraryItem) -> Value {
+    get_list("ln", get_plugins(), item).await
 }
 
 #[tauri::command]

@@ -2,13 +2,13 @@
     import { invoke } from "@tauri-apps/api/core";
     import { faArrowLeft, faBookmark, faEllipsisVertical } from '@fortawesome/free-solid-svg-icons';
     import { faBookmark as faOutlineBookmark } from '@fortawesome/free-regular-svg-icons';
-    import { find_ln } from "$lib/ln_common.js";
+    import { find_item } from "$lib/common.js";
     import { goto } from "$app/navigation";
     import { Moon } from 'svelte-loading-spinners';
     import Fa from 'svelte-fa'
     export let data;
 
-    let ln = find_ln(data.id);
+    let ln = find_item("ln", data.plugin, data.id);
     let chapter = ln['chapters'][data.ln_index];
     let curr_page = 0;
     let display_page = 0;

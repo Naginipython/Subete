@@ -9,23 +9,12 @@
         faHeart, faBook, faRotateRight 
     } from '@fortawesome/free-solid-svg-icons'
     import { faHeart as faOutlineHeart } from '@fortawesome/free-regular-svg-icons';
-    import { 
-        find_manga,
-        in_lib as in_manga_lib, 
-        toggle_favorite as toggle_manga_favorite, 
-        update_lib as manga_update
-    } from "$lib/manga_common.js";
-    import { 
-        find_anime,
-        in_lib as in_anime_lib, 
-        toggle_favorite as toggle_anime_favorite, 
-        update_lib as anime_update
-    } from "$lib/anime_common.js";
-    import { 
-        find_ln, 
-        in_lib as in_ln_lib, 
-        toggle_favorite as toggle_ln_favorite 
-    } from "$lib/ln_common.js";
+    import {
+        find_item,
+        in_lib,
+        toggle_favorite,
+        update
+    } from "$lib/common.js";
 
     // Vars
     export let nav = '';
@@ -61,8 +50,8 @@
             if (from=='/library' || from=='/updates' || from=='/browse') {
                 back = from;
             }
-            manga_data.data = find_manga($navigating.to.params.plugin, $navigating.to.params.manga);
-            manga_data.favorited = in_manga_lib(manga_data.data.id)
+            manga_data.data = find_item("manga", $navigating.to.params.plugin, $navigating.to.params.manga);
+            manga_data.favorited = in_lib("manga", manga_data.data.id)
         } else {
             in_manga = false;
         }
@@ -74,8 +63,8 @@
             if (from=='/library' || from=='/updates' || from=='/browse') {
                 back = from;
             }
-            anime_data.data = find_anime($navigating.to.params.plugin, $navigating.to.params.anime);
-            anime_data.favorited = in_anime_lib(anime_data.data.id)
+            anime_data.data = find_item("anime", $navigating.to.params.plugin, $navigating.to.params.anime);
+            anime_data.favorited = in_lib("anime", anime_data.data.id)
         } else {
             in_anime = false;
         }
@@ -87,8 +76,8 @@
             if (from=='/library' || from=='/updates' || from=='/browse') {
                 back = from;
             }
-            ln_data.data = find_ln($navigating.to.params.ln);
-            ln_data.favorited = in_ln_lib(ln_data.data.id)
+            ln_data.data = find_item("ln", $navigating.to.params.plugin, $navigating.to.params.ln);
+            ln_data.favorited = in_lib("ln", ln_data.data.id)
         } else {
             in_ln = false;
         }
@@ -97,22 +86,18 @@
     // BACKEND CALLS
     async function toggle_manga_fav() {
         manga_data.favorited = !manga_data.favorited;
-        await toggle_manga_favorite(manga_data.data);
+        await toggle_favorite("manga", manga_data.data);
     }
     async function toggle_ln_fav() {
         ln_data.favorited = !ln_data.favorited;
-        await toggle_ln_favorite(ln_data.data);
+        await toggle_favorite("ln", ln_data.data);
     }
     async function toggle_anime_fav() {
         anime_data.favorited = !anime_data.favorited;
-        await toggle_anime_favorite(anime_data.data);
+        await toggle_favorite("anime", anime_data.data);
     }
     async function update_lib() {
-        switch (media_screen) {
-            case "manga": manga_update(); break;
-            case "anime": /*anime_update();*/ break;
-            case "ln": /*ln_update();*/ break;
-        }
+        update(media_screen);
     }
 
     // MEDIA TYPE CHANGE

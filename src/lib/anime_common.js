@@ -11,7 +11,7 @@ export function find_anime(plugin, id) {
     if (anime == undefined) {
         anime = json.anime_library.find(m => m.id == id && (m.plugin==plugin || plugin==null));
         if (anime==undefined) {
-            anime = json.anime_search_results.find(m => m.id == id && (m.plugin==plugin || plugin==null));
+            anime = json.anime_search_results.map(m => m.data).flat().find(m => m.id == id && (m.plugin==plugin || plugin==null));
             if (anime==undefined) {
                 // hist to anime
                 let hist = json.anime_history.find(m => m.id==id && (m.plugin==plugin || plugin==null));

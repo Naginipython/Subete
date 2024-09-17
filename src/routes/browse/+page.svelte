@@ -11,7 +11,6 @@
     let sources = [];
     let checked_sources;
     let media_screen = "manga";
-    let error = "";
     
     $: if (checked_sources) update_settings();
     let first_run = true;
@@ -59,13 +58,12 @@
     async function search() {
         is_searching = true;
         results = [];
-        error = "";
         // setup sources to be searched and the output
         let search_sources = Object.entries(checked_sources).filter(([key, value]) => value).map(([key, value]) => key);
         search_sources = search_sources.filter(x => sources.includes(x));
         let result = [];
         for (const s of search_sources) {
-            result.push({plugin: s, data: []});
+            result.push({plugin: s, data: [], error: ""});
         }
         // based on media_screen, calls different tauri commands & stores differently
         switch (media_screen) {
@@ -76,7 +74,6 @@
                         result[result.findIndex(i => i.plugin==s)].data = r;
                     } else {
                         result[result.findIndex(i => i.plugin==s)].error = r.error;
-                        error = r.error;
                     }
                     store.update(json => {
                         json.manga_search_results = result;
@@ -91,7 +88,6 @@
                         result[result.findIndex(i => i.plugin==s)].data = r;
                     } else {
                         result[result.findIndex(i => i.plugin==s)].error = r.error;
-                        error = r.error;
                     }
                     store.update(json => {
                         json.ln_search_results = result;
@@ -106,7 +102,6 @@
                         result[result.findIndex(i => i.plugin==s)].data = r;
                     } else {
                         result[result.findIndex(i => i.plugin==s)].error = r.error;
-                        error = r.error;
                     }
                     store.update(json => {
                         json.anime_search_results = result;
@@ -147,9 +142,6 @@
             <button id="search" on:click="{search}"><Fa icon={faMagnifyingGlass} /></button><br>
         </div>
     </form>
-    {#if error != ""}
-        <p style="color: red; width: inherit; text-align: center; padding: 0; margin: 0">{error}</p>
-    {/if}
     {#if results.length == 0 && !is_searching}
         <div class="quickselect">
             <p>Source Quickselect</p>
@@ -170,7 +162,7 @@
                 <Moon color="var(--selection-color)" size="30" />
             </div>
         {:else}
-            <Display data={item.data} media_screen={media_screen}/>
+            <Display data={item.data} media_screen={media_screen} error={item.error}/>
         {/if}
     {/each}
 

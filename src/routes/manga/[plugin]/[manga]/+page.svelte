@@ -7,7 +7,7 @@
     import { faCircleDown, faBookmark as faOutlineBookmark, faSquare } from '@fortawesome/free-regular-svg-icons';
     import Fa from 'svelte-fa'
     import store from "$lib/store.js"
-    import { find_manga } from "$lib/manga_common.js";
+    import { find_item } from "$lib/common.js";
     import { Moon } from 'svelte-loading-spinners';
     import "$lib/css/listItems.css";
 
@@ -20,7 +20,7 @@
     onMount(async () => {
         loading = true;
         if (manga['chapters'].length == 0) {
-            let updated_manga = await invoke('get_manga_chapters', { manga });
+            let updated_manga = await invoke('get_manga_chapters', { item: manga });
             // let html = await invoke('fetch', {url: c.url});
             // manga['chapters'] = eval(c.getChapters + `getChapters(${manga}, ${JSON.stringify(html)})`);
             if (!updated_manga.hasOwnProperty("error")) {
@@ -40,7 +40,7 @@
     
     store.subscribe(async (json) => {
         // gets manga search details
-        manga = find_manga(data.plugin, data.id);
+        manga = find_item("manga", data.plugin, data.id);
     });
 
     // CHAPTER OPTION BUTTONS

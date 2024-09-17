@@ -125,11 +125,7 @@ pub async fn get_list<T: Serialize + IsPlugin, U: Serialize + IsItem + HasId>(
     plugins: Vec<T>,
     item: U,
 ) -> Value {
-    let m_type = if media == "anime" {
-        "episodes"
-    } else {
-        "chapters"
-    };
+    let m_type = if media == "anime" { "episodes" } else { "chapters" };
     println!("Getting {media} {m_type}...");
     let mut result: Value = json!({});
 
@@ -265,12 +261,26 @@ async fn run_js(file: &str, code: &str, method_name: &str, args: Vec<String>) ->
     let runtime = QuickJsRuntimeBuilder::new().build();
     let script = Script::new(file, &code);
     runtime.eval_sync(None, script).ok().expect("script failed");
-    runtime
+    let check = runtime
         .invoke_function_sync(None, &[], method_name, args)
-        .unwrap()
-        .to_serde_value()
-        .await
-        .unwrap()
+        .unwrap_or_else(|e| {
+            JsValueFacade::JsError { val: e }
+        });
+    match check {
+        JsValueFacade::JsError { val } => {
+            json!({"error": val.to_string()})
+        },
+        _ => {
+            check.to_serde_value().await.unwrap()
+        }
+    }
+    //     println!("{:?}", temp);
+    // let temp2 = temp.to_serde_value()
+    //     .await
+    //     .unwrap();
+    // println!("{:?}", temp2);
+    // temp2
+        
 }
 
 #[cfg(target_os = "windows")]

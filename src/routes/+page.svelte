@@ -4,7 +4,7 @@
 
     // On mount, prep store and send to set page
     onMount(async () => {
-        goto('/library');
+        // goto('/library');
         // goto('/anime/test/viewer/test')
     });
 </script>

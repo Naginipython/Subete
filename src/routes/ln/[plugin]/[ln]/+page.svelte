@@ -6,7 +6,7 @@
     import { faCircleDown, faBookmark as faOutlineBookmark, faSquare } from '@fortawesome/free-regular-svg-icons';
     import Fa from 'svelte-fa'
     import store from "$lib/store.js"
-    import { find_ln } from "$lib/ln_common.js";
+    import { find_item } from "$lib/common.js";
     import { Moon } from 'svelte-loading-spinners';
     import "$lib/css/listItems.css";
 
@@ -26,7 +26,7 @@
     onMount(async () => {
         if (ln['chapters'].length == 0) {
             loading = true;
-            let updated_ln = await invoke('get_ln_chapters', { ln });
+            let updated_ln = await invoke('get_ln_chapters', { item: ln });
             // let html = '';
             // if (c.extra.hasOwnProperty("request")) {
             //     if (c.extra.request == "post") {
@@ -47,7 +47,7 @@
     
     store.subscribe(async (json) => {
         // gets ln search details
-        ln = find_ln(data.id);
+        ln = find_item("ln", data.plugin, data.id);
     });
 
     // CHAPTER OPTION BUTTONS

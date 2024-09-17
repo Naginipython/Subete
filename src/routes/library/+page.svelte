@@ -10,33 +10,22 @@
         switch (media_screen) {
             case "manga":
                 library = json["manga_library"];
-                if (json["settings"].hasOwnProperty("library_widths")) {
-                    if (json["settings"]["library_widths"].hasOwnProperty("manga")) {
-                        width = json["settings"]["library_widths"].manga;
-                    }
-                }
+                width = json["settings"]["library_widths"].manga;
                 setWidth();
                 break;
             case "anime":
                 library = json["anime_library"];
-                if (json["settings"].hasOwnProperty("library_widths")) {
-                    if (json["settings"]["library_widths"].hasOwnProperty("anime")) {
-                        width = json["settings"]["library_widths"].anime;
-                    }
-                }
+                width = json["settings"]["library_widths"].anime;
                 setWidth();
                 break;
             case "ln":
                 library = json["ln_library"];
-                if (json["settings"].hasOwnProperty("library_widths")) {
-                    if (json["settings"]["library_widths"].hasOwnProperty("ln")) {
-                        width = json["settings"]["library_widths"].ln;
-                    }
-                }
+                width = json["settings"]["library_widths"].ln;
                 setWidth();
                 break;
         }
         document.documentElement.style.setProperty('--lib-width', `${width}px`);
+        document.documentElement.style.setProperty('--lib-height', `${width*1.5}px`);
     });
 
     window.addEventListener('resize', setWidth);

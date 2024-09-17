@@ -7,7 +7,7 @@
     import { faCircleDown, faBookmark as faOutlineBookmark, faSquare } from '@fortawesome/free-regular-svg-icons';
     import Fa from 'svelte-fa'
     import store from "$lib/store.js"
-    import { find_anime } from "$lib/anime_common.js";
+    import { find_item } from "$lib/common.js";
     import { Moon } from 'svelte-loading-spinners';
     import "$lib/css/listItems.css";
 
@@ -20,7 +20,7 @@
     onMount(async () => {
         loading = true;
         if (anime['episodes'].length == 0) {
-            let updated_anime = await invoke('get_anime_episodes', { anime });
+            let updated_anime = await invoke('get_anime_episodes', { item: anime });
             if (!updated_anime.hasOwnProperty("error")) {
                 updated_anime['episodes'].sort((a,b) => b.number-a.number);
                 anime.studio = updated_anime.studio;
@@ -38,7 +38,7 @@
     
     store.subscribe(async (json) => {
         // gets anime search details
-        anime = find_anime(data.plugin, data.id);
+        anime = find_item("anime", data.plugin, data.id);
     });
 
     // CHAPTER OPTION BUTTONS

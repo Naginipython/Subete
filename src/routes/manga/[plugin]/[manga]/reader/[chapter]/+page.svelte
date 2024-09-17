@@ -2,7 +2,7 @@
     import { invoke } from "@tauri-apps/api/core";
     import { faArrowLeft, faBookmark, faEllipsisVertical } from '@fortawesome/free-solid-svg-icons';
     import { faBookmark as faOutlineBookmark } from '@fortawesome/free-regular-svg-icons';
-    import { find_manga } from "$lib/manga_common.js";
+    import { find_item } from "$lib/common.js";
     import { goto } from "$app/navigation";
     import { Moon } from 'svelte-loading-spinners';
     import Fa from 'svelte-fa'
@@ -10,7 +10,7 @@
     export let data;
 
     // TODO: add query params for this, but if there are none do find manga
-    let manga = find_manga(data.plugin, data.id);
+    let manga = find_item("manga", data.plugin, data.id);
     let chapter = manga['chapters'][data.manga_index];
     let curr_page = 0;
     let display_page = 0;

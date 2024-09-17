@@ -93,8 +93,8 @@ pub async fn manga_search(query: String, source: String) -> Value {
 }
 
 #[tauri::command]
-pub async fn get_manga_chapters(manga: LibraryItem) -> Value {
-    get_list("manga", get_plugins(), manga).await
+pub async fn get_manga_chapters(item: LibraryItem) -> Value {
+    get_list("manga", get_plugins(), item).await
 }
 
 #[tauri::command]

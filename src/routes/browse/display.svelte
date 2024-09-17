@@ -1,6 +1,8 @@
 <script>
     export let data = [];
     export let media_screen = "manga";
+    export let error = "";
+    console.log(error);
 
     // Drag Scrolling
     let scrollContainer;
@@ -37,16 +39,20 @@
     on:mousemove={handleMouseMove}
     on:dragstart|preventDefault
     role="group">
-    {#each data as d, i} <!-- can change d to {varname varname}, example {img, title}. i exists to find index -->
 
-        <a class="manga" href="/{media_screen}/{d.plugin}/{d.id}">
-            <div class="manga-wrap">
-                <img src={d.img} alt={d.title}/>
-            </div>
-            <p>{d.title}</p>
-        </a>
+    {#if error != ""}
+        <p style="color: red; width: inherit; text-align: center; padding: 0; margin: 0">{error}</p>
+    {:else}
+        {#each data as d, i} <!-- can change d to {varname varname}, example {img, title}. i exists to find index -->
+            <a class="manga" href="/{media_screen}/{d.plugin}/{d.id}">
+                <div class="manga-wrap">
+                    <img src={d.img} alt={d.title}/>
+                </div>
+                <p>{d.title}</p>
+            </a>
+        {/each}
+    {/if}
 
-    {/each}
 </div>
 
 <style>
