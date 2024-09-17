@@ -10,14 +10,18 @@ export async function setup(media_screen) {
     let manga_history = await invoke('get_manga_history');
     let manga_updates = await invoke('get_manga_updates_list');
     let anime_library = await invoke('get_anime_lib');
+    let anime_updates = await invoke('get_anime_updates_list');
     let ln_library = await invoke('get_ln_lib');
+    let ln_updates = await invoke('get_ln_updates_list');
     let settings = await invoke('get_settings');
     store.update(json => {
         json.manga_library = manga_library;
         json.manga_history = manga_history;
-        json.manga_updates = manga_updates
-        json.ln_library = ln_library;
+        json.manga_updates = manga_updates;
         json.anime_library = anime_library;
+        json.anime_updates = anime_updates;
+        json.ln_library = ln_library;
+        json.ln_updates = ln_updates;
         json.settings = settings;
         json.media_screen = media_screen;
         return json;
@@ -112,8 +116,8 @@ export async function toggle_favorite(type, item) {
 export async function update(type) {
     // vars for easier readability
     let entry_type = type=="anime"? "episodes" : "chapters";
-    let lib = type+"_library";
-    let progress = type+"_update_progress"
+    let lib = `${type}_library`;
+    let progress = `${type}_update_progress`;
     
     const updated = () => store.update(_json => { _json[progress] = json[progress]; return _json; });
     json[progress] = {
@@ -158,6 +162,11 @@ export async function update(type) {
                     received: Date.now()
                 };
             store.update(_json => {
+                // removes from [item]_temp
+                let dropIndex = _json[`${type}_temp`].findIndex(t => t.id == json[lib][i].id && t.plugin == json[lib][i].plugin);
+                _json[`${type}_temp`].splice(dropIndex, 1);
+                // item = json[`${type}_temp`].find(i => i.id==id && (i.plugin==plugin || plugin==null));
+
                 _json[`${type}_updates`].unshift(item);
                 _json[lib] = json[lib];
                 return _json;

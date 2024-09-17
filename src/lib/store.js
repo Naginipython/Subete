@@ -45,7 +45,7 @@ const store = writable({
         }*/
     ],
     "manga_temp": [
-        //TODO: Will hold every manga_lib entry pressed, from lib and search. To be wiped upon app close. Solves fav issue, and cleans up manga_common
+        //TODO: Will hold every manga_lib entry pressed, from lib and search. To be wiped upon app close. Solves fav issue, and cleans up common.js
     ],
     "manga_history": [
         /*{

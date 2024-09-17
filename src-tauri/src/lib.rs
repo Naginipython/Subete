@@ -74,6 +74,9 @@ pub fn run() {
             anime::add_anime_plugin,
             anime::delete_anime_plugins,
             anime::delete_anime_plugin,
+            // manga/update.rs
+            anime::save_anime_updates_list,
+            anime::get_anime_updates_list,
             // ln/library.rs
             ln::get_ln_lib,
             ln::add_to_ln_lib,
@@ -88,6 +91,9 @@ pub fn run() {
             ln::add_ln_plugin,
             ln::delete_ln_plugins,
             ln::delete_ln_plugin,
+            // manga/update.rs
+            ln::save_ln_updates_list,
+            ln::get_ln_updates_list,
             // settings.rs
             update_settings,
             get_settings,
