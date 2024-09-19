@@ -89,7 +89,6 @@
     </div>
     <div id="header-content">
         <div id="text">
-            <!-- TODO: ANIME VS MANGA -->
             <h3>{item.title}</h3>
             {#if data.type == "anime"}
                 <p>Status: {item.status}</p>
@@ -116,8 +115,8 @@
 
 {#each item[entry_type] as c, i}
 <div class="entry-item" style="{item[entry_type][i].completed? 'color: grey' : ''}">
-    <!-- Main Entry button -->
-    <button class="entry-link" on:click={() => goto(`/${data.type}/${data.plugin}/${data.id}/reader/${i}`)}>
+    <!-- Main Entry button --> <!-- `/${data.type}/${data.plugin}/${data.id}/reader/${i}` -->
+    <button class="entry-link" on:click={() => goto(`/viewer/${data.type}/${data.plugin}/${data.id}/${i}`)}>
         <p>
             {#if c.title == "" || c.title.toLowerCase() == entry_text.toLowerCase()+" "+c.number} {entry_text} {c.number}
             {:else} {entry_text} {c.number} - {c.title}
@@ -125,7 +124,7 @@
         </p>
         <div class="entry-lower">
             <p>date - group</p>
-            {#if item[entry_type][i].page-1 != 0 && !item[entry_type][i].completed}
+            {#if item[entry_type][i].page-1 != 0 && !item[entry_type][i].completed && data.type != "anime"}
                 <p class="progress">&emsp;(page: {item[entry_type][i].page})</p>
             {/if}
         </div>

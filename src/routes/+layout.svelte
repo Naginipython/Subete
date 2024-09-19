@@ -69,7 +69,7 @@
         //     }
         // } 
         // Is topmost for every nav, except for reader chapters
-        if (!from.includes("reader")) {
+        if (!from.includes("/item/")) {
             // sets memory
             scroll_memory[from] = document.getElementById('body').scrollTop;
             // remembers

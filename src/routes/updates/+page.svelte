@@ -42,14 +42,8 @@
     });
 
     async function goToEntry(u) {
-        // todo: episode
-        if (media_screen == "anime") {
-            let index = find_entry_index_by_id(media_screen, u.id, u.episode.id);
-            goto(`/anime/${u.plugin}/${u.id}/viewer/${index}`);
-        } else {
-            let index = find_entry_index_by_id(media_screen, u.id, u.chapter.id);
-            goto(`/${media_screen}/${u.plugin}/${u.id}/reader/${index}`);
-        }
+        let index = find_entry_index_by_id(media_screen, u.id, u.chapter.id);
+        goto(`/viewer/${media_screen}/${u.plugin}/${u.id}/${index}`);
     }
 </script>
 <div id="update-header">
