@@ -12,10 +12,7 @@ mod settings;
 
 static FILE_PATH: LazyLock<PathBuf> = LazyLock::new(|| {
     let mut data_folder: PathBuf = dirs::data_local_dir().unwrap_or_else(|| PathBuf::from("./"));
-    // let mut str = data_folder.to_str().unwrap_or_default().to_string();
     let os = std::env::consts::OS;
-    // if os == "windows" {
-    //   data_folder.join("\\subete");
     if os == "android" {
         data_folder = PathBuf::from("/data/data/com.subete.app/files/");
     } else {
@@ -23,6 +20,15 @@ static FILE_PATH: LazyLock<PathBuf> = LazyLock::new(|| {
     }
     std::fs::create_dir_all(&data_folder).unwrap_or_default();
     data_folder
+});
+static DOWNLOADS_PATH: LazyLock<PathBuf> = LazyLock::new(|| {
+    let mut downloads_folder = dirs::download_dir().unwrap_or_else(|| PathBuf::from("./"));
+    let os = std::env::consts::OS;
+    if os == "linux" || os == "windows" {
+        downloads_folder.push("subete");
+    }
+    std::fs::create_dir_all(&downloads_folder).unwrap_or_default();
+    downloads_folder
 });
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -74,7 +80,8 @@ pub fn run() {
             anime::add_anime_plugin,
             anime::delete_anime_plugins,
             anime::delete_anime_plugin,
-            // manga/update.rs
+            anime::download_anime,
+            // anime/update.rs
             anime::save_anime_updates_list,
             anime::get_anime_updates_list,
             // ln/library.rs
@@ -91,6 +98,7 @@ pub fn run() {
             ln::add_ln_plugin,
             ln::delete_ln_plugins,
             ln::delete_ln_plugin,
+            ln::download_ln,
             // manga/update.rs
             ln::save_ln_updates_list,
             ln::get_ln_updates_list,

@@ -1,7 +1,8 @@
-use std::{fs::File, path::PathBuf, sync::{LazyLock, Mutex}};
+use std::{fs::File, io::Write, path::PathBuf, sync::{LazyLock, Mutex}};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
-use crate::{get_item, get_list, save, search, IsPlugin, Media, FILE_PATH};
+use tauri_plugin_http::reqwest;
+use crate::{get_item, get_list, save, search, IsPlugin, Media, DOWNLOADS_PATH, FILE_PATH};
 
 use super::LibraryItem;
 
@@ -105,4 +106,21 @@ pub fn delete_ln_plugins() {
     let mut plugins = PLUGINS.lock().unwrap();
     *plugins = init_plugins();
     std::fs::remove_file(&*PLUGINS_PATH).unwrap();
+}
+
+#[tauri::command]
+pub async fn download_ln(url: String) {
+    println!("Downloading ln...");
+    let client = reqwest::Client::new();
+    let response = client
+        .get(url)
+        .send()
+        .await
+        .unwrap();
+    let mut file_path = DOWNLOADS_PATH.clone();
+    let data = response.bytes().await.unwrap();
+    file_path.push("test.pdf");
+    let mut file = File::create(file_path).unwrap();
+    file.write_all(&data).unwrap();
+    println!("done");
 }

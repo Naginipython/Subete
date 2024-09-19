@@ -9,13 +9,13 @@
 </script>
 
 {#each manga_history as m}
-    <div class="chapter-item">
-        <button class="chapter-manga">
-            <img class="chapter-manga-img" src={m.img} alt="title">
+    <div class="entry-item">
+        <button class="entry-left">
+            <img class="entry-left-img" src={m.img} alt="title">
         </button>
-        <button class="chapter-link">
+        <button class="entry-link">
             <p>{m.title}</p>
-            <div class="chapter-link-lower">
+            <div class="entry-link-lower">
                 chp. {m.recent_chapter_num} - 12:00 AM
             </div>
         </button>

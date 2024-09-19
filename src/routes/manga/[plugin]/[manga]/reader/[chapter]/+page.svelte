@@ -3,6 +3,7 @@
     import { faArrowLeft, faBookmark, faEllipsisVertical } from '@fortawesome/free-solid-svg-icons';
     import { faBookmark as faOutlineBookmark } from '@fortawesome/free-regular-svg-icons';
     import { find_item } from "$lib/common.js";
+    import appHist from "$lib/history.js";
     import { goto } from "$app/navigation";
     import { Moon } from 'svelte-loading-spinners';
     import Fa from 'svelte-fa'
@@ -82,8 +83,7 @@
             json.manga_history.unshift(new_hist);
             return json;
         });
-        // TODO: back button sends to update or manga entry
-        goto(`/manga/${data.plugin}/${data.id}`)
+        goto(appHist.back());
     }
 
     // ----- INPUT -----

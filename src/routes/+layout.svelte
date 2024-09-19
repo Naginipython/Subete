@@ -5,6 +5,7 @@
     import { onMount } from "svelte";
     import { invoke } from "@tauri-apps/api/core";
     import { setup } from "$lib/common.js";
+    import appHist from "$lib/history.js";
     import store from "$lib/store.js";
     import logo from "$lib/logo.png"
 
@@ -31,6 +32,8 @@
     $: if($navigating) page_check();
     function page_check() {
         nav = $navigating.to.url.pathname;
+        appHist.pushState(nav);
+        appHist.print();
         if (nav != $navigating.from.url.pathname) {
             from = $navigating.from.url.pathname
         }
@@ -40,8 +43,12 @@
         snack_nav_on();
 
         // Hides nav bar when not selected
-        if (!selected_valid_links.some(link => nav == link) && nav != '/library') {
+        if (!selected_valid_links.some(link => nav == link)) {
             only_snackbar_on();
+        } else {
+            // Prevents history from getting too big
+            // appHist.reset();
+            // appHist.pushState(nav);
         }
 
         // todo: Side scroll nav
@@ -241,3 +248,13 @@
         background-color: var(--selection-color);
     }
 </style>
+<!-- <script>
+    import { invoke } from "@tauri-apps/api/core";
+
+    // let url = 'https://server.elscione.com/Officially%20Translated%20Light%20Novels/Classroom%20of%20the%20Elite%20-%20Year%202/Classroom%20of%20the%20Elite%20-%20Year%202%20-%20Volume%2009%20%5BSeven%20Seas%5D%5BKobo_LNWNCentral%5D.pdf';
+    let url="https://raw.githubusercontent.com/vinodnimbalkar/svelte-pdf/369db2f9edbf5ab8c87184193e1404340729bb3a/public/sample.pdf";
+    async function test() {
+        await invoke("download_ln", {url});
+    }
+</script>
+<button on:click={async () => test()}>download me</button> -->

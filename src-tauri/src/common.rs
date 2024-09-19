@@ -3,7 +3,7 @@ use serde::Serialize;
 use serde_json::{json, Value};
 use std::{fs::File, io::Write, path::PathBuf, sync::Mutex};
 
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "android"))]
 use quickjs_runtime::{
     builder::QuickJsRuntimeBuilder,
     jsutils::Script,
@@ -251,7 +251,7 @@ pub async fn get_item<T: Serialize + IsPlugin>(
     result
 }
 
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "android"))]
 async fn run_js(file: &str, code: &str, method_name: &str, args: Vec<String>) -> Value {
     let args: Vec<JsValueFacade> = args
         .iter()

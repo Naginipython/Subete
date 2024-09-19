@@ -110,3 +110,20 @@ pub fn delete_anime_plugins() {
     *plugins = init_plugins();
     std::fs::remove_file(&*PLUGINS_PATH).unwrap();
 }
+
+#[tauri::command]
+pub async fn download_anime() {
+    // println!("Downloading ln...");
+    // let client = reqwest::Client::new();
+    // let response = client
+    //     .get(url)
+    //     .send()
+    //     .await
+    //     .unwrap();
+    // let mut file_path = DOWNLOADS_PATH.clone();
+    // let data = response.bytes().await.unwrap();
+    // file_path.push("test.pdf");
+    // let mut file = File::create(file_path).unwrap();
+    // file.write_all(&data).unwrap();
+    // println!("done");
+}

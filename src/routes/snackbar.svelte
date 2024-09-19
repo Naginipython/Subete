@@ -9,6 +9,7 @@
         faHeart, faBook, faRotateRight 
     } from '@fortawesome/free-solid-svg-icons'
     import { faHeart as faOutlineHeart } from '@fortawesome/free-regular-svg-icons';
+    import appHist from "$lib/history.js";
     import {
         find_item,
         in_lib,
@@ -41,8 +42,6 @@
     // Snackbar navigation manager
     $: if($navigating) page_check();
     function page_check() {
-        console.log(nav);
-
         // --- MANGA ---
         // Changes the top nav for manga
         if (nav.includes("manga/") && !nav.includes("reader")) {
@@ -50,7 +49,7 @@
             if (from=='/library' || from=='/updates' || from=='/browse') {
                 back = from;
             }
-            manga_data.data = find_item("manga", $navigating.to.params.plugin, $navigating.to.params.manga);
+            manga_data.data = find_item("manga", $navigating.to.params.plugin, $navigating.to.params.id);
             manga_data.favorited = in_lib("manga", manga_data.data.id)
         } else {
             in_manga = false;
@@ -63,7 +62,7 @@
             if (from=='/library' || from=='/updates' || from=='/browse') {
                 back = from;
             }
-            anime_data.data = find_item("anime", $navigating.to.params.plugin, $navigating.to.params.anime);
+            anime_data.data = find_item("anime", $navigating.to.params.plugin, $navigating.to.params.id);
             anime_data.favorited = in_lib("anime", anime_data.data.id)
         } else {
             in_anime = false;
@@ -76,7 +75,7 @@
             if (from=='/library' || from=='/updates' || from=='/browse') {
                 back = from;
             }
-            ln_data.data = find_item("ln", $navigating.to.params.plugin, $navigating.to.params.ln);
+            ln_data.data = find_item("ln", $navigating.to.params.plugin, $navigating.to.params.id);
             ln_data.favorited = in_lib("ln", ln_data.data.id)
         } else {
             in_ln = false;
@@ -116,9 +115,9 @@
 <div id="snackbar">
     <!-- left side -->
     {#if in_manga || in_ln || in_anime}
-        <button class="snackbar-item" on:click={async () => goto(back)}><Fa icon={faArrowLeft} /></button>
+        <button class="snackbar-item" on:click={async () => goto(appHist.back())}><Fa icon={faArrowLeft} /></button>
     {:else if is_nav_off}
-        <button class="snackbar-item" on:click={() => goto(from)}><Fa icon={faArrowLeft} /></button>
+        <button class="snackbar-item" on:click={() => goto(appHist.back())}><Fa icon={faArrowLeft} /></button>
     {:else}
         <!-- TODO: make work -->
         <button id="manga" class="media {media_screen=="manga"? 'selected':''}" on:click={() => change_media("manga")}>Manga</button>

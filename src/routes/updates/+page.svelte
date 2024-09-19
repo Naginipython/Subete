@@ -65,15 +65,15 @@
 
 {#each update as u, i}
     <!-- style="{manga['chapters'][i].completed? 'color: grey' : ''}" -->
-    <div class="chapter-item">
-        <button class="chapter-manga" on:click={async () => goto(`/${media_screen}/${u.plugin}/${u.id}`)}>
-            <img class="chapter-manga-img" src={u.img} alt="title">
+    <div class="entry-item">
+        <button class="entry-left" on:click={async () => goto(`/${media_screen}/${u.plugin}/${u.id}`)}>
+            <img class="entry-left-img" src={u.img} alt="title">
         </button>
-        <button class="chapter-link" on:click={async () => {await goToEntry(u)}}>
+        <button class="entry-link" on:click={async () => {await goToEntry(u)}}>
             <p>
                 {u.title}
             </p>
-            <div class="chapter-link-lower">
+            <div class="entry-link-lower">
                 {#if media_screen.toLowerCase() == "anime"}
                     {#if u.episode.title == ""} Episode {u.episode.number}
                     {:else} Episode {u.episode.number} - {u.episode.title}

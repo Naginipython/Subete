@@ -31,6 +31,7 @@ export async function setup(media_screen) {
     if (!settings.hasOwnProperty("app_colors")) {
         // init
         settings['app_colors'] = {theme: "Nagini's dark", primary: "1a1a1a", secondary: "330000", selection: "800000", text: "ffffff"};
+        await invoke('update_settings', { newSettings: {"app_colors":settings['app_colors']}});
     }
     document.documentElement.style.setProperty('--primary-color', `#${settings['app_colors'].primary}`); 
     document.documentElement.style.setProperty('--secondary-color', `#${settings['app_colors'].secondary}`); 
@@ -40,7 +41,7 @@ export async function setup(media_screen) {
     if (!settings.hasOwnProperty("library_widths")) {
         // init
         settings['library_widths'] = { manga: '100', ln: '100', anime: '100' };
-
+        await invoke('update_settings', { newSettings: {"library_widths":settings['library_widths']}});
     }
     document.documentElement.style.setProperty('--lib-manga-width', `${settings['library_widths'].manga}px`); 
     document.documentElement.style.setProperty('--lib-ln-width', `${settings['library_widths'].ln}px`); 
