@@ -284,12 +284,16 @@ async fn run_js(file: &str, code: &str, method_name: &str, args: Vec<String>) ->
 }
 
 #[cfg(target_os = "windows")]
-async fn run_js() -> Value {
+async fn run_js(file: &str, code: &str, method_name: &str, args: Vec<String>) -> Value {
     // example, TODO
     // note: reset(), call_function
     // maybe can eval and call_function?
-    let context = Context::new().unwrap();
-    let value = context
-        .eval_as::<String>(" var x = 100 + 250; x.toString() ")
-        .unwrap();
+
+    use quickjs_rusty::Context;
+
+    // let context = Context::new().unwrap();
+    // let value = context
+    //     .eval_as::<String>(" var x = 100 + 250; x.toString() ")
+    //     .unwrap();
+    Value::Null
 }

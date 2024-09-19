@@ -100,7 +100,7 @@ To-Build Pt.2: Windows\
 In windows, Microsoft's C compiler won't work. You will need to use the `stable-x86_64-pc-windows-gnu` rust toolchain, which uses gcc. Install it with `rustup toolchain install stable-x86_64-pc-windows-gnu`, then you have 3 ways to use this: (NOTE: you may need msys2 gcc & enviroment variable for `window-gnu`)
 1) In the root folder, run: `cargo tauri dev --target stable-x86_64-pc-windows-gnu` for testing, `cargo tauri build --target stable-x86_64-pc-windows-gnu` to build release (will be in `target/release/bundle/`).
 2) `rustup default stable-x86_64-pc-windows-gnu` to set as your primary toolchain.
-3) Create a `.cargo` folder, with a `config.toml` file. Add the line `[build]` at the top, and `target = "stable-x86_64-pc-windows-gnu"` below it.
+3) Create a `.cargo` folder, with a `config.toml` file. Add the line `[build]` at the top, and `target = "x86_64-pc-windows-gnu"` below it.
 
 As a note for newer people, the usual toolchain is `x86_64-pc-windows-msvc`.
 

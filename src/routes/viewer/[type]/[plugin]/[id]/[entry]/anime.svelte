@@ -1,6 +1,6 @@
 <script>
   import { invoke } from "@tauri-apps/api/core";
-  import { platform } from '@tauri-apps/plugin-os';
+  // import { platform } from '@tauri-apps/plugin-os';
   import { 
     faArrowLeft, faBookmark, faEllipsisVertical, 
     faPause, faPlay, faRightFromBracket
@@ -33,11 +33,11 @@
   
   onMount(async () => {
     is_loading = true;
-    currPlatform = await platform();
+    // currPlatform = await platform();
     // TODO: add query params for this, but if there are none do find manga
-    anime = find_item("anime", data.plugin, data.id);
-    episode = anime['episodes'][data.index];
-    streamUrl = await invoke('get_anime_video', { source: anime.plugin, id: episode.id });
+    // anime = find_item("anime", data.plugin, data.id);
+    // episode = anime['episodes'][data.index];
+    // streamUrl = await invoke('get_anime_video', { source: anime.plugin, id: episode.id });
   
     // if (currPlatform == "linux") {
       // await invoke("open_in_vlc", { url: streamUrl });
@@ -64,6 +64,7 @@
         hls.attachMedia(player);
         hls.on(Hls.Events.MANIFEST_PARSED, () => {
           player.play();
+          // player.currentTime = anime.watch_time;
         });
         hls.on(Hls.Events.ERROR, function (event, errData) {
           error = errData.details;
@@ -96,13 +97,21 @@
   });
   
   function keyInput(event) {
-    if (event.key == ' ') {
-      event.preventDefault();
-      if (paused) {
-        player.play();
-      } else {
-        player.pause();
-      }
+    console.log(event.key);
+    event.preventDefault();
+    switch (event.key) {
+      case ' ':
+        if (paused) {
+          player.play();
+        } else {
+          player.pause();
+        }
+        break;
+      case 'ArrowRight':
+        player.currentTime += 10;
+        break;
+      case 'ArrowLeft':
+        player.currentTime -= 10;
     }
   }
 
@@ -214,7 +223,12 @@
       <span>{parseInt(duration/60)}:{(parseInt(duration)%60).toString().padStart(2, '0')}</span>
     </div>
     <!-- svelte-ignore a11y-no-noninteractive-element-interactions a11y-click-events-have-key-events -->
-    <progress id="seeker" value={time / duration || 0} on:click={seek}/>
+    <!-- <progress id="seeker" value={time / duration || 0} on:click={seek}/> -->
+     <!-- svelte-ignore a11y-no-static-element-interactions -->
+     <div id="seeker" on:click={seek}>
+      <div id="seeker-bar" style="width: {(time / duration)*100 || 0}%">
+      </div>
+     </div>
   </div>
 </div>
 
@@ -245,6 +259,8 @@
     align-items: center;
     justify-content: center;
     flex-direction: column;
+    z-index: 0;
+    pointer-events: none;
   }
   #ep-menu {
     position: absolute;
@@ -338,6 +354,7 @@
     bottom: 0;
     display: flex;
     flex-direction: column;
+    gap: 5px;
   }
   #video-time {
     width: 95%;
@@ -345,9 +362,33 @@
     display: flex;
     gap: calc(100vw - 120px);
   }
-  progress {
+  /* progress {
     width: calc(100vw - 50px);
     margin: 0 25px;
     cursor: pointer;
+    background-color: #ffffcc;
+    border-radius: 20px;
+  } */
+  #seeker {
+    width: calc(100vw - 50px);
+    margin: 0 25px;
+    cursor: pointer;
+    background-color: white;
+    border-radius: 20px;
+    height: 5px;
+    position: relative;
   }
+  #seeker-bar {
+    background-color: var(--selection-color); 
+    color: white;
+    text-align: right; 
+    font-size: 20px; 
+    border-radius: 15px; 
+    height: inherit;
+    position: relative;
+    padding-right: 5px;
+  }
+  /* progress::-webkit-progress-bar {
+        background-color: rgb(178, 255, 255);
+    } */
 </style>
