@@ -213,6 +213,7 @@
       <span>{parseInt(time/60)>0? parseInt(time/60) : 0}:{(parseInt(time)%60).toString().padStart(2, '0')}</span>
       <span>{parseInt(duration/60)}:{(parseInt(duration)%60).toString().padStart(2, '0')}</span>
     </div>
+    <!-- svelte-ignore a11y-no-noninteractive-element-interactions a11y-click-events-have-key-events -->
     <progress id="seeker" value={time / duration || 0} on:click={seek}/>
   </div>
 </div>

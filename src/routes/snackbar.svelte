@@ -19,7 +19,6 @@
 
     // Vars
     export let nav = '';
-    export let from = "/";
     let media_screen = "manga";
     export let is_nav_off;
     let in_manga = false;

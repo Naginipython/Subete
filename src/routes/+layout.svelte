@@ -149,7 +149,7 @@
     <img src={logo} alt="logo">
 </div>
 
-<Snackbar {is_nav_off} {nav} {from} />
+<Snackbar {is_nav_off} {nav} />
 
 <div id="body">
     <slot></slot>
