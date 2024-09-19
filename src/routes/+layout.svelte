@@ -68,7 +68,7 @@
         //         }
         //     }
         // } 
-        // Is topmost for every nav, except for reader chapters
+        // Is topmost for every nav, except for items
         if (!from.includes("/item/")) {
             // sets memory
             scroll_memory[from] = document.getElementById('body').scrollTop;
@@ -79,12 +79,6 @@
                 // required for '/library', seemingly
                 setTimeout(() => document.getElementById('body').scrollTop = scroll_memory[nav], 1);
             }
-        }
-
-        // --- READER ---
-        // Removes snackbar and nav for reader
-        if (nav.includes("reader")) {
-            snack_nav_off();
         }
 
         // --- VIEWER ---

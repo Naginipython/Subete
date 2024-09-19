@@ -22,7 +22,6 @@
     export let from = "/";
     let media_screen = "manga";
     export let is_nav_off;
-    let back = "/";
     let in_manga = false;
     let manga_data = {
         favorited: false,
@@ -44,11 +43,8 @@
     function page_check() {
         // --- MANGA ---
         // Changes the top nav for manga
-        if (nav.includes("manga/") && !nav.includes("reader")) {
+        if (nav.includes("/manga/")) {
             in_manga = true;
-            if (from=='/library' || from=='/updates' || from=='/browse') {
-                back = from;
-            }
             manga_data.data = find_item("manga", $navigating.to.params.plugin, $navigating.to.params.id);
             manga_data.favorited = in_lib("manga", manga_data.data.id)
         } else {
@@ -57,11 +53,8 @@
 
         // --- ANIME ---
         // Changes the top nav for anime
-        if (nav.includes("anime/") && !nav.includes("reader")) {
+        if (nav.includes("anime/")) {
             in_anime = true;
-            if (from=='/library' || from=='/updates' || from=='/browse') {
-                back = from;
-            }
             anime_data.data = find_item("anime", $navigating.to.params.plugin, $navigating.to.params.id);
             anime_data.favorited = in_lib("anime", anime_data.data.id)
         } else {
@@ -70,11 +63,8 @@
 
         // --- LN ---
         // Changes the top nav for ln
-        if (nav.includes("ln/") && !nav.includes("reader")) {
+        if (nav.includes("ln/")) {
             in_ln = true;
-            if (from=='/library' || from=='/updates' || from=='/browse') {
-                back = from;
-            }
             ln_data.data = find_item("ln", $navigating.to.params.plugin, $navigating.to.params.id);
             ln_data.favorited = in_lib("ln", ln_data.data.id)
         } else {
