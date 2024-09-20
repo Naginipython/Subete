@@ -32,7 +32,8 @@ pub struct EpisodeItem {
     pub id: String,
     pub number: f64,
     pub title: String,
-    pub watch_time: u64,
+    pub watch_time: f32,
+    pub duration: f32,
     pub completed: bool,
 }
 impl PartialEq for LibraryItem {

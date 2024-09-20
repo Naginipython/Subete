@@ -1,9 +1,9 @@
 <script>
   import { invoke } from "@tauri-apps/api/core";
-  // import { platform } from '@tauri-apps/plugin-os';
+  import { platform } from '@tauri-apps/plugin-os';
   import { 
     faArrowLeft, faBookmark, faEllipsisVertical, 
-    faPause, faPlay, faRightFromBracket
+    faPause, faPlay, faRightFromBracket, faExpand
   } from '@fortawesome/free-solid-svg-icons';
   import { faBookmark as faOutlineBookmark } from '@fortawesome/free-regular-svg-icons';
   import { onMount } from 'svelte';
@@ -21,6 +21,11 @@
   let currPlatform = "windows";
   let is_loading = false;
   let error = "";
+  $: if (error != "") {
+    setTimeout(() => {
+      error = "";
+    }, 3000)
+  }
   
   let player;
   let hls;
@@ -33,66 +38,66 @@
   
   onMount(async () => {
     is_loading = true;
-    // currPlatform = await platform();
+    currPlatform = await platform();
     // TODO: add query params for this, but if there are none do find manga
-    // anime = find_item("anime", data.plugin, data.id);
-    // episode = anime['episodes'][data.index];
-    // streamUrl = await invoke('get_anime_video', { source: anime.plugin, id: episode.id });
+    anime = find_item("anime", data.plugin, data.id);
+    episode = anime['episodes'][data.index];
+    streamUrl = await invoke('get_anime_video', { source: anime.plugin, id: episode.id });
   
-    // if (currPlatform == "linux") {
-      // await invoke("open_in_vlc", { url: streamUrl });
-    // } else {
-      // Sets up link with video
-      if (Hls.isSupported()) {
-        hls = new Hls({
-          forceKeyFrameOnDiscontinuity: true,
-          enableWorker: true,
-          fragLoadingTimeOut: 20000,
-          startFragPrefetch: true, // Prefetch the next fragment before the current one finishes
-          appendErrorMaxRetry: 3,
-          maxBufferHole: 2, // Set a maximum allowed gap of 2 seconds in the buffer
-          maxSeekHole: 2,   // Maximum gap allowed when seeking
-          maxBufferLength: 120, // Increase buffer length in seconds
-          maxMaxBufferLength: 300, // Max buffer length cap
-          lowLatencyMode: false, // Disable low latency mode
-          liveSyncDuration: 10, // Duration to maintain a buffer in seconds for live streams
-          liveMaxLatencyDuration: 30, // Maximum latency duration for live streams
-          maxBufferHole: 1.5, // Maximum allowed gap in buffer (in seconds)
-          // maxBufferSize: 320 * 1000 * 1000
-        });
-        hls.loadSource(streamUrl);
-        hls.attachMedia(player);
-        hls.on(Hls.Events.MANIFEST_PARSED, () => {
-          player.play();
-          // player.currentTime = anime.watch_time;
-        });
-        hls.on(Hls.Events.ERROR, function (event, errData) {
-          error = errData.details;
-          console.log(errData);
-
-          if (errData.fatal) {
-            switch (errData.type) {
-              case Hls.ErrorTypes.NETWORK_ERROR:
-                console.log("Network error, trying to recover...");
-                hls.startLoad();
-                break;
-              case Hls.ErrorTypes.MEDIA_ERROR:
-                console.log("Media error, attempting recovery...");
-                hls.recoverMediaError();
-                break;
-              default:
-                console.log("Cannot recover, destroying HLS instance.");
-                hls.destroy();
-                break;
-            }
-          }
-        });
-      } else if (player.canPlayType('application/vnd.apple.mpegurl')) {
-        // Native support (e.g., in Safari)
-        player.src = streamUrl;
+    // Sets up link with video
+    if (Hls.isSupported()) {
+      hls = new Hls({
+        forceKeyFrameOnDiscontinuity: true,
+        enableWorker: true,
+        fragLoadingTimeOut: 20000,
+        startFragPrefetch: true, // Prefetch the next fragment before the current one finishes
+        appendErrorMaxRetry: 3,
+        maxBufferHole: 2, // Set a maximum allowed gap of 2 seconds in the buffer
+        maxSeekHole: 2,   // Maximum gap allowed when seeking
+        maxBufferLength: 120, // Increase buffer length in seconds
+        maxMaxBufferLength: 300, // Max buffer length cap
+        lowLatencyMode: false, // Disable low latency mode
+        liveSyncDuration: 10, // Duration to maintain a buffer in seconds for live streams
+        liveMaxLatencyDuration: 30, // Maximum latency duration for live streams
+        maxBufferHole: 1.5, // Maximum allowed gap in buffer (in seconds)
+        // maxBufferSize: 320 * 1000 * 1000
+      });
+      hls.loadSource(streamUrl);
+      hls.attachMedia(player);
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        // player.currentTime = 100;
+        player.currentTime = episode.watch_time? episode.watch_time : 0;
         player.play();
-      }
-    // }
+      });
+      hls.on(Hls.Events.ERROR, function (event, errData) {
+        error = errData.details;
+        console.log(errData);
+
+        if (errData.fatal) {
+          switch (errData.type) {
+            case Hls.ErrorTypes.NETWORK_ERROR:
+              console.log("Network error, trying to recover...");
+              hls.startLoad();
+              error = "";
+              break;
+            case Hls.ErrorTypes.MEDIA_ERROR:
+              console.log("Media error, attempting recovery...");
+              hls.recoverMediaError();
+              error = "";
+              break;
+            default:
+              console.log("Cannot recover, destroying HLS instance.");
+              hls.destroy();
+              error = "";
+              break;
+          }
+        }
+      });
+    } else if (player.canPlayType('application/vnd.apple.mpegurl')) {
+      // Native support (e.g., in Safari)
+      player.src = streamUrl;
+      player.play();
+    }
     is_loading = false;
   });
   
@@ -101,17 +106,20 @@
     event.preventDefault();
     switch (event.key) {
       case ' ':
-        if (paused) {
-          player.play();
-        } else {
-          player.pause();
-        }
+        pause()
         break;
       case 'ArrowRight':
         player.currentTime += 10;
         break;
       case 'ArrowLeft':
         player.currentTime -= 10;
+        break;
+      case 'i':
+        toggle_menu()
+        break;
+      case 'f':
+        openFullscreen();
+        break;
     }
   }
 
@@ -123,8 +131,8 @@
 
   function pause() {
     if (player.readyState < 2) { // If the media is not ready to play
-        console.log('Media is not ready, cannot pause');
-        return;
+      console.log('Media is not ready, cannot pause');
+      return;
     }
     if (paused) {
       player.play();
@@ -132,34 +140,54 @@
       player.pause();
     }
   }
-  // document.getElementById("seeker").addEventListener("click", function(e) {
-  //   let width = document.getElementById("seeker").clientWidth;
-  //   time = duration * (e.offsetX / width);
-  // });
   function seek(e) {
     let width = document.getElementById("seeker").clientWidth;
     time = duration * (e.offsetX / width);
   }
+  function skip() {
+    player.currentTime += 85;
+  }
+  function openFullscreen() {
+    if (player.requestFullscreen) {
+      player.requestFullscreen();
+    } else if (player.webkitRequestFullscreen) { /* Safari */
+      player.webkitRequestFullscreen();
+    } else if (player.msRequestFullscreen) { /* IE11 */
+      player.msRequestFullscreen();
+    }
+  }
 
   // Updates library backend
   async function update_lib() {
-    // if (curr_page >= imgs.length-1 && imgs.length > 0) chapter.completed = true;
-    // await invoke('update_manga_lib', { item: manga });
-    // let new_hist = {
-    //   id: manga.id,
-    //   title: manga.title,
-    //   img: manga.img,
-    //   plugin: manga.plugin,
-    //   recent_chapter_id: chapter.id,
-    //   recent_chapter_num: chapter.number,
-    //   timestamp: Date.now()
-    // }
+    // Updates anime
+    if (episode.duration == 0 && duration) {
+      episode.duration = duration;
+    }
+    if (time == duration) {
+      episode.completed = true;
+      episode.watch_time = 0;
+      await invoke('update_anime_lib', { item: anime });
+    } else if (duration) {
+      episode.watch_time = player.currentTime;
+      await invoke('update_anime_lib', { item: anime });
+    }
+
+    // Updates history
+    let new_hist = {
+      id: anime.id,
+      title: anime.title,
+      img: anime.img,
+      plugin: anime.plugin,
+      recent_episode_id: episode.id,
+      recent_episode_num: episode.number,
+      timestamp: Date.now()
+    }
     // await invoke('save_manga_history', {item: new_hist});
-    // store.update(json => {
-    //   json.manga_history = json.manga_history.filter(i => !(i.id == new_hist.id && i.plugin == new_hist.plugin));
-    //   json.manga_history.unshift(new_hist);
-    //   return json;
-    // });
+    store.update(json => {
+      json.anime_history = json.anime_history.filter(i => !(i.id == new_hist.id && i.plugin == new_hist.plugin));
+      json.anime_history.unshift(new_hist);
+      return json;
+    });
     goto(appHist.back());
   }
 
@@ -167,20 +195,6 @@
     let ele_styles = document.getElementById("ep-menu").style;
     ele_styles.opacity = ele_styles.opacity == "1"? "0" : "1";
   }
-  
-  // window.addEventListener('resize', adjustImage);
-  // function adjustImage() {
-  //   const vidAspectRatio = player.videoWidth / player.videoHeight;
-  //   const viewportAspectRatio = window.innerWidth / window.innerHeight;
-    
-  //   if (vidAspectRatio > viewportAspectRatio) {
-  //     player.style.height = "auto";
-  //     player.style.width = "100vw";
-  //   } else {
-  //     player.style.height = "100vh";
-  //     player.style.width = "auto";
-  //   }
-  // }
 </script>
   
 <svelte:window on:keydown={keyInput} />
@@ -206,7 +220,7 @@
     </div>
     <div class="ep-snack-right">
       <button class="ep-snack-item"><Fa icon={faOutlineBookmark} /></button>
-      <button class="ep-snack-item"><Fa icon={faRightFromBracket} on:click={async () => {vlc()}} /></button>
+      <button class="ep-snack-item" on:click={async () => {vlc()}}><Fa icon={faRightFromBracket} /></button>
       <button class="ep-snack-item"><Fa icon={faEllipsisVertical} /></button>
     </div>
   </div>
@@ -217,25 +231,31 @@
   <div class="ep-center">
     <button id="pause" on:click={pause}><Fa icon={paused? faPlay : faPause} /></button>
   </div>
+
   <div class="ep-bot">
+    <!-- Top bot -->
+    <div id="video-features">
+      <div class="ep-snack-right">
+        <div style="display: flex; justify-content: center; align-items:center">
+          <button class="ep-snack-item ep-snack-item-85s" on:click={skip}>+85 s</button>
+          <button class="ep-snack-item no-hover" on:click={openFullscreen}><Fa icon={faExpand} /></button>
+        </div>
+      </div>
+    </div>
+    <!-- Bottom bot -->
     <div id="video-time">
       <span>{parseInt(time/60)>0? parseInt(time/60) : 0}:{(parseInt(time)%60).toString().padStart(2, '0')}</span>
-      <span>{parseInt(duration/60)}:{(parseInt(duration)%60).toString().padStart(2, '0')}</span>
-    </div>
-    <!-- svelte-ignore a11y-no-noninteractive-element-interactions a11y-click-events-have-key-events -->
-    <!-- <progress id="seeker" value={time / duration || 0} on:click={seek}/> -->
-     <!-- svelte-ignore a11y-no-static-element-interactions -->
-     <div id="seeker" on:click={seek}>
-      <div id="seeker-bar" style="width: {(time / duration)*100 || 0}%">
+      <!-- svelte-ignore a11y-no-noninteractive-element-interactions a11y-click-events-have-key-events a11y-no-static-element-interactions -->
+      <div id="seeker" on:click={seek}>
+        <div id="seeker-bar" style="width: {(time / duration)*100 || 0}%">
+        </div>
       </div>
-     </div>
+      <span>{duration? parseInt(duration/60) : 0}:{duration? (parseInt(duration)%60).toString().padStart(2, '0') : '00'}</span>
+    </div>
   </div>
 </div>
 
 <div id="player-box">
-  <!-- {#if currPlatform == "linux"} -->
-  <!-- <p>Linux is not supported, vlc opening</p> -->
-  <!-- {:else} -->
     <!-- svelte-ignore a11y-media-has-caption -->
     <video 
       bind:this={player}
@@ -245,9 +265,8 @@
       bind:paused
       style="width: 100%;"
     />
-  <!-- {/if} -->
   {#if error != ""}
-    <p style="color: red; width: inherit; text-align: center; padding: 0; margin: 0">Error: {error}</p>
+    <p class="error">Error: {error}</p>
   {/if}
 </div>
   
@@ -260,6 +279,21 @@
     justify-content: center;
     flex-direction: column;
     z-index: 0;
+    pointer-events: none;
+  }
+  .error {
+    color: red; 
+    width: inherit; 
+    text-align: center; 
+    padding: 0; 
+    margin: 0;
+    position: absolute;
+    bottom: 20px;
+    background-color: gainsboro;
+    border-radius: 50px;
+    width: fit-content;
+    padding: 10px;
+    opacity: 75%;
     pointer-events: none;
   }
   #ep-menu {
@@ -294,6 +328,9 @@
   }
   button.ep-snack-item:hover {
     background-color: var(--selection-color);
+  }
+  button.no-hover:hover {
+    background-color: transparent;
   }
   #ep-snack-text {
     position: relative;
@@ -349,29 +386,31 @@
   }
   .ep-bot {
     width: 100vw;
-    height: 50px;
+    height: fit-content;
+    margin-bottom: 15px;
     position: absolute;
     bottom: 0;
     display: flex;
     flex-direction: column;
     gap: 5px;
   }
-  #video-time {
-    width: 95%;
-    margin-left: 25px;
-    display: flex;
-    gap: calc(100vw - 120px);
+  .ep-snack-item-85s {
+    background-color: var(--selection-color);
+    width: 70px;
+    border-radius: 50px;
+    padding: 10px;
   }
-  /* progress {
-    width: calc(100vw - 50px);
-    margin: 0 25px;
-    cursor: pointer;
-    background-color: #ffffcc;
-    border-radius: 20px;
-  } */
+  #video-time {
+    width: calc(100% - 20px);
+    margin-left: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* gap: calc(100vw - 120px); */
+  }
   #seeker {
     width: calc(100vw - 50px);
-    margin: 0 25px;
+    margin: 0 10px;
     cursor: pointer;
     background-color: white;
     border-radius: 20px;
@@ -388,7 +427,4 @@
     position: relative;
     padding-right: 5px;
   }
-  /* progress::-webkit-progress-bar {
-        background-color: rgb(178, 255, 255);
-    } */
 </style>

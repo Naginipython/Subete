@@ -52,7 +52,9 @@
     function toggle_complete(index) {
         if (item[entry_type][index].completed) {
             item[entry_type][index].completed = false;
+            // todo: maybe this will cause errors one day~~
             item[entry_type][index].page = 1;
+            item[entry_type][index].watch_time = 0;
         } else {
             item[entry_type][index].completed = true;
         }
@@ -65,7 +67,11 @@
         invoke(`update_${data.type}_lib`, { item });
     }
     function remove_page(index) {
-        item[entry_type][index].page = 1;
+        if (data.type == "anime") {
+            item[entry_type][index].watch_time = 0;
+        } else {
+            item[entry_type][index].page = 1;
+        }
         invoke(`update_${data.type}_lib`, { item });
     }
     let opened = [];
@@ -115,7 +121,7 @@
 
 {#each item[entry_type] as c, i}
 <div class="entry-item" style="{item[entry_type][i].completed? 'color: grey' : ''}">
-    <!-- Main Entry button --> <!-- `/${data.type}/${data.plugin}/${data.id}/reader/${i}` -->
+    <!-- Main Entry button -->
     <button class="entry-link" on:click={() => goto(`/viewer/${data.type}/${data.plugin}/${data.id}/${i}`)}>
         <p>
             {#if c.title == "" || c.title.toLowerCase() == entry_text.toLowerCase()+" "+c.number} {entry_text} {c.number}
@@ -126,6 +132,10 @@
             <p>date - group</p>
             {#if item[entry_type][i].page-1 != 0 && !item[entry_type][i].completed && data.type != "anime"}
                 <p class="progress">&emsp;(page: {item[entry_type][i].page})</p>
+            {:else if item[entry_type][i].watch_time != 0 && !item[entry_type][i].completed && data.type == "anime"}
+                <p class="progress">
+                    &emsp;(progress: {parseInt(item[entry_type][i].watch_time/60)>0? parseInt(item[entry_type][i].watch_time/60) : 0}:{(parseInt(item[entry_type][i].watch_time)%60).toString().padStart(2, '0')}/{parseInt(item[entry_type][i].duration/60)}:{(parseInt(item[entry_type][i].duration)%60).toString().padStart(2, '0')})
+                </p>
             {/if}
         </div>
     </button>
@@ -144,10 +154,10 @@
             <button id="check-below" class="entry-btn" on:click={() => check_below(i)}><Fa icon={faAnglesDown} /></button>
             <button id="download" class="entry-btn"><Fa icon={faCircleDown} /><!--<Fa icon={faCircleCheck} />--></button>
             <button id="select" class="entry-btn"><Fa icon={faSquare} /><!--<Fa icon={faSquareCheck} />--></button>
-            {#if item[entry_type][i].page-1 != 0}
-            <button id="uncheck" class="entry-btn" on:click={() => remove_page(i)}>
-                <Fa icon={faXmark} />
-            </button>
+            {#if (item[entry_type][i].page-1 != 0 && data.type != "anime") || (item[entry_type][i].watch_time != 0 && data.type == "anime")}
+                <button id="uncheck" class="entry-btn" on:click={() => remove_page(i)}>
+                    <Fa icon={faXmark} />
+                </button>
             {/if}
             <button id="options-return" class="entry-btn" on:click={() => show_options(i)}>
                 <Fa icon={faArrowTurnDown} />

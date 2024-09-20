@@ -154,6 +154,12 @@
         </div>
     {/if}
 
+    {#if results.length==0 && is_searching}
+        <div class="loading">
+            <Moon color="var(--selection-color)" size="30" />
+        </div>
+    {/if}
+
     <!-- displays manga -->
     {#each results as item, i}
         <h3>{item.plugin}</h3>
