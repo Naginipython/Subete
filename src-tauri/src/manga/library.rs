@@ -1,7 +1,13 @@
-use crate::{add_to_lib, delete_entire_lib, get_lib, remove_from_lib, update_lib, HasId, IsItem, FILE_PATH};
+use crate::{
+    add_to_lib, delete_entire_lib, get_lib, remove_from_lib, update_lib, HasId, IsItem, FILE_PATH,
+};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use std::{fs::File, path::PathBuf, sync::{LazyLock, Mutex}};
+use std::{
+    fs::File,
+    path::PathBuf,
+    sync::{LazyLock, Mutex},
+};
 
 static LIB_PATH: LazyLock<PathBuf> = LazyLock::new(|| {
     let mut path = (*FILE_PATH).clone();

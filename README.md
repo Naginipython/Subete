@@ -115,4 +115,4 @@ Android Studio will have 3 variables to set up, one being the JBR as JAVA_HOME (
 Add Android targets with `rustup`: `rustup target add aarch64-linux-android armv7-linux-androideabi i686-linux-android x86_64-linux-android`\
 In the main directory, run `cargo tauri android init`. Ideally, it will say that it is good to go.\
 Connect your phone to the computer with `android-tools` (adb), set your phone's USB debugging on, then run `cargo tauri android dev` for a quick view of the app (Note: The frontend is locally created, so the app will be installed, but won't work)\
-To build the app in an APK, use `cargo tauri android build`, going to where the APK is (says in console), signing it with `uber-apk-signer`, then installing it on my phone.
+To build the app in an APK, use `cargo tauri android build`, going to where the APK is (says in console), signing it with `uber-apk-signer` (`uber-apk-signer -a <file.apk> --out subete.apk`), then installing it on my phone.

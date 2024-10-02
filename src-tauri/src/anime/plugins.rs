@@ -1,7 +1,11 @@
-use std::{fs::File, path::PathBuf, sync::{LazyLock, Mutex}};
+use crate::{get_item, get_list, save, search, IsPlugin, Media, FILE_PATH};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
-use crate::{get_item, get_list, save, search, IsPlugin, Media, FILE_PATH};
+use std::{
+    fs::File,
+    path::PathBuf,
+    sync::{LazyLock, Mutex},
+};
 
 use super::LibraryItem;
 
@@ -10,13 +14,14 @@ static PLUGINS_PATH: LazyLock<PathBuf> = LazyLock::new(|| {
     path.push("anime_plugins.json");
     path
 });
-static PLUGINS: LazyLock<Mutex<Vec<Plugins>>> = LazyLock::new(|| match File::open(&*PLUGINS_PATH) {
-    Ok(file) => Mutex::new(serde_json::from_reader(file).unwrap_or_default()),
-    Err(_e) => {
-        File::create(&*PLUGINS_PATH).unwrap();
-        Mutex::new(Vec::new())
-    }
-});
+static PLUGINS: LazyLock<Mutex<Vec<Plugins>>> =
+    LazyLock::new(|| match File::open(&*PLUGINS_PATH) {
+        Ok(file) => Mutex::new(serde_json::from_reader(file).unwrap_or_default()),
+        Err(_e) => {
+            File::create(&*PLUGINS_PATH).unwrap();
+            Mutex::new(Vec::new())
+        }
+    });
 
 #[derive(Debug, Deserialize, Serialize, Default, Clone)]
 pub struct Plugins {
@@ -33,15 +38,33 @@ pub struct Plugins {
     pub videos_extra: Value,
 }
 impl IsPlugin for Plugins {
-    fn id(&self) -> String { self.id.clone() }
-    fn search_url(&self) -> &str { &self.search_url }
-    fn search(&self) -> &str { &self.search }
-    fn list_url(&self) -> &str { &self.episodes_url }
-    fn get_list(&self) -> &str { &self.get_episodes }
-    fn list_extra(&self) -> &Value { &self.episodes_extra }
-    fn item_url(&self) -> &str { &self.videos_url }
-    fn get_item(&self) -> &str { &self.get_videos }
-    fn item_fn(&self) -> &str { "getEpisodeVideo" }
+    fn id(&self) -> String {
+        self.id.clone()
+    }
+    fn search_url(&self) -> &str {
+        &self.search_url
+    }
+    fn search(&self) -> &str {
+        &self.search
+    }
+    fn list_url(&self) -> &str {
+        &self.episodes_url
+    }
+    fn get_list(&self) -> &str {
+        &self.get_episodes
+    }
+    fn list_extra(&self) -> &Value {
+        &self.episodes_extra
+    }
+    fn item_url(&self) -> &str {
+        &self.videos_url
+    }
+    fn get_item(&self) -> &str {
+        &self.get_videos
+    }
+    fn item_fn(&self) -> &str {
+        "getEpisodeVideo"
+    }
 }
 
 fn get_plugins() -> Vec<Plugins> {

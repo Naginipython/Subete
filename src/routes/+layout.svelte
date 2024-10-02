@@ -8,11 +8,23 @@
     import appHist from "$lib/history.js";
     import store from "$lib/store.js";
     import logo from "$lib/logo.png"
+    // temp?
+    import Database from '@tauri-apps/plugin-sql';
+    import { appConfigDir } from '@tauri-apps/api/path';
 
     // Gets data from backend, sets settings
     let media_screen = "manga";
     let loading = true;
     onMount(async () => {
+        const appDataDirPath2 = await appConfigDir();
+        console.log(appDataDirPath2)
+        const db = await Database.load('sqlite:subete_database.db');
+        //temp?
+        const result = await db.execute(
+            "INSERT INTO manga_library (id, title, img, plugin, authors, artists, description) VALUES ($1,$2,$3,$4,$5,$6,$7)",
+            ["akame-ga-kill", "Akame ga Kill", "http://test.com", "MangaDex", "idk", "idk", ""],
+        );
+        console.log(result);
         // GET LIB
         await setup(media_screen);
         goto('/library');

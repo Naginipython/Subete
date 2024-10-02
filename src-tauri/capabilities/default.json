@@ -9,6 +9,8 @@
     "core:default",
     "shell:allow-open",
     "http:default",
-    "os:default"
+    "os:default",
+    "sql:default",
+    "sql:allow-execute"
   ]
 }

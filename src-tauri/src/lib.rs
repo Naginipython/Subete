@@ -1,4 +1,6 @@
 use settings::*;
+use tauri::path::BaseDirectory;
+use tauri_plugin_sql::Migration;
 use std::{path::PathBuf, sync::LazyLock};
 
 pub use common::*;
@@ -12,6 +14,8 @@ mod settings;
 
 static FILE_PATH: LazyLock<PathBuf> = LazyLock::new(|| {
     let mut data_folder: PathBuf = dirs::data_local_dir().unwrap_or_else(|| PathBuf::from("./"));
+    let mut test = BaseDirectory::LocalData;
+    println!("{:?}", test.variable());
     let os = std::env::consts::OS;
     if os == "android" {
         data_folder = PathBuf::from("/data/data/com.subete.app/files/");
@@ -33,7 +37,29 @@ static DOWNLOADS_PATH: LazyLock<PathBuf> = LazyLock::new(|| {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    let migrations = vec! [
+        Migration {
+            version: 1,
+            description: "create_manga_library_table",
+            sql: "CREATE TABLE manga_library (
+                id VARCHAR(255), 
+                title VARCHAR(255), 
+                img VARCHAR(255),
+                plugin VARCHAR(255), 
+                authors VARCHAR(255),
+                artists VARCHAR(255),
+                description VARCHAR(255)
+            );",
+            kind: tauri_plugin_sql::MigrationKind::Up
+        }
+    ];
+
     tauri::Builder::default()
+        .plugin(
+            tauri_plugin_sql::Builder::default()
+                .add_migrations("sqlite:subete_database.db", migrations)
+                .build()
+        )
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_shell::init())

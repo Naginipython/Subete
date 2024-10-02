@@ -1,8 +1,13 @@
-use std::{fs::File, io::Write, path::PathBuf, sync::{LazyLock, Mutex}};
+use crate::{get_item, get_list, save, search, IsPlugin, Media, DOWNLOADS_PATH, FILE_PATH};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
+use std::{
+    fs::File,
+    io::Write,
+    path::PathBuf,
+    sync::{LazyLock, Mutex},
+};
 use tauri_plugin_http::reqwest;
-use crate::{get_item, get_list, save, search, IsPlugin, Media, DOWNLOADS_PATH, FILE_PATH};
 
 use super::LibraryItem;
 
@@ -11,13 +16,14 @@ static PLUGINS_PATH: LazyLock<PathBuf> = LazyLock::new(|| {
     path.push("ln_plugins.json");
     path
 });
-static PLUGINS: LazyLock<Mutex<Vec<Plugins>>> = LazyLock::new(|| match File::open(&*PLUGINS_PATH) {
-  Ok(file) => Mutex::new(serde_json::from_reader(file).unwrap_or_default()),
-  Err(_e) => {
-      File::create(&*PLUGINS_PATH).unwrap();
-      Mutex::new(Vec::new())
-  }
-});
+static PLUGINS: LazyLock<Mutex<Vec<Plugins>>> =
+    LazyLock::new(|| match File::open(&*PLUGINS_PATH) {
+        Ok(file) => Mutex::new(serde_json::from_reader(file).unwrap_or_default()),
+        Err(_e) => {
+            File::create(&*PLUGINS_PATH).unwrap();
+            Mutex::new(Vec::new())
+        }
+    });
 
 #[derive(Debug, Deserialize, Serialize, Default, Clone)]
 pub struct Plugins {
@@ -34,15 +40,33 @@ pub struct Plugins {
     pub pages_extra: Value,
 }
 impl IsPlugin for Plugins {
-  fn id(&self) -> String { self.id.clone() }
-  fn search_url(&self) -> &str { &self.search_url }
-  fn search(&self) -> &str { &self.search }
-  fn list_url(&self) -> &str { &self.chapters_url }
-  fn get_list(&self) -> &str { &self.get_chapters }
-  fn list_extra(&self) -> &Value { &self.chapters_extra }
-  fn item_url(&self) -> &str { &self.pages_url }
-  fn get_item(&self) -> &str { &self.get_pages }
-  fn item_fn(&self) -> &str { "getChapterPages" }
+    fn id(&self) -> String {
+        self.id.clone()
+    }
+    fn search_url(&self) -> &str {
+        &self.search_url
+    }
+    fn search(&self) -> &str {
+        &self.search
+    }
+    fn list_url(&self) -> &str {
+        &self.chapters_url
+    }
+    fn get_list(&self) -> &str {
+        &self.get_chapters
+    }
+    fn list_extra(&self) -> &Value {
+        &self.chapters_extra
+    }
+    fn item_url(&self) -> &str {
+        &self.pages_url
+    }
+    fn get_item(&self) -> &str {
+        &self.get_pages
+    }
+    fn item_fn(&self) -> &str {
+        "getChapterPages"
+    }
 }
 
 fn get_plugins() -> Vec<Plugins> {
@@ -112,11 +136,7 @@ pub fn delete_ln_plugins() {
 pub async fn download_ln(url: String) {
     println!("Downloading ln...");
     let client = reqwest::Client::new();
-    let response = client
-        .get(url)
-        .send()
-        .await
-        .unwrap();
+    let response = client.get(url).send().await.unwrap();
     let mut file_path = DOWNLOADS_PATH.clone();
     let data = response.bytes().await.unwrap();
     file_path.push("test.pdf");

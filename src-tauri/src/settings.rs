@@ -1,6 +1,11 @@
 use super::FILE_PATH;
 use serde_json::{json, Value};
-use std::{fs::File, io::Write, path::PathBuf, sync::{LazyLock, Mutex}};
+use std::{
+    fs::File,
+    io::Write,
+    path::PathBuf,
+    sync::{LazyLock, Mutex},
+};
 
 static PATH: LazyLock<PathBuf> = LazyLock::new(|| {
     let mut path = (*FILE_PATH).clone();

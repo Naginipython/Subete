@@ -1,7 +1,11 @@
-use std::{fs::File, path::PathBuf, sync::{LazyLock, Mutex}};
+use crate::{get_item, get_list, save, search, IsPlugin, Media, FILE_PATH};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
-use crate::{get_item, get_list, save, search, IsPlugin, Media, FILE_PATH};
+use std::{
+    fs::File,
+    path::PathBuf,
+    sync::{LazyLock, Mutex},
+};
 
 use super::LibraryItem;
 
@@ -31,15 +35,33 @@ pub struct Plugins {
     pub pages_extra: Value,
 }
 impl IsPlugin for Plugins {
-    fn id(&self) -> String { self.id.clone() }
-    fn search_url(&self) -> &str { &self.search_url }
-    fn search(&self) -> &str { &self.search }
-    fn list_url(&self) -> &str { &self.chapters_url }
-    fn get_list(&self) -> &str { &self.get_chapters }
-    fn list_extra(&self) -> &Value { &self.chapters_extra }
-    fn item_url(&self) -> &str { &self.pages_url }
-    fn get_item(&self) -> &str { &self.get_pages }
-    fn item_fn(&self) -> &str { "getChapterPages" }
+    fn id(&self) -> String {
+        self.id.clone()
+    }
+    fn search_url(&self) -> &str {
+        &self.search_url
+    }
+    fn search(&self) -> &str {
+        &self.search
+    }
+    fn list_url(&self) -> &str {
+        &self.chapters_url
+    }
+    fn get_list(&self) -> &str {
+        &self.get_chapters
+    }
+    fn list_extra(&self) -> &Value {
+        &self.chapters_extra
+    }
+    fn item_url(&self) -> &str {
+        &self.pages_url
+    }
+    fn get_item(&self) -> &str {
+        &self.get_pages
+    }
+    fn item_fn(&self) -> &str {
+        "getChapterPages"
+    }
 }
 
 fn get_plugins() -> Vec<Plugins> {

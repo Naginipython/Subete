@@ -1,8 +1,8 @@
+use super::ChapterItem;
 use crate::{save, FILE_PATH};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::{fs::File, path::PathBuf, sync::LazyLock};
-use super::ChapterItem;
 
 static UPDATE_PATH: LazyLock<PathBuf> = LazyLock::new(|| {
     let mut path = (*FILE_PATH).clone();

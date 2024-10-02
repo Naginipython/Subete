@@ -68,6 +68,7 @@
         // player.currentTime = 100;
         player.currentTime = episode.watch_time? episode.watch_time : 0;
         player.play();
+        player.style.display = "block";
       });
       hls.on(Hls.Events.ERROR, function (event, errData) {
         error = errData.details;
@@ -263,7 +264,7 @@
       bind:currentTime={time}
       bind:duration
       bind:paused
-      style="width: 100%;"
+      style="width: 100%; display: none;"
     />
   {#if error != ""}
     <p class="error">Error: {error}</p>
@@ -377,7 +378,7 @@
     justify-content: center;
     /* background-color: transparent; */
     border: 0;
-    color: var(--text-color);
+    color: black;
     font-size: xx-large;
     width: 50px;
     border-radius: 25px;
@@ -407,6 +408,7 @@
     justify-content: center;
     align-items: center;
     /* gap: calc(100vw - 120px); */
+    color: var(--text-color)
   }
   #seeker {
     width: calc(100vw - 50px);
