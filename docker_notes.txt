@@ -1,8 +1,0 @@
-Needed x11-docker package
-remove build/ node-modules/ src-tauri/target
-
-docker build -t <name> .
-
-// For x11 forwarding?
-xhost +local:docker
-docker run -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix <your_image>
