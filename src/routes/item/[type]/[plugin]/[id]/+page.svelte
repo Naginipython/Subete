@@ -24,28 +24,40 @@
         if (item[entry_type].length == 0) {
             let updated_item = await invoke(`get_${data.type}_${entry_type}`, { item });
             if (!updated_item.hasOwnProperty("error")) {
-                updated_item[entry_type].sort((a,b) => b.number-a.number);
                 if (data.type=="anime") {
                     item.studio = updated_item.studio;
                     item.status = updated_item.status;
                 } else {
-                    item.author = updated_item.author;
-                    item.artist = updated_item.artist;
+                    item.authors = updated_item.authors;
+                    item.artists = updated_item.artists;
                 }
                 item.description = updated_item.description;
                 item[entry_type] = updated_item[entry_type];
+                // Updating databases
+                store.update(async (json) => {
+                    let toChange = json[`${data.type}_library`].find(i => i.id == data.id && i.plugin==data.plugin);
+                    toChange = item;
+                    await invoke(`update_${data.type}_lib`, { item });
+                    return json;
+                });
             } else {
                 error = updated_item.error;
             }
-        } else {
-            item[entry_type] = item[entry_type].sort((a,b) => b.number-a.number);
         }
+        // todo: sorting
+
         loading = false;
+            item[entry_type] = item[entry_type].sort((a,b) => b.number-a.number);
     });
     
     store.subscribe(async (json) => {
         // gets item search details
-        item = find_item(data.type, data.plugin, data.id);
+        if (data.item != null) {
+            item = data.item;
+        } else {
+            item = find_item(data.type, data.plugin, data.id);
+        }
+        console.log(item);
     });
 
     // ENTRY OPTION BUTTONS

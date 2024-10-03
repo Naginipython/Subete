@@ -42,7 +42,7 @@
 <div id="lib-section">
 <!-- TODO: loading icon -->
 {#each library as l, i}
-    <a class="lib" href="/item/{media_screen}/{l.plugin}/{l.id}">
+    <a class="lib" href="/item/{media_screen}/{l.plugin}/{l.id}?item={JSON.stringify(l)}">
         <div class="lib-wrap">
             <img src={l.img} alt={l.title} on:error={console.log("img failed")}/>
         </div>
