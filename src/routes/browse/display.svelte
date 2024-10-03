@@ -44,7 +44,7 @@
         <p style="color: red; width: inherit; text-align: center; padding: 0; margin: 0">{error}</p>
     {:else}
         {#each data as d, i} <!-- can change d to {varname varname}, example {img, title}. i exists to find index -->
-            <a class="manga" href="/item/{media_screen}/{d.plugin}/{d.id}">
+            <a class="manga" href="/item/{media_screen}/{d.plugin}/{d.id}?item={JSON.stringify(d)}">
                 <div class="manga-wrap">
                     <img src={d.img} alt={d.title}/>
                 </div>

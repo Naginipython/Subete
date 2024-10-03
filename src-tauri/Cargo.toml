@@ -29,6 +29,7 @@ quickjs_runtime = { version = "0.14.1", optional = true }
 quickjs-rusty = { version="0.6.3", optional=true }
 tauri-plugin-os = "2.0.0"
 tauri-plugin-sql = { version = "2.0.0", features = ["sqlite"] }
+tauri-plugin-fs = "2"
 
 [features]
 windows = ["quickjs-rusty"]

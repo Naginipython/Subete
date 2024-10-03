@@ -39,12 +39,12 @@
 
     // Snackbar navigation manager
     $: if($navigating) page_check();
-    function page_check() {
+    async function page_check() {
         // --- MANGA ---
         // Changes the top nav for manga
         if (nav.includes("/manga/")) {
             in_manga = true;
-            manga_data.data = find_item("manga", $navigating.to.params.plugin, $navigating.to.params.id);
+            manga_data.data = await find_item("manga", $navigating.to.params.plugin, $navigating.to.params.id);
             manga_data.favorited = in_lib("manga", manga_data.data.id)
         } else {
             in_manga = false;
@@ -54,7 +54,7 @@
         // Changes the top nav for anime
         if (nav.includes("anime/")) {
             in_anime = true;
-            anime_data.data = find_item("anime", $navigating.to.params.plugin, $navigating.to.params.id);
+            anime_data.data = await find_item("anime", $navigating.to.params.plugin, $navigating.to.params.id);
             anime_data.favorited = in_lib("anime", anime_data.data.id)
         } else {
             in_anime = false;
@@ -64,7 +64,7 @@
         // Changes the top nav for ln
         if (nav.includes("ln/")) {
             in_ln = true;
-            ln_data.data = find_item("ln", $navigating.to.params.plugin, $navigating.to.params.id);
+            ln_data.data = await find_item("ln", $navigating.to.params.plugin, $navigating.to.params.id);
             ln_data.favorited = in_lib("ln", ln_data.data.id)
         } else {
             in_ln = false;

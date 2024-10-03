@@ -1,12 +1,19 @@
 import { invoke } from "@tauri-apps/api/core";
+import Database from '@tauri-apps/plugin-sql';
 import store from "$lib/store.js";
 let json;
+let db;
 store.subscribe(_json => {
     json = _json;
-})
+});
 
+// Setup
 export async function setup(media_screen) {
-    let manga_library = await invoke('get_manga_lib');
+    db = await Database.load('sqlite:subete.db');
+
+    let manga_library = await db.select("SELECT * FROM manga_library");
+    console.log(manga_library);
+    manga_library.forEach(manga => manga.chapters = []);
     let manga_history = await invoke('get_manga_history');
     let manga_updates = await invoke('get_manga_updates_list');
     let anime_library = await invoke('get_anime_lib');
@@ -54,14 +61,51 @@ export async function setup(media_screen) {
     });
 }
 
-export function find_item(type, plugin, id) {
-    let item = {};
-    item = json[`${type}_temp`].find(i => i.id==id && (i.plugin==plugin || plugin==null));
+export async function get_entries(type, entry_type, plugin, id) {
+    let item = await find_item(type, plugin, id);
+    let entries = await db.select("SELECT * FROM manga_chapters WHERE manga_id=$1 AND plugin=$2", [id, plugin]);
+    entries.forEach(e => e.completed = e.completed=="true"? true : false);
+    
+    if (entries.length == 0) {
+        item[entry_type] = entries;
+        // Calls backend for plugin chapter/episode retrieval
+        let updated_item = await invoke(`get_${type}_${entry_type}`, { item });
+        if (!updated_item.hasOwnProperty("error")) {
+            // entries = 
+            if (type=="anime") {
+                // TODO
+                item.studio = updated_item.studio;
+                item.status = updated_item.status;
+            } else {
+                await db.execute(
+                    "UPDATE manga_library SET authors=$1, artists=$2, description=$3 WHERE id=$4 AND plugin=$5",
+                    [updated_item.author, updated_item.artist, updated_item.description, id, plugin]
+                );
+            }
+            entries = updated_item[entry_type];
+            entries.forEach(async entry => {
+                await db.execute(
+                    `INSERT INTO ${type+"_"+entry_type} (chapter_id,manga_id,plugin,number,title,page,completed) VALUES ($1,$2,$3,$4,$5,$6,$7)`,
+                    [entry.id, id, plugin, entry.number, entry.title, entry.page, entry.completed]
+                );
+            })
+        } else {
+            return { error: updated_item.error };
+        }
+    }
+    return { result: entries };
+}
+
+export async function find_item(type, plugin, id) {
+    let lib = `${type}_library`;
+    let item = (await db.select(`SELECT * FROM ${lib} WHERE id=$2 AND plugin=$3`, [lib, id, plugin]))[0];
+
+    // The plan: check lib first. Then history (to include same fields as lib & more). Then browse?
     if (item == undefined) {
-        item = json[`${type}_library`].find(i => i.id == id && (i.plugin==plugin || plugin==null));
+        // search results
+        item = json[`${type}_search_results`].map(i => i.data).flat().find(i => i.id == id && (i.plugin==plugin || plugin==null));
         if (item==undefined) {
-            item = json[`${type}_search_results`].map(i => i.data).flat().find(i => i.id == id && (i.plugin==plugin || plugin==null));
-            if (item==undefined) {
+            // todo: hist
                 // hist to item
                 let hist = json[`${type}_history`].find(i => i.id==id && (i.plugin==plugin || plugin==null));
                 if (type=="anime") {
@@ -87,7 +131,6 @@ export function find_item(type, plugin, id) {
                         chapters: []
                     };
                 }
-            }
         }
         // add to temp for quicker access
         if (!json[`${type}_temp`].some(i => i.id==id && i.plugin==plugin)) {
@@ -100,13 +143,30 @@ export function in_lib(type, id) {
     return json[`${type}_library`].some(i => i.id == id);
 }
 export async function toggle_favorite(type, item) {
+    let lib = `${type}_library`;
+
+
     if (!in_lib(type, item.id)) {
+        //new
+        db.execute(
+            `INSERT INTO ${lib} (id,title,img,plugin,authors,artists,description) VALUES ($1,$2,$3,$4,$5,$6,$7)`,
+            [item.id, item.title, item.img, item.plugin, item.authors, item.artists, item.description]
+        );
+
+        //old
         await invoke(`add_to_${type}_lib`, { newItem: item });
         store.update(_json => {
             _json[`${type}_library`].push(item);
             return _json;
         });
     } else {
+        // new
+        db.execute(
+            `DELETE FROM ${lib} WHERE id=$1 AND plugin=$2`,
+            [item.id, item.plugin]
+        );
+
+        // old
         await invoke(`remove_from_${type}_lib`, { id: item.id });
         store.update(_json => {
             _json[`${type}_library`] = _json[`${type}_library`].filter(i => !(i.id==item.id && i.plugin==item.plugin));

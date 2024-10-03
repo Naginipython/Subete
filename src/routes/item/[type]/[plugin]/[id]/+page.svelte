@@ -7,13 +7,14 @@
     import { faCircleDown, faBookmark as faOutlineBookmark, faSquare } from '@fortawesome/free-regular-svg-icons';
     import Fa from 'svelte-fa'
     import store from "$lib/store.js"
-    import { find_item } from "$lib/common.js";
+    import { find_item, get_entries } from "$lib/common.js";
     import { Moon } from 'svelte-loading-spinners';
     import "$lib/css/listItems.css";
 
     export let data;
 
     let item = {};
+    let entries = [];
     let entry_type = data.type=="anime"? "episodes" : "chapters";
     let entry_text = data.type=="anime"? "Episode" : "Chapter";
     let loading = false;
@@ -21,56 +22,51 @@
 
     onMount(async () => {
         loading = true;
-        if (item[entry_type].length == 0) {
-            let updated_item = await invoke(`get_${data.type}_${entry_type}`, { item });
-            if (!updated_item.hasOwnProperty("error")) {
-                updated_item[entry_type].sort((a,b) => b.number-a.number);
-                if (data.type=="anime") {
-                    item.studio = updated_item.studio;
-                    item.status = updated_item.status;
-                } else {
-                    item.author = updated_item.author;
-                    item.artist = updated_item.artist;
-                }
-                item.description = updated_item.description;
-                item[entry_type] = updated_item[entry_type];
-            } else {
-                error = updated_item.error;
-            }
+        // Gets entries first, because this can also update other fields
+        let result = await get_entries(data.type, entry_type, data.plugin, data.id);
+        if (result.hasOwnProperty("error")) {
+            error = result.error
         } else {
-            item[entry_type] = item[entry_type].sort((a,b) => b.number-a.number);
+            entries = result.result;
         }
+        if (data.item != null) {
+            item = data.item;
+        } else {
+            item = await find_item(data.type, data.plugin, data.id);
+        }
+        // todo: sorting
+        entries = entries.sort((a,b) => b.number-a.number);
         loading = false;
     });
     
-    store.subscribe(async (json) => {
-        // gets item search details
-        item = find_item(data.type, data.plugin, data.id);
-    });
+    // store.subscribe(async (json) => {
+    //     // gets item search details
+    //     item = find_item(data.type, data.plugin, data.id);
+    // });
 
     // ENTRY OPTION BUTTONS
     function toggle_complete(index) {
-        if (item[entry_type][index].completed) {
-            item[entry_type][index].completed = false;
+        if (entries[index].completed) {
+            entries[index].completed = false;
             // todo: maybe this will cause errors one day~~
-            item[entry_type][index].page = 1;
-            item[entry_type][index].watch_time = 0;
+            entries[index].page = 1;
+            entries[index].watch_time = 0;
         } else {
-            item[entry_type][index].completed = true;
+            entries[index].completed = true;
         }
         invoke(`update_${data.type}_lib`, { item });
     }
     function check_below(index) {
-        for (let i = index+1; i < item[entry_type].length; i++) {
-            item[entry_type][i].completed = true;
+        for (let i = index+1; i < entries.length; i++) {
+            entries[i].completed = true;
         }
         invoke(`update_${data.type}_lib`, { item });
     }
     function remove_page(index) {
         if (data.type == "anime") {
-            item[entry_type][index].watch_time = 0;
+            entries[index].watch_time = 0;
         } else {
-            item[entry_type][index].page = 1;
+            entries[index].page = 1;
         }
         invoke(`update_${data.type}_lib`, { item });
     }
@@ -108,7 +104,7 @@
     </div>
 </div>
 
-<h3 class="entry-num">{item[entry_type].length} {entry_type}</h3>
+<h3 class="entry-num">{entries.length} {entry_type}</h3>
 
 <!-- Loading icon -->
 <div style="margin: auto; width: fit-content; display: {loading? 'block' : 'none'}">
@@ -119,22 +115,22 @@
     <p style="color: red; width: inherit; text-align: center; padding: 0; margin: 0">{error}</p>
 {/if}
 
-{#each item[entry_type] as c, i}
-<div class="entry-item" style="{item[entry_type][i].completed? 'color: grey' : ''}">
+{#each entries as entry, i}
+<div class="entry-item" style="{entry.completed? 'color: grey' : ''}">
     <!-- Main Entry button -->
     <button class="entry-link" on:click={() => goto(`/viewer/${data.type}/${data.plugin}/${data.id}/${i}`)}>
         <p>
-            {#if c.title == "" || c.title.toLowerCase() == entry_text.toLowerCase()+" "+c.number} {entry_text} {c.number}
-            {:else} {entry_text} {c.number} - {c.title}
+            {#if entry.title == "" || entry.title.toLowerCase() == entry_text.toLowerCase()+" "+entry.number} {entry_text} {entry.number}
+            {:else} {entry_text} {entry.number} - {entry.title}
             {/if}
         </p>
         <div class="entry-lower">
             <p>date - group</p>
-            {#if item[entry_type][i].page-1 != 0 && !item[entry_type][i].completed && data.type != "anime"}
-                <p class="progress">&emsp;(page: {item[entry_type][i].page})</p>
-            {:else if item[entry_type][i].watch_time != 0 && !item[entry_type][i].completed && data.type == "anime"}
+            {#if entry.page-1 != 0 && !entry.completed && data.type != "anime"}
+                <p class="progress">&emsp;(page: {entry.page})</p>
+            {:else if entry.watch_time != 0 && !entry.completed && data.type == "anime"}
                 <p class="progress">
-                    &emsp;(progress: {parseInt(item[entry_type][i].watch_time/60)>0? parseInt(item[entry_type][i].watch_time/60) : 0}:{(parseInt(item[entry_type][i].watch_time)%60).toString().padStart(2, '0')}/{parseInt(item[entry_type][i].duration/60)}:{(parseInt(item[entry_type][i].duration)%60).toString().padStart(2, '0')})
+                    &emsp;(progress: {parseInt(entry.watch_time/60)>0? parseInt(entry.watch_time/60) : 0}:{(parseInt(entry.watch_time)%60).toString().padStart(2, '0')}/{parseInt(entry.duration/60)}:{(parseInt(entry.duration)%60).toString().padStart(2, '0')})
                 </p>
             {/if}
         </div>
@@ -143,7 +139,7 @@
     <div class="entry-btns">
         <!-- simple check icon -->
         <button id="check" class="entry-btn" on:click={() => toggle_complete(i)}>
-            {#if item[entry_type][i].completed} <Fa icon={faXmark} />
+            {#if entry.completed} <Fa icon={faXmark} />
             {:else} <Fa icon={faCheck} />
             {/if}
         </button>
@@ -154,7 +150,7 @@
             <button id="check-below" class="entry-btn" on:click={() => check_below(i)}><Fa icon={faAnglesDown} /></button>
             <button id="download" class="entry-btn"><Fa icon={faCircleDown} /><!--<Fa icon={faCircleCheck} />--></button>
             <button id="select" class="entry-btn"><Fa icon={faSquare} /><!--<Fa icon={faSquareCheck} />--></button>
-            {#if (item[entry_type][i].page-1 != 0 && data.type != "anime") || (item[entry_type][i].watch_time != 0 && data.type == "anime")}
+            {#if (entry.page-1 != 0 && data.type != "anime") || (entry.watch_time != 0 && data.type == "anime")}
                 <button id="uncheck" class="entry-btn" on:click={() => remove_page(i)}>
                     <Fa icon={faXmark} />
                 </button>

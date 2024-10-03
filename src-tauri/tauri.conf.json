@@ -38,7 +38,7 @@
   },
   "plugins": {
     "sql": {
-      "preload": ["sqlite:subete_database.db"]
+      "preload": ["sqlite:subete.db"]
     }
   }
 }
